@@ -20,4 +20,4 @@ npm run build
 3. Change the colour and spacing tokens at the top of `src/styles.css`.
 4. Put your resume in `public/resume.pdf`, or change the resume URL in `src/data.js`.
 
-The `/about` view uses client-side history. If you deploy to a static host, configure its SPA fallback so `/about` serves `index.html`.
+Navigation uses static-host-friendly fragments such as `#work`, `#playground`, and `#about`, so direct links and page refreshes work on GitHub Pages without an SPA fallback.

@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { about, playgroundProjects, profile, workProjects } from "./data";
 
 const Arrow = () => <span aria-hidden="true">↗</span>;
+const BASE_URL = import.meta.env.BASE_URL;
+
+const routeHref = (route = "") => `${BASE_URL}${route ? `#${route}` : ""}`;
 
 function useClock() {
   const formatter = useMemo(
@@ -25,21 +28,43 @@ function useClock() {
 }
 
 function usePage() {
-  const readPage = () => (window.location.pathname.startsWith("/about") ? "about" : "home");
+  const readRoute = () => window.location.hash.replace(/^#\/?/, "");
+  const readPage = () => (readRoute() === "about" ? "about" : "home");
   const [page, setPage] = useState(readPage);
 
   useEffect(() => {
-    const onPopState = () => setPage(readPage());
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
+    const syncRoute = () => {
+      const route = readRoute();
+      const nextPage = route === "about" ? "about" : "home";
+      setPage(nextPage);
+
+      window.requestAnimationFrame(() => {
+        if (nextPage === "home" && ["work", "playground"].includes(route)) {
+          document.getElementById(route)?.scrollIntoView();
+        } else {
+          window.scrollTo({ top: 0 });
+        }
+      });
+    };
+
+    syncRoute();
+    window.addEventListener("hashchange", syncRoute);
+    window.addEventListener("popstate", syncRoute);
+    return () => {
+      window.removeEventListener("hashchange", syncRoute);
+      window.removeEventListener("popstate", syncRoute);
+    };
   }, []);
 
   const navigate = (event, destination, anchor) => {
     event?.preventDefault();
-    window.history.pushState({}, "", destination);
-    setPage(destination === "/about" ? "about" : "home");
+    const route = destination === "/about" ? "about" : anchor || "";
+    const nextPage = route === "about" ? "about" : "home";
+
+    window.history.pushState({}, "", routeHref(route));
+    setPage(nextPage);
     window.setTimeout(() => {
-      if (anchor) document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
+      if (nextPage === "home" && anchor) document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
       else window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
@@ -57,17 +82,17 @@ function NavigationLinks({ page, navigate, closeMenu }) {
     <nav aria-label="Primary navigation">
       <ol className="numbered-links">
         <li>
-          <a href="/#work" className={page === "home" ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
+          <a href={routeHref("work")} className={page === "home" ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
             <span>01.</span><span>work</span>
           </a>
         </li>
         <li>
-          <a href="/#playground" onClick={(e) => go(e, "/", "playground")}>
+          <a href={routeHref("playground")} onClick={(e) => go(e, "/", "playground")}>
             <span>02.</span><span>playground</span>
           </a>
         </li>
         <li>
-          <a href="/about" className={page === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
+          <a href={routeHref("about")} className={page === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
             <span>03.</span><span>about</span>
           </a>
         </li>
@@ -86,7 +111,7 @@ function ContactLinks() {
       </li>
       {profile.socials.map((social, index) => (
         <li key={social.label}>
-          <a href={social.href} target="_blank" rel="noreferrer">
+          <a href={social.href.startsWith("/") ? `${BASE_URL}${social.href.slice(1)}` : social.href} target="_blank" rel="noreferrer">
             <span>{String(index + 5).padStart(2, "0")}.</span>
             <span>{social.label.toLowerCase()}</span>
             <Arrow />
@@ -101,7 +126,7 @@ function Sidebar({ page, navigate }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
-        <a className="brand reveal reveal-fast" href="/" onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <a className="brand reveal reveal-fast" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
         <div className="profile-copy reveal">
           <p>{profile.role}</p>
           <p>{profile.bio}</p>
@@ -131,7 +156,7 @@ function MobileHeader({ page, navigate }) {
   return (
     <>
       <header className="mobile-header">
-        <a className="brand" href="/" onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <a className="brand" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
         <button
           className={`menu-toggle ${open ? "is-open" : ""}`}
           type="button"
