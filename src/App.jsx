@@ -1,10 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
-import { about, playgroundProjects, profile, workProjects } from "./data";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { about, playgroundItems, profile, workProjects } from "./data";
 
 const Arrow = () => <span aria-hidden="true">↗</span>;
 const BASE_URL = import.meta.env.BASE_URL;
 
 const routeHref = (route = "") => `${BASE_URL}${route ? `#${route}` : ""}`;
+const assetHref = (href = "") => {
+  if (/^https?:\/\//.test(href)) return href;
+  return `${BASE_URL}${href.replace(/^\//, "")}`;
+};
+const allProjects = workProjects.flatMap((project) => [project, ...(project.subprojects || [])]);
+const projectFromRoute = (route) => allProjects.find((project) => route === `project/${project.slug}`);
+const pageFromRoute = (route) => {
+  if (route === "about") return "about";
+  if (route === "playground") return "playground";
+  if (route === "playground/photography") return "playground/photography";
+  if (route === "playground/design") return "playground/design";
+  if (projectFromRoute(route)) return route;
+  return "home";
+};
 
 function useClock() {
   const formatter = useMemo(
@@ -29,13 +43,13 @@ function useClock() {
 
 function usePage() {
   const readRoute = () => window.location.hash.replace(/^#\/?/, "");
-  const readPage = () => (readRoute() === "about" ? "about" : "home");
+  const readPage = () => pageFromRoute(readRoute());
   const [page, setPage] = useState(readPage);
 
   useEffect(() => {
     const syncRoute = () => {
       const route = readRoute();
-      const nextPage = route === "about" ? "about" : "home";
+      const nextPage = pageFromRoute(route);
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
@@ -58,8 +72,8 @@ function usePage() {
 
   const navigate = (event, destination, anchor) => {
     event?.preventDefault();
-    const route = destination === "/about" ? "about" : anchor || "";
-    const nextPage = route === "about" ? "about" : "home";
+    const route = destination === "/about" ? "about" : destination === "/playground" ? "playground" : anchor || "";
+    const nextPage = pageFromRoute(route);
 
     window.history.pushState({}, "", routeHref(route));
     setPage(nextPage);
@@ -82,12 +96,12 @@ function NavigationLinks({ page, navigate, closeMenu }) {
     <nav aria-label="Primary navigation">
       <ol className="numbered-links">
         <li>
-          <a href={routeHref("work")} className={page === "home" ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
+          <a href={routeHref("work")} className={page === "home" || page.startsWith("project/") ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
             <span>01.</span><span>work</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("playground")} onClick={(e) => go(e, "/", "playground")}>
+          <a href={routeHref("playground")} className={page.startsWith("playground") ? "active" : ""} onClick={(e) => go(e, "/playground")}>
             <span>02.</span><span>playground</span>
           </a>
         </li>
@@ -102,17 +116,18 @@ function NavigationLinks({ page, navigate, closeMenu }) {
 }
 
 function ContactLinks() {
+  const start = 4;
   return (
-    <ol className="numbered-links contact-links" start="4">
+    <ol className="numbered-links contact-links" start={start}>
       <li>
         <a href={`mailto:${profile.email}`}>
-          <span>04.</span><span>email</span><Arrow />
+          <span>{String(start).padStart(2, "0")}.</span><span>email</span><Arrow />
         </a>
       </li>
       {profile.socials.map((social, index) => (
         <li key={social.label}>
-          <a href={social.href.startsWith("/") ? `${BASE_URL}${social.href.slice(1)}` : social.href} target="_blank" rel="noreferrer">
-            <span>{String(index + 5).padStart(2, "0")}.</span>
+          <a href={assetHref(social.href)} target="_blank" rel="noreferrer">
+            <span>{String(index + start + 1).padStart(2, "0")}.</span>
             <span>{social.label.toLowerCase()}</span>
             <Arrow />
           </a>
@@ -167,7 +182,7 @@ function MobileHeader({ page, navigate }) {
           <span /><span /><span />
         </button>
       </header>
-      <div className={`mobile-menu ${open ? "is-open" : ""}`} aria-hidden={!open}>
+      <div className={`mobile-menu ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open}>
         <div className="profile-copy">
           <p>{profile.role}</p>
           <p>{profile.bio}</p>
@@ -183,7 +198,84 @@ function MobileHeader({ page, navigate }) {
   );
 }
 
-function ProjectVisual({ type }) {
+function ProjectVisual({ project, surface = "detail" }) {
+  const { coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
+
+  if (surface === "card" && project.coverImage) {
+    return (
+      <div className={`visual project-logo-cover project-logo-cover-${project.coverImageStyle || "default"}`}>
+        <img src={assetHref(project.coverImage)} alt={project.coverImageAlt || ""} loading="lazy" />
+      </div>
+    );
+  }
+
+  if (image) {
+    return <img className="visual project-asset" src={assetHref(image)} alt={imageAlt || ""} loading="lazy" />;
+  }
+
+  if (video) {
+    return (
+      <video
+        className="visual project-asset"
+        src={assetHref(video)}
+        poster={poster ? assetHref(poster) : undefined}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (["tt", "loblaw", "aves", "chenny"].includes(type)) {
+    return (
+      <div className={`visual project-cover project-cover-${type}`} aria-hidden="true">
+        <span>{coverEyebrow}</span>
+        <strong>{coverTitle}</strong>
+        <small>{coverMetric}</small>
+      </div>
+    );
+  }
+
+  if (type === "loblaw-careers") {
+    return (
+      <div className="visual visual-loblaw-careers" aria-hidden="true">
+        <div className="loblaw-browser">
+          <div className="loblaw-browser-bar"><i /><i /><i /><span>careers.loblaw.ca</span></div>
+          <div className="loblaw-careers-hero">
+            <span>Careers at Loblaw</span>
+            <b>Find your next opportunity.</b>
+            <div>Search open roles <Arrow /></div>
+          </div>
+          <div className="loblaw-careers-tiles"><i /><i /><i /></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "loblaw-toolkit") {
+    return (
+      <div className="visual visual-loblaw-toolkit" aria-hidden="true">
+        <div className="toolkit-shell">
+          <aside>
+            <b>TA toolkit</b>
+            <span>Templates</span>
+            <span>Banners</span>
+            <span>Photography</span>
+            <span>LinkedIn</span>
+          </aside>
+          <div className="toolkit-main">
+            <span>Global Talent Acquisition</span>
+            <strong>Digital toolkit</strong>
+            <div className="toolkit-grid"><i /><i /><i /><i /><i /><i /></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (type === "ai") {
     return (
       <div className="visual visual-ai" aria-hidden="true">
@@ -296,14 +388,18 @@ function ProjectVisual({ type }) {
 }
 
 function ProjectCard({ project, index }) {
+  const href = project.href || routeHref(`project/${project.slug}`);
+  const external = /^https?:\/\//.test(href);
   return (
     <a
       className="project-card reveal"
-      href={project.href}
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
       style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}
-      aria-label={`${project.title}: ${project.description}`}
+      aria-label={`View the ${project.title} case study: ${project.description}`}
     >
-      <div className="project-media"><ProjectVisual type={project.visual} /></div>
+      <div className="project-media"><ProjectVisual project={project} surface="card" /></div>
       <div className="project-copy">
         <h3>{project.title}</h3>
         <p>{project.description}</p>
@@ -335,10 +431,348 @@ function HomePage({ clock }) {
         <p className="section-label reveal reveal-fast">work</p>
         <ProjectColumns projects={workProjects} />
       </section>
-      <section id="playground" className="portfolio-section">
-        <p className="section-label reveal">playground + practice</p>
-        <ProjectColumns projects={playgroundProjects} />
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+function PlaygroundObject({ kind }) {
+  if (kind === "photo") {
+    return <div className="mock-object mock-photo" aria-hidden="true"><i /><i /><i /></div>;
+  }
+  if (kind === "motion") {
+    return <div className="mock-object mock-motion" aria-hidden="true"><i /><span>▶</span></div>;
+  }
+  if (kind === "poster") {
+    return <div className="mock-object mock-poster" aria-hidden="true"><span>A</span><i /><b /></div>;
+  }
+  if (kind === "type") {
+    return <div className="mock-object mock-type" aria-hidden="true"><span>Aa</span><i /></div>;
+  }
+  if (kind === "sketchbook") {
+    return <div className="mock-object mock-sketchbook" aria-hidden="true"><i /><i /><i /><b /></div>;
+  }
+  return <div className="mock-object mock-blobs" aria-hidden="true"><i /><i /><i /></div>;
+}
+
+function PlaygroundItem({ index, item }) {
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragState = useRef(null);
+  const suppressClick = useRef(false);
+
+  const content = item.image ? (
+    <img src={assetHref(item.image)} alt={item.alt || ""} loading="lazy" draggable="false" />
+  ) : item.video ? (
+    <video src={assetHref(item.video)} poster={item.poster ? assetHref(item.poster) : undefined} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />
+  ) : (
+    <PlaygroundObject kind={item.kind} />
+  );
+  const className = `plaything plaything-${item.slot}${isDragging ? " is-dragging" : ""}`;
+  const style = {
+    "--play-delay": `${index * -0.65}s`,
+    "--sticker-position": item.position || "center",
+    "--sticker-rotation": item.rotation || "0deg",
+    "--sticker-scale": item.scale || 1,
+    transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
+  };
+  const label = <span className="plaything-label">{item.label}{item.href && <i aria-hidden="true">↗</i>}</span>;
+
+  const handlePointerDown = (event) => {
+    if (event.button !== 0) return;
+    const element = event.currentTarget;
+    const stage = element.closest(".playground-stage");
+    const elementRect = element.getBoundingClientRect();
+    const stageRect = stage?.getBoundingClientRect();
+
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: offset.x,
+      originY: offset.y,
+      minX: stageRect ? offset.x + stageRect.left - elementRect.left : -Infinity,
+      maxX: stageRect ? offset.x + stageRect.right - elementRect.right : Infinity,
+      minY: stageRect ? offset.y + stageRect.top - elementRect.top : -Infinity,
+      maxY: stageRect ? offset.y + stageRect.bottom - elementRect.bottom : Infinity,
+    };
+    suppressClick.current = false;
+    element.setPointerCapture?.(event.pointerId);
+    setIsDragging(true);
+  };
+
+  const handlePointerMove = (event) => {
+    const drag = dragState.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    if (Math.hypot(deltaX, deltaY) > 4) suppressClick.current = true;
+
+    setOffset({
+      x: Math.min(drag.maxX, Math.max(drag.minX, drag.originX + deltaX)),
+      y: Math.min(drag.maxY, Math.max(drag.minY, drag.originY + deltaY)),
+    });
+  };
+
+  const finishDrag = (event) => {
+    if (!dragState.current || dragState.current.pointerId !== event.pointerId) return;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    dragState.current = null;
+    setIsDragging(false);
+  };
+
+  const handleKeyDown = (event) => {
+    const movement = {
+      ArrowLeft: [-10, 0],
+      ArrowRight: [10, 0],
+      ArrowUp: [0, -10],
+      ArrowDown: [0, 10],
+    }[event.key];
+    if (!movement) return;
+    event.preventDefault();
+    setOffset((current) => ({ x: current.x + movement[0], y: current.y + movement[1] }));
+  };
+
+  const interactionProps = {
+    onPointerDown: handlePointerDown,
+    onPointerMove: handlePointerMove,
+    onPointerUp: finishDrag,
+    onPointerCancel: finishDrag,
+    onKeyDown: handleKeyDown,
+    onDragStart: (event) => event.preventDefault(),
+  };
+
+  if (item.href) {
+    const external = /^https?:\/\//.test(item.href);
+    return (
+      <a
+        {...interactionProps}
+        className={className}
+        href={assetHref(item.href)}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noreferrer" : undefined}
+        style={style}
+        onClick={(event) => {
+          if (!suppressClick.current) return;
+          event.preventDefault();
+          suppressClick.current = false;
+        }}
+      >
+        <div className="plaything-media">{content}</div>
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <div {...interactionProps} aria-label={`${item.label}, draggable object`} className={className} role="group" style={style} tabIndex="0">
+      <div className="plaything-media">{content}</div>
+      {label}
+    </div>
+  );
+}
+
+function PlaygroundNavigation({ clock, navigate }) {
+  return (
+    <header className="playground-nav">
+      <a className="playground-nav-brand" href={routeHref()} onClick={(event) => navigate(event, "/")}>{profile.name}</a>
+      <nav aria-label="Playground navigation">
+        <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span>01.</span> work</a>
+        <a className="active" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}><span>02.</span> playground</a>
+        <a href={routeHref("about")} onClick={(event) => navigate(event, "/about")}><span>03.</span> about</a>
+      </nav>
+      <div className="playground-nav-meta">
+        <a href={`mailto:${profile.email}`}>email <Arrow /></a>
+        <span>{clock}</span>
+      </div>
+    </header>
+  );
+}
+
+function PlaygroundPage({ clock, navigate }) {
+  return (
+    <main className="playground-page">
+      <PlaygroundNavigation clock={clock} navigate={navigate} />
+      <section
+        className="playground-stage"
+        aria-labelledby="playground-title"
+        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-table-background.jpg")})` }}
+      >
+        <h1 className="playground-title" id="playground-title">Playground</h1>
+        <p className="playground-kicker">personal archive · ongoing</p>
+        <p className="playground-note">A space for things made from curiosity.</p>
+        {playgroundItems.map((item, index) => <PlaygroundItem index={index} item={item} key={item.id} />)}
       </section>
+    </main>
+  );
+}
+
+function PhotographyPage({ clock, navigate }) {
+  return (
+    <main className="playground-page photography-page">
+      <PlaygroundNavigation clock={clock} navigate={navigate} />
+      <section
+        className="photography-hero"
+        aria-labelledby="photography-title"
+        style={{ "--photography-background": `url(${assetHref("/projects/playground/photography/toronto-waterfront-deck.jpg")})` }}
+      >
+        <div className="photography-hero-copy reveal">
+          <a className="photography-back" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}>
+            <span aria-hidden="true">←</span> playground
+          </a>
+          <p className="photography-kicker">personal archive · my art</p>
+          <h1 id="photography-title">My Art</h1>
+          <p className="photography-lede">My evolving collection of portraits, events, sports, and everyday moments that catch my eye.</p>
+          <div className="photography-meta" aria-label="My Art archive details">
+            <span>2020—present</span>
+            <span>Toronto + elsewhere</span>
+          </div>
+        </div>
+        <div className="photography-camera-stage reveal">
+          <span>sony α7r iii</span>
+          <img src={assetHref("/projects/playground/stickers/a7riii-sticker.png")} alt="Sony A7R III camera sticker" />
+        </div>
+      </section>
+      <section className="photography-archive-intro" aria-labelledby="photography-archive-title">
+        <p>selected frames</p>
+        <div>
+          <h2 id="photography-archive-title">The archive starts here.</h2>
+          <p>Selected photography projects will be added to this space as the collection is curated.</p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function DesignPage({ clock, navigate }) {
+  return (
+    <main className="playground-page photography-page design-page">
+      <PlaygroundNavigation clock={clock} navigate={navigate} />
+      <section
+        className="photography-hero design-hero"
+        aria-labelledby="design-title"
+        style={{ "--photography-background": `url(${assetHref("/projects/playground/photography/toronto-waterfront-deck.jpg")})` }}
+      >
+        <div className="photography-hero-copy reveal">
+          <a className="photography-back" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}>
+            <span aria-hidden="true">←</span> playground
+          </a>
+          <p className="photography-kicker">personal archive · UX design</p>
+          <h1 id="design-title">My Design</h1>
+          <p className="photography-lede">A selection of UX projects shaped by research, strategy, thoughtful interactions, and clear visual systems.</p>
+          <div className="photography-meta" aria-label="My Design archive details">
+            <span>UX/UI design</span>
+            <span>Research → prototype</span>
+          </div>
+        </div>
+        <div className="photography-camera-stage design-laptop-stage reveal">
+          <span>Selected UX work</span>
+          <img src={assetHref("/projects/playground/stickers/macbook-sticker.png")} alt="MacBook sticker" />
+        </div>
+      </section>
+      <section className="photography-archive-intro design-projects-intro" aria-labelledby="design-projects-title">
+        <p>UX case studies</p>
+        <div>
+          <h2 id="design-projects-title">The project space is ready.</h2>
+          <p>Each case study can show the challenge, my role, research, design process, prototype, and outcome.</p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function CaseStudyPage({ clock, navigate, project }) {
+  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
+  const backLabel = project.parentTitle || "selected work";
+
+  return (
+    <main className="main-content case-study-page">
+      <article className="case-study">
+        <a className="case-study-back reveal reveal-fast" href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}>
+          <span aria-hidden="true">←</span> {backLabel}
+        </a>
+        <div className="case-study-media reveal" style={{ "--aspect": project.aspect }}>
+          <ProjectVisual project={project} />
+        </div>
+        <header className="case-study-header reveal">
+          <p>{project.coverEyebrow}</p>
+          <h1>{project.title}</h1>
+          <div className="case-study-intro">{project.description}</div>
+        </header>
+        <dl className="case-study-meta reveal">
+          <div><dt>Role</dt><dd>{project.role}</dd></div>
+          <div><dt>Organization</dt><dd>{project.organization}</dd></div>
+          <div><dt>Timeline</dt><dd>{project.period}</dd></div>
+        </dl>
+        {project.mediaSections?.map((section, sectionIndex) => (
+          <section className="case-study-feature reveal" aria-labelledby={`${project.slug}-feature-${sectionIndex}`} key={section.title}>
+            <div className="case-study-feature-copy">
+              <p>{section.eyebrow}</p>
+              <div>
+                <h2 id={`${project.slug}-feature-${sectionIndex}`}>{section.title}</h2>
+                {section.description && <p>{section.description}</p>}
+              </div>
+            </div>
+            <div className={`case-study-gallery${section.layout ? ` case-study-gallery-${section.layout}` : ""}`}>
+              {section.items.map((item, itemIndex) => (
+                <figure className="case-study-gallery-item" key={item.src || item.videoId} style={{ "--media-aspect": item.aspect || "1 / 1" }}>
+                  {item.type === "youtube" ? (
+                    <div className="case-study-embed">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${item.videoId}`}
+                        title={item.title || section.title}
+                        loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : item.type === "video" ? (
+                    <video
+                      controls
+                      playsInline
+                      preload="metadata"
+                      poster={item.poster ? assetHref(item.poster) : undefined}
+                      aria-label={item.caption || `${section.title} video ${itemIndex + 1}`}
+                    >
+                      <source src={assetHref(item.src)} type="video/mp4" />
+                      Your browser does not support embedded video.
+                    </video>
+                  ) : (
+                    <img src={assetHref(item.src)} alt={item.alt || ""} loading="lazy" />
+                  )}
+                  {item.caption && (
+                    <figcaption>
+                      <span>{String(itemIndex + 1).padStart(2, "0")}</span>
+                      {item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<Arrow /></a> : item.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </section>
+        ))}
+        {project.subprojects?.length > 0 && (
+          <section className="case-study-subprojects reveal" aria-labelledby={`${project.slug}-projects`}>
+            <div className="case-study-subprojects-heading">
+              <p>Featured projects</p>
+              <h2 id={`${project.slug}-projects`}>Explore the Loblaw work.</h2>
+            </div>
+            <div className="case-study-subproject-grid">
+              {project.subprojects.map((subproject, index) => (
+                <ProjectCard project={subproject} index={index} key={subproject.slug} />
+              ))}
+            </div>
+          </section>
+        )}
+        <section className="case-study-impact reveal" aria-labelledby={`${project.slug}-impact`}>
+          <h2 id={`${project.slug}-impact`}>Selected impact</h2>
+          <ol>
+            {project.impact.map((item) => <li key={item}>{item}</li>)}
+          </ol>
+        </section>
+      </article>
       <MobileFooter clock={clock} />
     </main>
   );
@@ -382,6 +816,8 @@ function MobileFooter({ clock }) {
 export default function App() {
   const { page, navigate } = usePage();
   const clock = useClock();
+  const selectedProject = projectFromRoute(page);
+  const isPlayground = page.startsWith("playground");
 
   useEffect(() => {
     document.documentElement.classList.add("js");
@@ -405,16 +841,33 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    document.title = page === "about" ? `${profile.name} — About` : `${profile.name} — Designer`;
-  }, [page]);
+    if (page === "about") document.title = `${profile.name} — About`;
+    else if (page === "playground/photography") document.title = `${profile.name} — My Art`;
+    else if (page === "playground/design") document.title = `${profile.name} — My Design`;
+    else if (page === "playground") document.title = `${profile.name} — Playground`;
+    else if (selectedProject) document.title = `${selectedProject.title} — ${profile.name}`;
+    else document.title = `${profile.name} — Digital Designer & Content Strategist`;
+  }, [page, selectedProject]);
 
   return (
     <div className="site-shell">
-      <div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" />
-      <Sidebar page={page} navigate={navigate} />
-      <MobileHeader page={page} navigate={navigate} />
-      {page === "about" ? <AboutPage clock={clock} /> : <HomePage clock={clock} />}
-      <div className="desktop-clock">{clock}</div>
+      {!isPlayground && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
+      {!isPlayground && <Sidebar page={page} navigate={navigate} />}
+      {!isPlayground && <MobileHeader page={page} navigate={navigate} />}
+      {page === "about" ? (
+        <AboutPage clock={clock} />
+      ) : page === "playground/photography" ? (
+        <PhotographyPage clock={clock} navigate={navigate} />
+      ) : page === "playground/design" ? (
+        <DesignPage clock={clock} navigate={navigate} />
+      ) : page === "playground" ? (
+        <PlaygroundPage clock={clock} navigate={navigate} />
+      ) : selectedProject ? (
+        <CaseStudyPage clock={clock} navigate={navigate} project={selectedProject} />
+      ) : (
+        <HomePage clock={clock} />
+      )}
+      {!isPlayground && <div className="desktop-clock">{clock}</div>}
     </div>
   );
 }

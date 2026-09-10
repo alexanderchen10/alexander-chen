@@ -1,4 +1,6 @@
 node_modules/
 dist/
+.pnpm-store/
 .DS_Store
 *.local
+source-media/
