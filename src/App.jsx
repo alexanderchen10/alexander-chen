@@ -434,13 +434,30 @@ function MobileHeader({ page, route, navigate }) {
 }
 
 function ProjectVisual({ project, surface = "detail" }) {
-  const { coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
+  const { bannerVideo, coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
 
   if (surface === "card" && project.coverImage) {
     return (
       <div className={`visual project-logo-cover project-logo-cover-${project.coverImageStyle || "default"}`}>
         <img src={assetHref(project.coverImage)} alt={project.coverImageAlt || ""} loading="lazy" />
       </div>
+    );
+  }
+
+  if (surface === "detail" && bannerVideo) {
+    return (
+      <video
+        className="visual project-asset"
+        src={assetHref(bannerVideo)}
+        poster={assetHref(poster || image)}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        disablePictureInPicture
+        aria-hidden="true"
+      />
     );
   }
 

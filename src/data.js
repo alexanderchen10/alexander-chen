@@ -316,6 +316,7 @@ export const workProjects = [
     role: "Video Production · Event Coverage · Editing · Social Content",
     period: "September - November 2026",
     image: "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
+    bannerVideo: "/projects/work/corcoran/oakville-banner.m4v",
     imageAlt: "Speaker featured in the Corcoran Group Real Estate Oakville grand-opening film",
     coverEyebrow: "Creative partnership · Ontario",
     homeMetric: "2 campaigns · live + long-form",
