@@ -321,8 +321,21 @@ function ContactLinks() {
 }
 
 function Sidebar({ page, route, navigate, clock }) {
+  const moveTopbarGlow = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--topbar-x", `${event.clientX - bounds.left}px`);
+    event.currentTarget.style.setProperty("--topbar-y", `${event.clientY - bounds.top}px`);
+  };
+
   return (
-    <aside className="sidebar global-topbar">
+    <aside
+      className="sidebar global-topbar"
+      onPointerMove={moveTopbarGlow}
+      onPointerLeave={(event) => {
+        event.currentTarget.style.removeProperty("--topbar-x");
+        event.currentTarget.style.removeProperty("--topbar-y");
+      }}
+    >
       <div className="topbar-primary">
         <a className="brand reveal reveal-fast" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
         <NavigationLinks page={page} route={route} navigate={navigate} />
