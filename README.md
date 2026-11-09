@@ -1,4 +1,4 @@
-# Alexander Chen — Portfolio
+# Alexander Chen Portfolio
 
 A React and Vite portfolio deployed to GitHub Pages.
 

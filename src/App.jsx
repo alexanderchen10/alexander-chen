@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { about, playgroundItems, profile, workProjects } from "./data";
+import AlexLifeGame from "./AlexLifeGame";
+import AlexLifeGameV2 from "./AlexLifeGameV2";
 
 const Arrow = () => <span aria-hidden="true">↗</span>;
 const BASE_URL = import.meta.env.BASE_URL;
@@ -11,12 +14,27 @@ const assetHref = (href = "") => {
 };
 const allProjects = workProjects.flatMap((project) => [project, ...(project.subprojects || [])]);
 const projectFromRoute = (route) => allProjects.find((project) => route === `project/${project.slug}`);
+const projectDetailRoute = (project, chapter, index) => `project/${project.slug}/${chapter.id}/${index + 1}`;
+const detailFromRoute = (route) => {
+  for (const project of workProjects) {
+    for (const chapter of project.chapters || []) {
+      const index = chapter.projects.findIndex((_, projectIndex) => route === projectDetailRoute(project, chapter, projectIndex));
+      if (index !== -1) return { project, chapter, entry: chapter.projects[index], index };
+    }
+  }
+  return null;
+};
 const pageFromRoute = (route) => {
   if (route === "about") return "about";
+  if (route === "ao-studio") return "ao-studio";
   if (route === "playground") return "playground";
   if (route === "playground/photography") return "playground/photography";
+  if (route.startsWith("playground/photography/")) return route;
   if (route === "playground/design") return "playground/design";
-  if (projectFromRoute(route)) return route;
+  if (route === "playground/fa-adventure") return "playground/fa-adventure";
+  if (route === "playground/alexs-life") return "playground/alexs-life";
+  if (route === "playground/alexs-life-hifi") return "playground/alexs-life-hifi";
+  if (projectFromRoute(route) || detailFromRoute(route)) return route;
   return "home";
 };
 
@@ -41,20 +59,72 @@ function useClock() {
   return `${time.toLowerCase()}, ${profile.location.toLowerCase()}`;
 }
 
+function useIcffActiveSection() {
+  const [activeSection, setActiveSection] = useState("icff-context");
+
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const photoshoot = document.getElementById("icff-photoshoot");
+      if (!photoshoot) return;
+      const nextSection = photoshoot.getBoundingClientRect().top <= window.innerHeight * 0.28 ? "icff-photoshoot" : "icff-context";
+      setActiveSection((current) => current === nextSection ? current : nextSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
+
+  return activeSection;
+}
+
+const icffHubSections = ["icff-role", "icff-organization", "icff-timeline", "icff-featured-projects"];
+
+function useIcffHubActiveSection() {
+  const [activeSection, setActiveSection] = useState(icffHubSections[0]);
+
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const marker = window.innerHeight * 0.3;
+      const currentSection = icffHubSections.reduce((current, sectionId) => {
+        const section = document.getElementById(sectionId);
+        return section && section.getBoundingClientRect().top <= marker ? sectionId : current;
+      }, icffHubSections[0]);
+      setActiveSection((current) => current === currentSection ? current : currentSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
+
+  return activeSection;
+}
+
 function usePage() {
   const readRoute = () => window.location.hash.replace(/^#\/?/, "");
   const readPage = () => pageFromRoute(readRoute());
+  const [route, setRoute] = useState(readRoute);
   const [page, setPage] = useState(readPage);
 
   useEffect(() => {
     const syncRoute = () => {
-      const route = readRoute();
-      const nextPage = pageFromRoute(route);
+      const currentRoute = readRoute();
+      const nextPage = pageFromRoute(currentRoute);
+      setRoute(currentRoute);
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
-        if (nextPage === "home" && ["work", "playground"].includes(route)) {
-          document.getElementById(route)?.scrollIntoView();
+        if (nextPage === "home" && ["work", "experience"].includes(currentRoute)) {
+          document.getElementById(currentRoute)?.scrollIntoView();
         } else {
           window.scrollTo({ top: 0 });
         }
@@ -72,10 +142,12 @@ function usePage() {
 
   const navigate = (event, destination, anchor) => {
     event?.preventDefault();
-    const route = destination === "/about" ? "about" : destination === "/playground" ? "playground" : anchor || "";
+    const standaloneRoutes = { "/about": "about", "/ao-studio": "ao-studio", "/playground": "playground" };
+    const route = standaloneRoutes[destination] || anchor || "";
     const nextPage = pageFromRoute(route);
 
     window.history.pushState({}, "", routeHref(route));
+    setRoute(route);
     setPage(nextPage);
     window.setTimeout(() => {
       if (nextPage === "home" && anchor) document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
@@ -83,10 +155,111 @@ function usePage() {
     });
   };
 
-  return { page, navigate };
+  return { page, route, navigate };
 }
 
-function NavigationLinks({ page, navigate, closeMenu }) {
+function useProjectProgress(sections = []) {
+  const [progress, setProgress] = useState(0);
+  const [activeId, setActiveId] = useState(sections[0]?.id || "");
+  const sectionKey = sections.map((section) => section.id).join("|");
+
+  useEffect(() => {
+    const update = () => {
+      const root = document.documentElement;
+      const scrollable = Math.max(1, root.scrollHeight - window.innerHeight);
+      const nextProgress = Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100));
+      const marker = window.innerHeight * 0.38;
+      const nextActive = sections.reduce((current, section) => {
+        const element = document.getElementById(section.id);
+        return element && element.getBoundingClientRect().top <= marker ? section.id : current;
+      }, sections[0]?.id || "");
+      setProgress((current) => Math.abs(current - nextProgress) > 0.4 ? nextProgress : current);
+      setActiveId((current) => current === nextActive ? current : nextActive);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [sectionKey]);
+
+  return { progress, activeId };
+}
+
+function ProjectProgressHUD({ sections, label = "Project journey" }) {
+  const { progress, activeId } = useProjectProgress(sections);
+  const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
+  const activeSection = sections[activeIndex] || sections[0];
+
+  if (!sections.length) return null;
+
+  const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  return (
+    <aside className="project-progress-hud" aria-label={label}>
+      <div className="project-progress-copy">
+        <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
+        <strong>{activeSection?.label}</strong>
+        <small>{Math.round(progress)}%</small>
+      </div>
+      <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
+        <i style={{ width: `${progress}%` }} />
+      </div>
+      <nav aria-label={`${label} chapters`}>
+        {sections.map((section, index) => (
+          <button
+            type="button"
+            className={section.id === activeId ? "active" : ""}
+            onClick={() => jumpTo(section.id)}
+            aria-label={`Go to ${section.label}`}
+            aria-current={section.id === activeId ? "step" : undefined}
+            key={section.id}
+          >
+            <span>{String(index + 1).padStart(2, "0")}</span>
+          </button>
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+function ZoomableImage({ src, alt = "", loading = "lazy", className = "" }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => event.key === "Escape" && setOpen(false);
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
+  return (
+    <>
+      <button className={`zoomable-image ${className}`} type="button" onClick={() => setOpen(true)} aria-label={`Open ${alt || "project image"} full screen`}>
+        <img src={assetHref(src)} alt={alt} loading={loading} />
+        <span aria-hidden="true">↗</span>
+      </button>
+      {open && createPortal(
+        <div className="media-lightbox" role="dialog" aria-modal="true" aria-label={alt || "Expanded project image"} onClick={() => setOpen(false)}>
+          <button type="button" onClick={() => setOpen(false)} aria-label="Close image">×</button>
+          <img src={assetHref(src)} alt={alt} onClick={(event) => event.stopPropagation()} />
+          {alt && <p>{alt}</p>}
+        </div>,
+        document.body,
+      )}
+    </>
+  );
+}
+
+function NavigationLinks({ page, route, navigate, closeMenu }) {
   const go = (event, destination, anchor) => {
     closeMenu?.();
     navigate(event, destination, anchor);
@@ -96,18 +269,28 @@ function NavigationLinks({ page, navigate, closeMenu }) {
     <nav aria-label="Primary navigation">
       <ol className="numbered-links">
         <li>
-          <a href={routeHref("work")} className={page === "home" || page.startsWith("project/") ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
+          <a href={routeHref("work")} className={route !== "experience" && (page === "home" || page.startsWith("project/")) ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
             <span>01.</span><span>work</span>
           </a>
         </li>
         <li>
+          <a href={routeHref("experience")} className={route === "experience" ? "active" : ""} onClick={(e) => go(e, "/", "experience")}>
+            <span>02.</span><span>experience</span>
+          </a>
+        </li>
+        <li>
           <a href={routeHref("playground")} className={page.startsWith("playground") ? "active" : ""} onClick={(e) => go(e, "/playground")}>
-            <span>02.</span><span>playground</span>
+            <span>03.</span><span>playground</span>
           </a>
         </li>
         <li>
           <a href={routeHref("about")} className={page === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
-            <span>03.</span><span>about</span>
+            <span>04.</span><span>about</span>
+          </a>
+        </li>
+        <li>
+          <a href={routeHref("ao-studio")} className={page === "ao-studio" ? "active" : ""} onClick={(e) => go(e, "/ao-studio")}>
+            <span>05.</span><span>ao studio</span>
           </a>
         </li>
       </ol>
@@ -116,7 +299,7 @@ function NavigationLinks({ page, navigate, closeMenu }) {
 }
 
 function ContactLinks() {
-  const start = 4;
+  const start = 6;
   return (
     <ol className="numbered-links contact-links" start={start}>
       <li>
@@ -137,7 +320,7 @@ function ContactLinks() {
   );
 }
 
-function Sidebar({ page, navigate }) {
+function Sidebar({ page, route, navigate }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -147,7 +330,7 @@ function Sidebar({ page, navigate }) {
           <p>{profile.bio}</p>
         </div>
         <div className="reveal">
-          <NavigationLinks page={page} navigate={navigate} />
+          <NavigationLinks page={page} route={route} navigate={navigate} />
           <div className="rule" />
           <ContactLinks />
         </div>
@@ -160,7 +343,59 @@ function Sidebar({ page, navigate }) {
   );
 }
 
-function MobileHeader({ page, navigate }) {
+function IcffSidebar({ clock, navigate, project }) {
+  const activeSection = useIcffActiveSection();
+  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
+  const backLabel = project.parentSlug ? "Back to ICFF" : "Back to work";
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <aside className="sidebar icff-sidebar">
+      <div className="icff-sidebar-main">
+        <a className="icff-sidebar-back" href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}>{backLabel}</a>
+        <nav className="icff-section-nav" aria-label="ICFF page navigation">
+          <a className={activeSection === "icff-context" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-context")} aria-current={activeSection === "icff-context" ? "location" : undefined}>context</a>
+          <a className={activeSection === "icff-photoshoot" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-photoshoot")} aria-current={activeSection === "icff-photoshoot" ? "location" : undefined}>photoshoot</a>
+        </nav>
+      </div>
+      <div className="sidebar-meta">
+        <span>ICFF · {project.period}</span>
+        <span>{clock}</span>
+      </div>
+    </aside>
+  );
+}
+
+function IcffHubSidebar({ clock, navigate, project }) {
+  const activeSection = useIcffHubActiveSection();
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <aside className="sidebar icff-sidebar">
+      <div className="icff-sidebar-main">
+        <a className="icff-sidebar-back" href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Back to work</a>
+        <nav className="icff-section-nav icff-hub-section-nav" aria-label="ICFF collection navigation">
+          <a className={activeSection === "icff-role" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-role")}>Role</a>
+          <a className={activeSection === "icff-organization" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-organization")}>Organization</a>
+          <a className={activeSection === "icff-timeline" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-timeline")}>Timeline</a>
+          <a className={activeSection === "icff-featured-projects" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-featured-projects")}>Featured Projects</a>
+        </nav>
+      </div>
+      <div className="sidebar-meta">
+        <span>ICFF · {project.period}</span>
+        <span>{clock}</span>
+      </div>
+    </aside>
+  );
+}
+
+function MobileHeader({ page, route, navigate }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -188,7 +423,7 @@ function MobileHeader({ page, navigate }) {
           <p>{profile.bio}</p>
         </div>
         <div>
-          <NavigationLinks page={page} navigate={navigate} closeMenu={() => setOpen(false)} />
+          <NavigationLinks page={page} route={route} navigate={navigate} closeMenu={() => setOpen(false)} />
           <div className="rule" />
           <ContactLinks />
         </div>
@@ -229,7 +464,7 @@ function ProjectVisual({ project, surface = "detail" }) {
     );
   }
 
-  if (["tt", "loblaw", "aves", "chenny"].includes(type)) {
+  if (["tt", "loblaw", "aves", "chenny", "icff-isabella", "icff-giancarlo"].includes(type)) {
     return (
       <div className={`visual project-cover project-cover-${type}`} aria-hidden="true">
         <span>{coverEyebrow}</span>
@@ -365,7 +600,7 @@ function ProjectVisual({ project, surface = "detail" }) {
       <div className="visual visual-editorial" aria-hidden="true">
         <div className="editorial-title">THE SHARED<br />TABLE</div>
         <div className="plate"><i /><b /><span /></div>
-        <div className="editorial-note">issue 04 — common knowledge</div>
+        <div className="editorial-note">issue 04 / common knowledge</div>
       </div>
     );
   }
@@ -397,20 +632,31 @@ function ProjectCard({ project, index }) {
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
       style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}
-      aria-label={`View the ${project.title} case study: ${project.description}`}
+      aria-label={`View the ${project.title} ${project.chapters ? "projects" : "case study"}: ${project.description}`}
     >
       <div className="project-media"><ProjectVisual project={project} surface="card" /></div>
       <div className="project-copy">
-        <h3>{project.title}</h3>
-        <p>{project.description}</p>
+        <div className="project-copy-heading">
+          <h3>{project.title}</h3>
+          <div className="project-copy-meta">
+            {project.status && <span className="project-status">{project.status}</span>}
+            <span>{project.period}</span>
+          </div>
+        </div>
+        <p className="project-card-role">{project.role}</p>
+        <p className="project-card-summary">{project.description}</p>
+        {project.homeMetric && (
+          <p className="project-card-impact"><span>impact</span>{project.homeMetric}</p>
+        )}
       </div>
     </a>
   );
 }
 
 function ProjectColumns({ projects }) {
-  const midpoint = Math.ceil(projects.length / 2);
-  const columns = [projects.slice(0, midpoint), projects.slice(midpoint)];
+  const visibleProjects = projects.filter((project) => project.showInWork !== false);
+  const midpoint = Math.ceil(visibleProjects.length / 2);
+  const columns = [visibleProjects.slice(0, midpoint), visibleProjects.slice(midpoint)];
   return (
     <div className="masonry-columns">
       {columns.map((column, columnIndex) => (
@@ -424,13 +670,161 @@ function ProjectColumns({ projects }) {
   );
 }
 
-function HomePage({ clock }) {
+function HomeExperience() {
+  const updateHighlightGlow = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
+    event.currentTarget.style.setProperty("--my", `${event.clientY - bounds.top}px`);
+  };
+
   return (
-    <main className="main-content">
-      <section id="work" className="portfolio-section">
-        <p className="section-label reveal reveal-fast">work</p>
+    <section id="experience" className="home-experience" aria-labelledby="home-experience-title">
+      <header className="home-experience-heading">
+        <p><span aria-hidden="true" />02 / experience</p>
+        <h2 id="home-experience-title">Professional experience</h2>
+        <p className="home-experience-note">Scroll through six roles spanning client success, marketing, systems, community, and creative production.</p>
+      </header>
+      <div className="home-experience-list">
+        {about.experience.map((experience, index) => (
+          <article className="home-experience-item experience-reveal" key={`${experience.organization}-${experience.role}`} style={{ "--experience-order": index }}>
+            <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            <div className="home-experience-side">
+              <span className="home-experience-badge" aria-hidden="true"><span>{experience.badge}</span></span>
+              <p>{experience.period}</p>
+            </div>
+            <div className="home-experience-content">
+              <header>
+                <h3>{experience.role}</h3>
+                <p>{experience.organization}{experience.location && <><span aria-hidden="true"> · </span>{experience.location}</>}</p>
+              </header>
+              <p className="home-experience-summary">{experience.summary}</p>
+              <ol className="home-experience-highlights">
+                {experience.highlights.map((highlight, highlightIndex) => (
+                  <li key={highlight.value} style={{ "--highlight-order": highlightIndex }} onPointerMove={updateHighlightGlow}>
+                    <span>Highlight {String(highlightIndex + 1).padStart(2, "0")}</span>
+                    <strong>{highlight.value}</strong>
+                    <p>{highlight.detail}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </article>
+        ))}
+        <footer className="home-experience-resume reveal" aria-label="Resume education, capabilities, and contact details">
+          <header>
+            <div>
+              <p>Resume / credentials</p>
+              <h3>Education, delivery skills, and the tools behind the work.</h3>
+            </div>
+            <a href={assetHref("/resume.pdf")} target="_blank" rel="noreferrer">Open full résumé <Arrow /></a>
+          </header>
+          <div className="home-resume-details-grid">
+            <section className="home-resume-education" aria-labelledby="home-resume-education-title">
+              <h4 id="home-resume-education-title">Education</h4>
+              {about.education.map((item) => (
+                <article key={item.program}>
+                  <p>{item.program}</p>
+                  <span>{item.school}</span>
+                  <time>{item.period}</time>
+                </article>
+              ))}
+            </section>
+            <section className="home-resume-capabilities" aria-labelledby="home-resume-capabilities-title">
+              <h4 id="home-resume-capabilities-title">Skills &amp; tools</h4>
+              <dl>
+                {about.capabilities.map((item) => (
+                  <div key={item.label}>
+                    <dt>{item.label}</dt>
+                    <dd>{item.items}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          </div>
+          <nav className="home-resume-contact" aria-label="Resume contact information">
+            <a href={`tel:${profile.phone.replace(/[^+\d]/g, "")}`}><span>Phone</span>{profile.phone}</a>
+            <a href={`mailto:${profile.email}`}><span>Email</span>{profile.email}</a>
+            <a href={profile.socials[0].href} target="_blank" rel="noreferrer"><span>LinkedIn</span>in/alexanderchen-</a>
+          </nav>
+        </footer>
+      </div>
+    </section>
+  );
+}
+
+function CollaboratorCard({ collaborator, index, navigate }) {
+  const content = <>
+    <div className="home-collaborator-mark">
+      <img src={assetHref(collaborator.logo)} alt={`${collaborator.name} logo`} loading="lazy" />
+    </div>
+    <div className="home-collaborator-meta">
+      <span>{String(index + 1).padStart(2, "0")}</span>
+      <h3>{collaborator.name}</h3>
+    </div>
+  </>;
+
+  const style = { "--logo-scale": collaborator.scale ?? 1 };
+  if (!collaborator.projectSlug) return <article className="home-collaborator" role="listitem" style={style}>{content}</article>;
+
+  const projectRoute = `project/${collaborator.projectSlug}`;
+  return (
+    <article className="home-collaborator-item" role="listitem">
+      <a
+        className="home-collaborator home-collaborator-linked"
+        href={routeHref(projectRoute)}
+        onClick={(event) => navigate(event, "/", projectRoute)}
+        style={style}
+        aria-label={`View ${collaborator.name} portfolio project`}
+      >
+        {content}
+      </a>
+    </article>
+  );
+}
+
+function HomePage({ clock, navigate }) {
+  return (
+    <main className="main-content home-main">
+      <section className="home-hero" aria-labelledby="home-hero-title">
+        <img className="home-hero-image" src={assetHref(profile.hero.image)} alt={profile.hero.imageAlt} />
+        <div className="home-hero-shade" aria-hidden="true" />
+        <div className="home-hero-topline">
+          <span>Alexander Chen</span>
+          <span>{clock}</span>
+        </div>
+        <div className="home-hero-copy">
+          <p>{profile.hero.eyebrow}</p>
+          <h1 id="home-hero-title">{profile.hero.headline}</h1>
+          <p className="home-hero-summary">{profile.hero.summary}</p>
+          <div className="home-hero-actions">
+            <a href={routeHref("work")}>View selected work <span aria-hidden="true">↓</span></a>
+            <a href={`mailto:${profile.email}`}>Start a conversation <Arrow /></a>
+          </div>
+        </div>
+        <p className="home-hero-index"><span>01</span> Multidisciplinary designer in Toronto</p>
+      </section>
+
+      <section className="home-collaborators" aria-labelledby="home-collaborators-title">
+        <div className="home-collaborators-heading">
+          <p>Who I’ve worked with</p>
+          <div>
+            <h2 id="home-collaborators-title">Trusted across retail, talent, technology, and culture.</h2>
+            <p>A selection of organizations I’ve collaborated with across in-house, studio, event, and campaign work.</p>
+          </div>
+        </div>
+        <div className="home-collaborator-grid" role="list" aria-label="Organizations Alexander Chen has worked with">
+          {profile.collaborators.map((collaborator, index) => <CollaboratorCard collaborator={collaborator} index={index} navigate={navigate} key={collaborator.name} />)}
+        </div>
+      </section>
+
+      <section id="work" className="portfolio-section home-work-section">
+        <div className="home-work-heading reveal">
+          <p className="section-label">work</p>
+          <p>Selected roles and projects across brand systems, digital products, community, and visual storytelling.</p>
+        </div>
         <ProjectColumns projects={workProjects} />
       </section>
+      <HomeExperience />
       <MobileFooter clock={clock} />
     </main>
   );
@@ -462,7 +856,24 @@ function PlaygroundItem({ index, item }) {
   const suppressClick = useRef(false);
 
   const content = item.image ? (
-    <img src={assetHref(item.image)} alt={item.alt || ""} loading="lazy" draggable="false" />
+    <>
+      <img
+        className={item.hoverImage ? "plaything-image-default" : undefined}
+        src={assetHref(item.image)}
+        alt={item.alt || ""}
+        loading="lazy"
+        draggable="false"
+      />
+      {item.hoverImage && (
+        <img
+          className="plaything-image-hover"
+          src={assetHref(item.hoverImage)}
+          alt=""
+          loading="lazy"
+          draggable="false"
+        />
+      )}
+    </>
   ) : item.video ? (
     <video src={assetHref(item.video)} poster={item.poster ? assetHref(item.poster) : undefined} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />
   ) : (
@@ -581,6 +992,7 @@ function PlaygroundNavigation({ clock, navigate }) {
         <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span>01.</span> work</a>
         <a className="active" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}><span>02.</span> playground</a>
         <a href={routeHref("about")} onClick={(event) => navigate(event, "/about")}><span>03.</span> about</a>
+        <a href={routeHref("ao-studio")} onClick={(event) => navigate(event, "/ao-studio")}><span>04.</span> ao studio</a>
       </nav>
       <div className="playground-nav-meta">
         <a href={`mailto:${profile.email}`}>email <Arrow /></a>
@@ -597,7 +1009,7 @@ function PlaygroundPage({ clock, navigate }) {
       <section
         className="playground-stage"
         aria-labelledby="playground-title"
-        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-table-background.jpg")})` }}
+        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-background-moving.gif")})` }}
       >
         <h1 className="playground-title" id="playground-title">Playground</h1>
         <p className="playground-kicker">personal archive · ongoing</p>
@@ -605,6 +1017,143 @@ function PlaygroundPage({ clock, navigate }) {
         {playgroundItems.map((item, index) => <PlaygroundItem index={index} item={item} key={item.id} />)}
       </section>
     </main>
+  );
+}
+
+const photographyAlbum = {
+  id: "icff-lavazza-inclucity",
+  title: "ICFF Lavazza IncluCity Festival",
+  eyebrow: "Opening night · portraits, candids, atmosphere",
+  meta: "22 photographs · Distillery District, Toronto",
+  ask: "Create a complete opening-night story that celebrated the festival's guests while also documenting the energy, setting, and unscripted moments around them.",
+  creativity: "I worked like a friendly paparazzo, moving between polished portraits and spontaneous interactions, then using the Distillery District's architecture and evening light to give the collection rhythm, warmth, and a clear sense of place.",
+  photoBase: "/projects/work/icff",
+  previewPhotos: ["dsc01934.jpg", "dsc02010.jpg", "dsc01693.jpg"],
+  photos: [
+    "dsc01934.jpg", "dsc01827.jpg", "dsc01824.jpg", "dsc01819.jpg", "dsc01796.jpg", "dsc01782.jpg", "dsc01741.jpg", "dsc01723.jpg",
+    "dsc02115.jpg", "dsc02101.jpg", "dsc02020.jpg", "dsc02010.jpg", "dsc01870.jpg", "dsc01802.jpg", "dsc01783.jpg",
+    "dsc01716.jpg", "dsc01693.jpg", "dsc01668.jpg", "dsc01639.jpg", "dsc01475.jpg", "dsc01263.jpg", "dsc01233.jpg",
+  ],
+};
+const photographySessions = [
+  photographyAlbum,
+  {
+    id: "icff-isabella-rossellini",
+    title: "A Night with Isabella Rossellini",
+    eyebrow: "ICFF Lavazza · celebrity portraits",
+    meta: "15 photographs · July 26, 2024 · The Hearn, Toronto",
+    ask: "Create celebrity portrait coverage around Isabella Rossellini while preserving the atmosphere, production, and guest experience of ICFF Lavazza's closing-gala evening.",
+    creativity: "I treated the session as more than a portrait assignment. The edit moves from the venue's cinematic architecture and luminous arrival sequence to the live performance, portrait-production details, and the guests inhabiting the space, building a complete visual story around the featured celebrity.",
+    photoBase: "/projects/playground/photography/isabella-rossellini",
+    previewPhotos: ["dsc02312.jpg", "dsc7395.jpg", "dsc02345.jpg"],
+    photos: [
+      "dsc02312.jpg", "dsc7395.jpg", "dsc7427.jpg", "dsc7396.jpg", "dsc7391.jpg",
+      "dsc7390.jpg", "dsc7399.jpg", "dsc02320.jpg", "dsc7428.jpg", "dsc7423.jpg",
+      "dsc02345.jpg", "dsc02348.jpg", "dsc02359.jpg", "dsc7401.jpg", "dsc7389.jpg",
+    ],
+  },
+  {
+    id: "icff-susan-sarandon",
+    title: "A Night with Susan Sarandon",
+    eyebrow: "ICFF Lavazza · celebrity photography",
+    meta: "Photographs coming soon · Toronto",
+    ask: "Document ICFF Lavazza's evening with Susan Sarandon, balancing the defining guest moments with the atmosphere and audience experience surrounding the event.",
+    creativity: "The visual direction moves between composed portraiture and candid editorial moments, creating a warm, cinematic record of the conversation and the evening around it.",
+    coverTone: "susan",
+    previewPhotos: [],
+    photos: [],
+  },
+  {
+    id: "icff-giancarlo-esposito",
+    title: "Giancarlo Esposito",
+    eyebrow: "ICFF Lavazza · On the Couch With…",
+    meta: "2 photographs · November 29, 2024 · Toronto",
+    ask: "Document ICFF's “On the Couch With…” conversation and the black-tie celebration surrounding Giancarlo Esposito.",
+    creativity: "The approach balances the intimacy of the live conversation with the energy of the after-party, maintaining a consistent editorial story as the light, pace, and mood change throughout the evening.",
+    coverTone: "giancarlo",
+    photoBase: "/projects/playground/photography/giancarlo-esposito",
+    previewPhotos: ["giancarlo-esposito-portrait-session.jpg"],
+    photos: ["giancarlo-esposito-portrait-session.jpg", "alexander-with-giancarlo-esposito.jpg"],
+  },
+];
+
+const photographyPhotoHref = (album, photo) => assetHref(`${album.photoBase || "/projects/work/icff"}/${photo}`);
+
+function PhotographyLightbox({ album, index, onChange, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowLeft") onChange((index - 1 + album.photos.length) % album.photos.length);
+      if (event.key === "ArrowRight") onChange((index + 1) % album.photos.length);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [album.photos.length, index, onChange, onClose]);
+
+  return (
+    <div className="photography-lightbox" role="dialog" aria-modal="true" aria-label={`${album.title} photograph ${index + 1}`}>
+      <button className="photography-lightbox-close" type="button" onClick={onClose} aria-label="Close photograph">×</button>
+      <button className="photography-lightbox-prev" type="button" onClick={() => onChange((index - 1 + album.photos.length) % album.photos.length)} aria-label="Previous photograph">←</button>
+      <figure>
+        <img src={photographyPhotoHref(album, album.photos[index])} alt={`${album.title} photograph ${String(index + 1).padStart(2, "0")}`} />
+        <figcaption>{String(index + 1).padStart(2, "0")} / {String(album.photos.length).padStart(2, "0")}</figcaption>
+      </figure>
+      <button className="photography-lightbox-next" type="button" onClick={() => onChange((index + 1) % album.photos.length)} aria-label="Next photograph">→</button>
+    </div>
+  );
+}
+
+function PhotographySessionCard({ album, index, navigate }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const previewPhotos = album.previewPhotos || album.photos;
+  const hasPreviewPhotos = previewPhotos.length > 0;
+
+  useEffect(() => {
+    if (paused || !hasPreviewPhotos) return undefined;
+    const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % previewPhotos.length), 4200);
+    return () => window.clearInterval(timer);
+  }, [hasPreviewPhotos, paused, previewPhotos.length]);
+
+  return (
+    <a
+      className="photography-session-card"
+      href={routeHref(`playground/photography/${album.id}`)}
+      onClick={(event) => navigate(event, "/", `playground/photography/${album.id}`)}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      aria-label={`Open ${album.title} album`}
+    >
+      <div className="photography-session-image">
+        {hasPreviewPhotos ? (
+          <>
+            <img key={previewPhotos[activeIndex]} src={photographyPhotoHref(album, previewPhotos[activeIndex])} alt="" />
+            <span className="photography-session-count">{String(activeIndex + 1).padStart(2, "0")} / {String(previewPhotos.length).padStart(2, "0")}</span>
+          </>
+        ) : (
+          <div className={`photography-session-placeholder photography-session-placeholder-${album.coverTone || "default"}`} aria-hidden="true">
+            <span>ICFF Lavazza</span>
+            <strong>{album.title}</strong>
+            <small>Album in progress</small>
+          </div>
+        )}
+      </div>
+      <div className="photography-session-copy">
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        <div>
+          <p>{album.eyebrow}</p>
+          <h3>{album.title}</h3>
+          <small>{album.meta}</small>
+        </div>
+        <i aria-hidden="true">↗</i>
+      </div>
+    </a>
   );
 }
 
@@ -625,7 +1174,7 @@ function PhotographyPage({ clock, navigate }) {
           <h1 id="photography-title">My Art</h1>
           <p className="photography-lede">My evolving collection of portraits, events, sports, and everyday moments that catch my eye.</p>
           <div className="photography-meta" aria-label="My Art archive details">
-            <span>2020—present</span>
+            <span>2020 to present</span>
             <span>Toronto + elsewhere</span>
           </div>
         </div>
@@ -635,12 +1184,80 @@ function PhotographyPage({ clock, navigate }) {
         </div>
       </section>
       <section className="photography-archive-intro" aria-labelledby="photography-archive-title">
-        <p>selected frames</p>
+        <p>photoshoot sessions</p>
         <div>
-          <h2 id="photography-archive-title">The archive starts here.</h2>
-          <p>Selected photography projects will be added to this space as the collection is curated.</p>
+          <h2 id="photography-archive-title">A growing archive of sessions.</h2>
+          <p>Select a photoshoot to see its complete edit, creative brief, and the thinking behind the work.</p>
         </div>
       </section>
+      <section className="photography-session-grid" aria-label="Photography sessions">
+        {photographySessions.map((album, index) => <PhotographySessionCard album={album} index={index} navigate={navigate} key={album.id} />)}
+      </section>
+    </main>
+  );
+}
+
+function PhotographyAlbumPage({ album, clock, navigate }) {
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [slideshowIndex, setSlideshowIndex] = useState(0);
+  const [albumOpen, setAlbumOpen] = useState(false);
+  const hasPhotos = album.photos.length > 0;
+  const showPreviousSlide = () => {
+    if (hasPhotos) setSlideshowIndex((current) => (current - 1 + album.photos.length) % album.photos.length);
+  };
+  const showNextSlide = () => {
+    if (hasPhotos) setSlideshowIndex((current) => (current + 1) % album.photos.length);
+  };
+
+  return (
+    <main className="playground-page photography-page photography-album-page">
+      <PlaygroundNavigation clock={clock} navigate={navigate} />
+      <header className="photography-album-page-header">
+        <a href={routeHref("playground/photography")} onClick={(event) => navigate(event, "/", "playground/photography")}><span aria-hidden="true">←</span> My Art</a>
+        <p>{album.eyebrow}</p>
+        <h1>{album.title}</h1>
+        <div><span>{album.meta}</span><span>{hasPhotos ? "Slideshow" : "Album in progress"}</span></div>
+      </header>
+      {hasPhotos ? (
+        <section className="photography-album-slideshow" aria-label={`${album.title} slideshow`}>
+          <button className="photography-slideshow-image" type="button" onClick={showNextSlide} aria-label={`Show next photograph. Currently showing photograph ${slideshowIndex + 1} of ${album.photos.length}`}>
+            <img key={album.photos[slideshowIndex]} src={photographyPhotoHref(album, album.photos[slideshowIndex])} alt={`${album.title} photograph ${String(slideshowIndex + 1).padStart(2, "0")}`} />
+          </button>
+          <div className="photography-slideshow-controls">
+            <span>{String(slideshowIndex + 1).padStart(2, "0")} / {String(album.photos.length).padStart(2, "0")}</span>
+            <div>
+              <button type="button" onClick={showPreviousSlide} aria-label="Previous photograph">←</button>
+              <button type="button" onClick={showNextSlide} aria-label="Next photograph">→</button>
+            </div>
+          </div>
+          <button className="photography-open-album" type="button" onClick={() => setAlbumOpen((open) => !open)} aria-expanded={albumOpen} aria-controls="photography-complete-album">
+            <span>{albumOpen ? "Close the album" : "Open the album"}</span><i aria-hidden="true">{albumOpen ? "−" : "+"}</i>
+          </button>
+        </section>
+      ) : (
+        <section className={`photography-empty-album photography-empty-album-${album.coverTone || "default"}`} aria-label={`${album.title} album status`}>
+          <p>Selected photographs will appear here.</p>
+          <h2>Album in progress.</h2>
+          <span>This session is now part of the archive. Its complete edit will be added once the photographs are supplied.</span>
+        </section>
+      )}
+      {hasPhotos && albumOpen && (
+        <section className="photography-full-album" id="photography-complete-album" aria-label={`${album.title} complete photo album`}>
+          {album.photos.map((photo, index) => (
+            <figure key={photo}>
+              <button type="button" onClick={() => setLightboxIndex(index)} aria-label={`Open photograph ${index + 1} in full-screen viewer`}>
+                <img src={photographyPhotoHref(album, photo)} alt={`${album.title} photograph ${String(index + 1).padStart(2, "0")}`} loading={index < 4 ? "eager" : "lazy"} />
+              </button>
+              <figcaption>{String(index + 1).padStart(2, "0")}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )}
+      <section className="photography-album-page-brief">
+        <div><span>the ask</span><p>{album.ask}</p></div>
+        <div><span>creative approach</span><p>{album.creativity}</p></div>
+      </section>
+      {lightboxIndex !== null && <PhotographyLightbox album={album} index={lightboxIndex} onChange={setLightboxIndex} onClose={() => setLightboxIndex(null)} />}
     </main>
   );
 }
@@ -682,82 +1299,863 @@ function DesignPage({ clock, navigate }) {
   );
 }
 
-function CaseStudyPage({ clock, navigate, project }) {
-  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
-  const backLabel = project.parentTitle || "selected work";
+function FAAdventurePage({ clock, navigate }) {
+  const flightStats = [
+    { value: "16", label: "flights" },
+    { value: "28.3k", label: "kilometres" },
+    { value: "9", label: "airports" },
+    { value: "2", label: "countries" },
+  ];
+  const destinations = ["Vancouver", "Montreal", "Edmonton", "Calgary", "Halifax", "Tampa", "MCO · Orlando", "Ottawa", "Winnipeg"];
+  const flightMemories = [
+    {
+      title: "Class 15",
+      eyebrow: "the beginning",
+      summary: "Completing initial training with Class 15 turned unfamiliar routines into a shared milestone.",
+      strengths: "Training · Teamwork · Safety",
+      enjoyed: "I enjoyed learning beside a group that quickly became a support system and celebrating each step together.",
+      learned: "Clear communication, preparation, and teamwork build the confidence needed before entering the cabin.",
+      image: "/projects/playground/fa-adventure/class-15.jpg",
+      alt: "Porter Airlines Class 15 flight attendant training group",
+    },
+    {
+      title: "My first flight",
+      eyebrow: "first departure",
+      summary: "My first operating flight was the moment classroom training became real passenger service.",
+      strengths: "Passenger service · Adaptability · Crew coordination",
+      enjoyed: "I loved the energy of putting everything into practice with an encouraging crew beside me.",
+      learned: "Stay present, adapt quickly, and trust the procedures and people around you.",
+      image: "/projects/playground/fa-adventure/first-flight.jpg",
+      alt: "Alexander with fellow Porter crew members before his first flight",
+    },
+    {
+      title: "Pre-flight grooming",
+      eyebrow: "before report time",
+      summary: "The pre-flight routine helped me arrive polished, prepared, and ready to represent the airline.",
+      strengths: "Professional standards · Readiness · Attention to detail",
+      enjoyed: "I enjoyed the quiet ritual of getting ready because it created focus before a busy day.",
+      learned: "Professional presentation is part of operational readiness and helps set the tone for the passenger experience.",
+      image: "/projects/playground/fa-adventure/pre-flight-grooming.jpg",
+      alt: "Alexander checking his Porter flight attendant uniform before a flight",
+    },
+    {
+      title: "Flight organization",
+      eyebrow: "galley preparation",
+      summary: "A well-organized galley made service smoother and gave the crew more time to focus on passengers.",
+      strengths: "Galley setup · Workflow planning · Organization",
+      enjoyed: "I enjoyed turning a compact workspace into a clear, efficient setup.",
+      learned: "Strong service begins before takeoff by anticipating needs and arranging every step in sequence.",
+      image: "/projects/playground/fa-adventure/flight-organization.jpg",
+      alt: "Organized drinks and snacks in a Porter aircraft galley",
+    },
+    {
+      title: "Before serving food",
+      eyebrow: "cabin service",
+      summary: "Cabin service brought together timing, hospitality, and careful attention to safety.",
+      strengths: "Cabin service · Hospitality · Time management",
+      enjoyed: "I enjoyed the rhythm of working with the crew and creating a warm moment for passengers in the air.",
+      learned: "How to balance friendly service with efficiency, awareness, and consistent procedures.",
+      image: "/projects/playground/fa-adventure/before-serving-food.jpg",
+      alt: "Alexander ready to begin food service aboard a Porter flight",
+    },
+    {
+      title: "First time at MCO",
+      eyebrow: "Orlando · Florida",
+      summary: "My first arrival at MCO made the scale and variety of the route network feel tangible.",
+      strengths: "Airport navigation · Adaptability · Crew travel",
+      enjoyed: "I loved sharing the excitement of a new airport with the crew and experiencing Orlando for the first time.",
+      learned: "Every airport has its own flow, so observation and adaptability matter from arrival to departure.",
+      image: "/projects/playground/fa-adventure/first-time-in-mco.jpg",
+      alt: "Porter crew walking through Orlando International Airport with their luggage",
+    },
+    {
+      title: "On the ground at MCO",
+      eyebrow: "Orlando · Florida",
+      summary: "Seeing the aircraft during turnaround gave me a wider view of everything required between flights.",
+      strengths: "Turnaround awareness · Ground operations · Team coordination",
+      enjoyed: "I enjoyed the rare chance to slow down and appreciate the aircraft and the teams working around it.",
+      learned: "Reliable departures depend on many people completing precise tasks in a short window.",
+      image: "/projects/playground/fa-adventure/mco.jpg",
+      alt: "Porter aircraft parked at Orlando International Airport beneath a cloudy sky",
+    },
+    {
+      title: "In the pit",
+      eyebrow: "behind the scenes",
+      summary: "A closer look inside the flight deck connected the passenger-facing cabin experience with the systems guiding the aircraft.",
+      strengths: "Cross-functional awareness · Safety culture · Communication",
+      enjoyed: "I enjoyed seeing the cockpit up close and learning more about the environment my flight-deck colleagues work in.",
+      learned: "Safe operations are built on precision, checklists, and clear coordination between cabin and flight deck.",
+      video: "/projects/playground/fa-adventure/in-the-pit.m4v",
+    },
+  ];
+
+  const scrollToFlightLog = () => {
+    document.getElementById("fa-flight-log")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
-    <main className="main-content case-study-page">
-      <article className="case-study">
-        <a className="case-study-back reveal reveal-fast" href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}>
-          <span aria-hidden="true">←</span> {backLabel}
-        </a>
-        <div className="case-study-media reveal" style={{ "--aspect": project.aspect }}>
-          <ProjectVisual project={project} />
+    <main className="playground-page fa-adventure-page">
+      <PlaygroundNavigation clock={clock} navigate={navigate} />
+      <section
+        className="fa-hero"
+        aria-labelledby="fa-adventure-title"
+        style={{ "--fa-background": `url(${assetHref("/projects/playground/playground-background-moving.gif")})` }}
+      >
+        <div className="fa-hero-copy reveal reveal-fast">
+          <a className="fa-back" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}>
+            <span aria-hidden="true">←</span> playground
+          </a>
+          <p className="fa-eyebrow">personal archive · flight attendant</p>
+          <h1 id="fa-adventure-title">my FA<br />adventure</h1>
+          <p className="fa-lede">A growing record of the places, views, and in-between moments I have collected while working in the sky.</p>
+          <button className="fa-scroll-link" type="button" onClick={scrollToFlightLog}>Explore the flight log <span aria-hidden="true">↓</span></button>
         </div>
-        <header className="case-study-header reveal">
-          <p>{project.coverEyebrow}</p>
-          <h1>{project.title}</h1>
-          <div className="case-study-intro">{project.description}</div>
+        <div className="fa-hero-plane reveal">
+          <span>Porter Airlines</span>
+          <img src={assetHref("/projects/playground/stickers/porter-airlines-sticker.png")} alt="Porter Airlines airplane sticker" />
+        </div>
+      </section>
+
+      <section className="fa-map" id="fa-flight-log" aria-labelledby="fa-map-title">
+        <header className="fa-section-heading fa-map-heading reveal">
+          <p>routes</p>
+          <div>
+            <h2 id="fa-map-title">Where the adventure has taken me.</h2>
+            <p>My current route map connects nine airports across Canada and the United States.</p>
+          </div>
         </header>
-        <dl className="case-study-meta reveal">
-          <div><dt>Role</dt><dd>{project.role}</dd></div>
-          <div><dt>Organization</dt><dd>{project.organization}</dd></div>
-          <div><dt>Timeline</dt><dd>{project.period}</dd></div>
+        <figure className="fa-route-map reveal">
+          <img src={assetHref("/projects/playground/fa-adventure/flight-routes.jpg")} alt="Map of 16 flight routes connecting 9 airports across Canada and the United States" />
+          <figcaption>Flight history recorded with My Flight Routes.</figcaption>
+        </figure>
+      </section>
+
+      <section className="fa-stats" aria-labelledby="fa-stats-title">
+        <header className="fa-section-heading reveal">
+          <p>flight log · so far</p>
+          <div>
+            <h2 id="fa-stats-title">The journey in numbers.</h2>
+            <p>Every route adds another place, crew memory, and view from above to the archive.</p>
+          </div>
+        </header>
+        <dl className="fa-stat-grid reveal">
+          {flightStats.map((stat) => <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}
         </dl>
-        {project.mediaSections?.map((section, sectionIndex) => (
-          <section className="case-study-feature reveal" aria-labelledby={`${project.slug}-feature-${sectionIndex}`} key={section.title}>
-            <div className="case-study-feature-copy">
-              <p>{section.eyebrow}</p>
-              <div>
-                <h2 id={`${project.slug}-feature-${sectionIndex}`}>{section.title}</h2>
-                {section.description && <p>{section.description}</p>}
+      </section>
+
+      <section className="fa-journal" aria-labelledby="fa-journal-title">
+        <header className="fa-section-heading reveal">
+          <p>travel journal</p>
+          <div>
+            <h2 id="fa-journal-title">Beyond the route line.</h2>
+            <p>Each city carries its own crew stories, airport rituals, and moments found between flights.</p>
+          </div>
+        </header>
+        <ul className="fa-destination-list reveal" aria-label="Destinations visited as a flight attendant">
+          {destinations.map((destination) => <li key={destination}>{destination}</li>)}
+        </ul>
+        <div className="fa-memory-list">
+          {flightMemories.map((memory, index) => (
+            <article className="fa-memory reveal" key={memory.title}>
+              <div className="fa-memory-media">
+                {memory.video ? (
+                  <video src={assetHref(memory.video)} controls muted loop playsInline preload="metadata" aria-label={memory.title} />
+                ) : (
+                  <img src={assetHref(memory.image)} alt={memory.alt} loading="eager" decoding="sync" />
+                )}
               </div>
+              <div className="fa-memory-copy">
+                <span>{String(index + 1).padStart(2, "0")} · {memory.eyebrow}</span>
+                <h3>{memory.title}</h3>
+                <p className="fa-memory-summary">{memory.summary}</p>
+                <p className="fa-memory-strengths">{memory.strengths}</p>
+                <dl className="fa-memory-details">
+                  <div>
+                    <dt>What I enjoyed</dt>
+                    <dd>{memory.enjoyed}</dd>
+                  </div>
+                  <div>
+                    <dt>What I learned</dt>
+                    <dd>{memory.learned}</dd>
+                  </div>
+                </dl>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+function StructuredMediaItem({ item, title, index, presentation }) {
+  const isInstagramPhone = presentation === "instagram-phone" && item.type === "video";
+  return (
+    <figure className={`structured-media-item structured-media-${item.type}${isInstagramPhone ? " structured-media-instagram-phone" : ""}`} style={{ "--media-aspect": item.aspect || "4 / 3" }}>
+      <div className="structured-media-frame">
+        {isInstagramPhone ? (
+          <div className="instagram-phone">
+            <div className="instagram-phone-notch" aria-hidden="true" />
+            <div className="instagram-phone-screen">
+              <div className="instagram-phone-status" aria-hidden="true"><span>9:41</span><span>● ▰</span></div>
+              <div className="instagram-phone-topbar" aria-hidden="true"><span>Instagram</span><span>♡ &nbsp;↗</span></div>
+              <div className="instagram-phone-account" aria-hidden="true"><span className="instagram-phone-avatar">T&amp;T</span><strong>{item.account || "tt_supermarket"}</strong><span>•••</span></div>
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                poster={item.poster ? assetHref(item.poster) : undefined}
+                aria-label={item.caption || `${title} video ${index + 1}`}
+              >
+                <source src={assetHref(item.src)} type="video/mp4" />
+                Your browser does not support embedded video.
+              </video>
+              <div className="instagram-phone-actions" aria-hidden="true"><span>♡ &nbsp;○ &nbsp;↗</span><span>▢</span></div>
+              <div className="instagram-phone-caption" aria-hidden="true"><strong>{item.account || "tt_supermarket"}</strong><span>{item.postExcerpt || item.caption}</span></div>
+              <div className="instagram-phone-bottom" aria-hidden="true">⌂ &nbsp;⌕ &nbsp;⊞ &nbsp;♡ &nbsp;◉</div>
             </div>
-            <div className={`case-study-gallery${section.layout ? ` case-study-gallery-${section.layout}` : ""}`}>
-              {section.items.map((item, itemIndex) => (
-                <figure className="case-study-gallery-item" key={item.src || item.videoId} style={{ "--media-aspect": item.aspect || "1 / 1" }}>
-                  {item.type === "youtube" ? (
-                    <div className="case-study-embed">
-                      <iframe
-                        src={`https://www.youtube-nocookie.com/embed/${item.videoId}`}
-                        title={item.title || section.title}
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                      />
-                    </div>
-                  ) : item.type === "video" ? (
-                    <video
-                      controls
-                      playsInline
-                      preload="metadata"
-                      poster={item.poster ? assetHref(item.poster) : undefined}
-                      aria-label={item.caption || `${section.title} video ${itemIndex + 1}`}
-                    >
-                      <source src={assetHref(item.src)} type="video/mp4" />
-                      Your browser does not support embedded video.
-                    </video>
-                  ) : (
-                    <img src={assetHref(item.src)} alt={item.alt || ""} loading="lazy" />
-                  )}
-                  {item.caption && (
-                    <figcaption>
-                      <span>{String(itemIndex + 1).padStart(2, "0")}</span>
-                      {item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<Arrow /></a> : item.caption}
-                    </figcaption>
-                  )}
-                </figure>
+          </div>
+        ) : item.type === "youtube" ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${item.videoId}`}
+            title={item.title || title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        ) : item.type === "video" ? (
+          <video
+            controls
+            playsInline
+            preload="metadata"
+            poster={item.poster ? assetHref(item.poster) : undefined}
+            aria-label={item.caption || `${title} video ${index + 1}`}
+          >
+            <source src={assetHref(item.src)} type="video/mp4" />
+            Your browser does not support embedded video.
+          </video>
+        ) : item.type === "image" ? (
+          <ZoomableImage src={item.src} alt={item.alt || ""} />
+        ) : (
+          <div className="structured-media-placeholder" aria-label={`${item.label} placeholder`}>
+            <span>Media placeholder</span>
+            <strong>{item.label}</strong>
+            <small>Replace with your photo or video</small>
+          </div>
+        )}
+      </div>
+      {item.caption && (isInstagramPhone && item.postUrl ? (
+        <figcaption className="instagram-post-credit">
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <div>
+            <strong>{item.caption}</strong>
+            {item.publicMetrics && <small className="instagram-post-metrics">{item.publicMetrics.likes} likes{item.publicMetrics.comments ? ` · ${item.publicMetrics.comments} comments` : ""}</small>}
+            <a href={item.postUrl} target="_blank" rel="noopener noreferrer">Read the original caption on Instagram ↗</a>
+          </div>
+        </figcaption>
+      ) : (
+        <figcaption><span>{String(index + 1).padStart(2, "0")}</span>{item.caption}</figcaption>
+      ))}
+    </figure>
+  );
+}
+
+function StructuredCaseStudyPage({ clock, navigate, project }) {
+  const [openGlossaryId, setOpenGlossaryId] = useState(null);
+  const openGlossaryChapter = project.chapters.find((chapter) => chapter.id === openGlossaryId);
+  const progressSections = useMemo(() => [
+    { id: "structured-overview", label: "Overview" },
+    { id: "structured-work", label: "Project index" },
+    ...project.chapters.map((chapter) => ({ id: chapter.id, label: chapter.title })),
+  ], [project]);
+
+  return (
+    <main className={`main-content case-study-page structured-case-study-page immersive-project-page structured-case-study-${project.slug}`}>
+      <ProjectProgressHUD sections={progressSections} label={`${project.title} project journey`} />
+      <article className="case-study structured-case-study">
+        <header className="structured-case-study-hero reveal reveal-fast" id="structured-overview">
+          <div className="structured-case-study-hero-media" style={{ "--hero-aspect": project.aspect || "16 / 10" }}>
+            <ProjectVisual project={project} />
+            <span className="structured-hero-index">01 / {String(progressSections.length).padStart(2, "0")}</span>
+          </div>
+          <div className="structured-case-study-hero-copy">
+            <a className="case-study-back" href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>
+              <span aria-hidden="true">←</span> selected work
+            </a>
+            <p>{project.coverEyebrow || "Selected case study"}</p>
+            <h1>{project.caseStudyTitle || project.organization || project.title}</h1>
+            <div className="structured-case-study-lede">{project.description}</div>
+            <dl className="structured-case-study-meta" aria-label="Project details">
+              <div><dt>Role</dt><dd>{project.role}</dd></div>
+              <div><dt>Timeline</dt><dd>{project.period}</dd></div>
+            </dl>
+            <a className="project-scroll-cue" href={`#structured-work`} onClick={(event) => { event.preventDefault(); document.getElementById("structured-work")?.scrollIntoView({ behavior: "smooth" }); }}>
+              Explore the project <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+        </header>
+
+        {project.impact?.length > 0 && (
+          <section className="structured-proof-strip reveal" aria-label="Project proof">
+            {project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}
+          </section>
+        )}
+
+        <section className="structured-glossary reveal" id="structured-work" aria-labelledby={`${project.slug}-glossary`}>
+          <header>
+            <p>Project index</p>
+            <div><h2 id={`${project.slug}-glossary`}>Explore the work.</h2><p className="structured-glossary-lede">Choose a chapter to preview its projects, then open the full story.</p></div>
+          </header>
+          <nav className="structured-glossary-grid" aria-label={`${project.title} project sections`}>
+            {project.workstreams.map((workstream) => (
+              <button
+                className="structured-glossary-trigger"
+                type="button"
+                aria-expanded={openGlossaryId === workstream.id}
+                aria-controls={`${workstream.id}-glossary-projects`}
+                onClick={() => setOpenGlossaryId((current) => current === workstream.id ? null : workstream.id)}
+                key={workstream.id}
+              >
+                <span>{workstream.number}</span>
+                <h3>{workstream.title}</h3>
+                <p>{workstream.description}</p>
+                <small aria-hidden="true">↓</small>
+              </button>
+            ))}
+            {openGlossaryChapter && <div className="structured-glossary-projects structured-glossary-projects-wide" id={`${openGlossaryChapter.id}-glossary-projects`}>
+              {openGlossaryChapter.projects.map((entry, projectIndex) => (
+                <a href={routeHref(projectDetailRoute(project, openGlossaryChapter, projectIndex))} key={`${openGlossaryChapter.id}-${entry.number || projectIndex}`}>
+                  <span>{entry.number || String(projectIndex + 1).padStart(2, "0")}</span>
+                  <div><strong>{entry.title}</strong><p>{entry.description}</p></div>
+                  <i aria-hidden="true">↗</i>
+                </a>
               ))}
+            </div>}
+          </nav>
+        </section>
+
+        {project.chapters.map((chapter) => (
+          <section className="structured-chapter overview-chapter" id={chapter.id} aria-labelledby={`${chapter.id}-title`} key={chapter.id}>
+            <header className="structured-chapter-header reveal">
+              <p>{chapter.number}</p>
+              <div>
+                <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
+                <p>{chapter.description}</p>
+              </div>
+            </header>
+
+            <div className="overview-project-grid">
+              {chapter.projects.map((entry, projectIndex) => {
+                const cover = [...(entry.items || []), ...(entry.storyboardItems || []), ...(entry.finalOutputItems || [])].find((item) => item.type === "image" || item.poster);
+                return (
+                  <a className="overview-project-card reveal" href={routeHref(projectDetailRoute(project, chapter, projectIndex))} key={`${chapter.id}-${projectIndex}`}>
+                    <div className="overview-project-cover">
+                      {cover ? <img src={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} loading="lazy" /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
+                      <span className="overview-project-open" aria-hidden="true">↗</span>
+                    </div>
+                    <div className="overview-project-copy">
+                      <p>{entry.eyebrow}</p>
+                      <h3>{entry.title}</h3>
+                      <span>{entry.description}</span>
+                      <small>View project <span aria-hidden="true">→</span></small>
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           </section>
         ))}
+        <nav className="immersive-project-next reveal" aria-label="Continue exploring">
+          <span>Continue exploring</span>
+          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↗</span></a>
+        </nav>
+      </article>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+const detailSections = [
+  { id: "detail-context", label: "context" },
+  { id: "detail-contribution", label: "my contribution" },
+  { id: "detail-work", label: "the work" },
+  { id: "detail-impact", label: "impact" },
+];
+const detailSectionsFor = (entry) => detailSections.map((section) =>
+  section.id === "detail-contribution" && entry.solution ? { ...section, label: "solution" } : section
+).flatMap((section) => section.id === "detail-work" && entry.storyboardItems ? [
+  { id: "detail-storyboard", label: "storyboard" },
+  { id: "detail-final-output", label: "final output" },
+] : section);
+
+function ProjectDetailHeroItem({ item }) {
+  return <div className="project-detail-hero-item"><ZoomableImage src={item.src} alt={item.alt || ""} loading="eager" /></div>;
+}
+
+function ProjectDetailSidebar({ clock, navigate, detail, route }) {
+  const sections = detailSectionsFor(detail.entry);
+  const [activeSection, setActiveSection] = useState(sections[0].id);
+
+  useEffect(() => {
+    setActiveSection(sections[0].id);
+    const update = () => {
+      const marker = window.innerHeight * 0.35;
+      const active = sections.reduce((current, section) => {
+        const element = document.getElementById(section.id);
+        return element && element.getBoundingClientRect().top <= marker ? section.id : current;
+      }, sections[0].id);
+      setActiveSection(active);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [route]);
+
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <aside className="sidebar detail-sidebar">
+      <div className="detail-sidebar-main">
+        <a className="detail-sidebar-back" href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>← &nbsp; Back to work</a>
+        <div className="detail-sidebar-project"><span>{detail.project.title}</span><a href={routeHref(`project/${detail.project.slug}`)} onClick={(event) => navigate(event, "/", `project/${detail.project.slug}`)}>All projects ↗</a></div>
+        <nav className="detail-sidebar-nav" aria-label={`${detail.entry.title} sections`}>
+          {sections.map((section) => (
+            <a href={routeHref(route)} onClick={(event) => scrollToSection(event, section.id)} className={activeSection === section.id ? "active" : ""} aria-current={activeSection === section.id ? "location" : undefined} key={section.id}>{section.label}</a>
+          ))}
+        </nav>
+      </div>
+      <span className="detail-sidebar-clock">{clock}</span>
+    </aside>
+  );
+}
+
+function ToolkitAssetCard({ collection, index, isActive, onToggle, triggerRef }) {
+  const panelId = `toolkit-collection-${index}`;
+  const previewMode = collection.previewMode || "standard";
+  return (
+    <article className={`toolkit-asset-card toolkit-asset-card-${previewMode}${isActive ? " is-active" : ""}`}>
+      <button
+        type="button"
+        ref={triggerRef}
+        onClick={onToggle}
+        aria-expanded={isActive}
+        aria-controls={panelId}
+        aria-label={`${isActive ? "Close" : "View"} the ${collection.title} collection, ${collection.images.length} assets`}
+      >
+        <div className={`toolkit-asset-preview toolkit-asset-preview-${previewMode}`} data-format={collection.formatLabel || "asset preview"}>
+          <div className="toolkit-asset-preview-media" style={{ "--asset-aspect": collection.previewAspect || "4 / 3" }}>
+            <img src={assetHref(collection.images[0])} alt={`${collection.title} representative asset`} />
+          </div>
+          <span>01 / {String(collection.images.length).padStart(2, "0")}</span>
+        </div>
+        <div className="toolkit-asset-copy">
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <div><h3>{collection.title}</h3><p>{collection.description}</p></div>
+          <i aria-hidden="true">{isActive ? "−" : "+"}</i>
+        </div>
+      </button>
+    </article>
+  );
+}
+
+function ToolkitAssetExplorer({ collections }) {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const railRef = useRef(null);
+  const triggerRefs = useRef([]);
+  const activeCollection = activeIndex === null ? null : collections[activeIndex];
+
+  const closeCollection = () => {
+    const returnFocusIndex = activeIndex;
+    setActiveIndex(null);
+    window.requestAnimationFrame(() => triggerRefs.current[returnFocusIndex]?.focus());
+  };
+
+  useEffect(() => {
+    if (activeIndex === null) return undefined;
+    railRef.current?.scrollTo({ left: 0 });
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") closeCollection();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeIndex]);
+
+  useEffect(() => setActiveIndex(null), [collections]);
+
+  const scrollRail = (direction) => {
+    const rail = railRef.current;
+    const slide = rail?.querySelector("figure");
+    if (!rail || !slide) return;
+    const gap = parseFloat(window.getComputedStyle(rail).columnGap) || 0;
+    rail.scrollBy({ left: direction * (slide.getBoundingClientRect().width + gap), behavior: "smooth" });
+  };
+
+  return (
+    <div className="toolkit-asset-explorer">
+      <div className="toolkit-asset-grid" aria-label="Toolkit asset collections">
+        {collections.map((collection, collectionIndex) => (
+          <ToolkitAssetCard
+            collection={collection}
+            index={collectionIndex}
+            isActive={activeIndex === collectionIndex}
+            onToggle={() => setActiveIndex((current) => current === collectionIndex ? null : collectionIndex)}
+            triggerRef={(node) => { triggerRefs.current[collectionIndex] = node; }}
+            key={collection.title}
+          />
+        ))}
+      </div>
+      {activeCollection && <section
+        className={`toolkit-asset-tray toolkit-asset-tray-${activeCollection.previewMode || "standard"}`}
+        id={`toolkit-collection-${activeIndex}`}
+        role="region"
+        aria-roledescription="carousel"
+        aria-labelledby={`toolkit-collection-title-${activeIndex}`}
+      >
+        <header className="toolkit-asset-tray-header">
+          <span>Collection {String(activeIndex + 1).padStart(2, "0")}</span>
+          <div>
+            <h3 id={`toolkit-collection-title-${activeIndex}`}>{activeCollection.title}</h3>
+            <p>{activeCollection.images.length} assets · scroll or use the arrows to browse</p>
+          </div>
+          <div className="toolkit-asset-tray-controls">
+            <button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${activeCollection.title} asset`}>←</button>
+            <button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${activeCollection.title} asset`}>→</button>
+            <button type="button" onClick={closeCollection} aria-label={`Close the ${activeCollection.title} collection`}>×</button>
+          </div>
+        </header>
+        <div className="toolkit-asset-rail" ref={railRef} tabIndex="0" aria-label={`${activeCollection.title} assets`}>
+          {activeCollection.images.map((image, imageIndex) => <figure
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${imageIndex + 1} of ${activeCollection.images.length}`}
+            key={image}
+          >
+            <div style={{ "--asset-aspect": activeCollection.previewAspect || "4 / 3" }}><img src={assetHref(image)} alt={`${activeCollection.title} asset ${imageIndex + 1}`} loading="lazy" /></div>
+            <figcaption>{String(imageIndex + 1).padStart(2, "0")} / {String(activeCollection.images.length).padStart(2, "0")}</figcaption>
+          </figure>)}
+        </div>
+      </section>}
+    </div>
+  );
+}
+
+function ToolkitPrototypeGallery({ gallery }) {
+  const railRef = useRef(null);
+  const scrollRail = (direction) => {
+    const rail = railRef.current;
+    const screen = rail?.querySelector("figure");
+    if (!rail || !screen) return;
+    const gap = parseFloat(window.getComputedStyle(rail).columnGap) || 0;
+    rail.scrollBy({ left: direction * (screen.getBoundingClientRect().width + gap), behavior: "smooth" });
+  };
+
+  return (
+    <section className="toolkit-prototype" aria-labelledby="toolkit-prototype-title">
+      <header className="toolkit-prototype-header">
+        <span>{gallery.label || "First version"}</span>
+        <div>
+          <h3 id="toolkit-prototype-title">{gallery.title}</h3>
+          <p>{gallery.description}</p>
+        </div>
+        <div className="toolkit-prototype-controls">
+          <button type="button" onClick={() => scrollRail(-1)} aria-label="Previous first-version screen">←</button>
+          <button type="button" onClick={() => scrollRail(1)} aria-label="Next first-version screen">→</button>
+        </div>
+      </header>
+      <div className="toolkit-prototype-rail" ref={railRef} tabIndex="0" aria-label="First-version toolkit screens">
+        {gallery.items.map((item, itemIndex) => <figure key={item.src}>
+          <div><img src={assetHref(item.src)} alt={item.alt || ""} loading="lazy" /></div>
+          <figcaption><span>{String(itemIndex + 1).padStart(2, "0")}</span>{item.caption}</figcaption>
+        </figure>)}
+      </div>
+    </section>
+  );
+}
+
+function ProjectDetailSectionHeading({ label, title }) {
+  return <header className="project-detail-section-heading"><p className="project-detail-section-label">{label}</p><h2>{title}</h2></header>;
+}
+
+function ProjectDetailPage({ clock, navigate, detail }) {
+  const { project, chapter, entry, index } = detail;
+  const galleryRef = useRef(null);
+  const sections = detailSectionsFor(entry);
+  const projectRoute = `project/${project.slug}`;
+  const heroImages = (entry.items || []).filter((item) => item.type === "image" && item.hero !== false);
+  const entries = project.chapters.flatMap((section) => section.projects.map((item, itemIndex) => ({ chapter: section, entry: item, index: itemIndex })));
+  const currentIndex = entries.findIndex((item) => item.chapter.id === chapter.id && item.index === index);
+  const next = entries[currentIndex + 1];
+  const hasSplitWork = Boolean(entry.storyboardItems?.length);
+  const scrollGallery = (direction) => {
+    const gallery = galleryRef.current;
+    const card = gallery?.querySelector("figure");
+    if (!card) return;
+    const gap = parseFloat(window.getComputedStyle(gallery).columnGap) || 0;
+    gallery.scrollBy({ left: direction * (card.getBoundingClientRect().width + gap), behavior: "smooth" });
+  };
+
+  return (
+    <main className={`main-content project-detail-page structured-case-study-${project.slug}${entry.mediaPresentation === "instagram-phone" ? " project-detail-editorial" : ""}`}>
+      <ProjectProgressHUD sections={sections.map((section) => ({ id: section.id, label: section.label }))} label={`${entry.title} project journey`} />
+      <article className={`project-detail${heroImages.length === 0 ? " project-detail-no-hero" : ""}`}>
+        <nav className="project-detail-breadcrumb reveal reveal-fast" aria-label="Breadcrumb">
+          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>work</a>
+          <span aria-hidden="true">/</span>
+          <a href={routeHref(projectRoute)} onClick={(event) => navigate(event, "/", projectRoute)}>{project.title}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{entry.title}</span>
+        </nav>
+        <nav className="project-detail-mobile-nav" aria-label={`${entry.title} sections`}>{sections.map((section) => <a href={routeHref(projectDetailRoute(project, chapter, index))} onClick={(event) => { event.preventDefault(); document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }} key={section.id}>{section.label}</a>)}</nav>
+        {heroImages.length > 0 && (
+          <div className={`project-detail-hero project-detail-hero-${heroImages.length} reveal`}>
+            {heroImages.map((item) => <ProjectDetailHeroItem item={item} key={item.src} />)}
+          </div>
+        )}
+        <header className="project-detail-intro reveal">
+          <p>{entry.eyebrow} <span>·</span> {project.title}</p>
+          <h1>{entry.title}</h1>
+          <div>{entry.description}</div>
+          {entry.profileUrl && <a className="project-detail-profile-button" href={entry.profileUrl} target="_blank" rel="noopener noreferrer">Explore @tt_supermarket on Instagram <span aria-hidden="true">↗</span></a>}
+        </header>
+        <section className="project-detail-section reveal" id="detail-context">
+          <ProjectDetailSectionHeading label={entry.mediaPresentation === "instagram-phone" ? "context" : "01 / context"} title={entry.contextHeading || "The bigger picture."} />
+          <div className="project-detail-section-body">
+            <p>{entry.context || chapter.description}</p>
+            {entry.contextDetails && <div className="project-detail-context-details">
+              {entry.contextDetails.map((detail) => <div key={detail.heading}>
+                <h3>{detail.heading}</h3>
+                {detail.body && <p>{detail.body}</p>}
+                {detail.items && <ul>{detail.items.map((item) => <li key={item}>{item}</li>)}</ul>}
+              </div>)}
+            </div>}
+            {entry.contextClosing && <p className="project-detail-context-closing">{entry.contextClosing}</p>}
+          </div>
+        </section>
+        <section className="project-detail-section reveal" id="detail-contribution">
+          <ProjectDetailSectionHeading label={entry.mediaPresentation === "instagram-phone" ? (entry.solution ? "solution" : "my contribution") : `02 / ${entry.solution ? "solution" : "my contribution"}`} title={entry.solutionHeading || "What I worked on."} />
+          <div className="project-detail-section-body">
+            <p>{entry.solution || entry.contribution || entry.description}</p>
+            {!entry.solution && <p className="project-detail-role">Role: {project.role}</p>}
+          </div>
+        </section>
+        {!hasSplitWork && <section className="project-detail-section reveal" id="detail-work">
+          <ProjectDetailSectionHeading label={entry.mediaPresentation === "instagram-phone" ? "the work" : "03 / the work"} title={entry.workHeading || "A closer look."} />
+          <div className="project-detail-section-body"><p>{entry.workIntro || (entry.items?.some((item) => item.type !== "placeholder") ? "Selected visuals and production details from this project." : "This project's visuals are being prepared. Space is reserved for the final photography, video, or design work.")}</p>
+            {entry.mediaPresentation === "instagram-phone" && <div className="project-detail-gallery-toolbar">
+              <span>Four videos · scroll or swipe to explore</span>
+              <div>
+                <button type="button" aria-label="Previous video" onClick={() => scrollGallery(-1)}>←</button>
+                <button type="button" aria-label="Next video" onClick={() => scrollGallery(1)}>→</button>
+              </div>
+            </div>}
+            {entry.prototypeGallery && <ToolkitPrototypeGallery gallery={entry.prototypeGallery} />}
+            {entry.assetCollections && <ToolkitAssetExplorer collections={entry.assetCollections} />}
+            {entry.outcomeVideo && <section className="toolkit-outcome">
+              <div className="toolkit-outcome-heading"><span>Outcome</span><div><h3>{entry.outcomeVideo.title}</h3><p>{entry.outcomeVideo.description}</p></div></div>
+              <video controls playsInline preload="metadata" aria-label={entry.outcomeVideo.title}>
+                <source src={assetHref(entry.outcomeVideo.src)} type="video/mp4" />
+                Your browser does not support embedded video.
+              </video>
+            </section>}
+            {entry.items?.length > 0 && <div ref={galleryRef} className={`project-detail-gallery project-detail-gallery-${entry.items.length}${entry.mediaPresentation ? ` project-detail-gallery-${entry.mediaPresentation}` : ""}`}>
+              {entry.items.map((item, itemIndex) => <StructuredMediaItem item={item} title={entry.title} index={itemIndex} presentation={entry.mediaPresentation} key={item.src || item.videoId || `${item.label}-${itemIndex}`} />)}
+            </div>}
+            {entry.documentUrl && <a className="project-detail-gallery-link" href={assetHref(entry.documentUrl)} target="_blank" rel="noreferrer">{entry.documentLabel || "Open project document"} ↗</a>}
+            {entry.additionalPosts && <details className="project-detail-related-posts">
+              <summary>More posts from the account <span>{String(entry.additionalPosts.length).padStart(2, "0")}</span></summary>
+              <div>{entry.additionalPosts.map((post, postIndex) => <a href={post.url} target="_blank" rel="noopener noreferrer" key={post.url}>
+                <span>{String((entry.items?.length || 0) + postIndex + 1).padStart(2, "0")}</span>
+                <strong>{post.title}</strong>
+                <p>“{post.excerpt}”</p>
+                {post.publicMetrics && <div className="related-post-metrics">{post.publicMetrics.likes} likes{post.publicMetrics.comments ? ` · ${post.publicMetrics.comments} comments` : ""}</div>}
+                <small>Read the original caption on Instagram ↗</small>
+              </a>)}</div>
+            </details>}
+            {entry.galleryRoute && <a className="project-detail-gallery-link" href={routeHref(entry.galleryRoute)} onClick={(event) => navigate(event, "/", entry.galleryRoute)}>View the full photo gallery ↗</a>}
+          </div>
+        </section>}
+        {hasSplitWork && <>
+          <section className="project-detail-section reveal" id="detail-storyboard">
+            <ProjectDetailSectionHeading label="03 / storyboard" title={entry.storyboardHeading || "Planning the experience."} />
+            <div className="project-detail-section-body">
+              <p>{entry.storyboardIntro}</p>
+              <div className={`project-detail-gallery project-detail-gallery-${entry.storyboardItems.length}`}>
+                {entry.storyboardItems.map((item, itemIndex) => <StructuredMediaItem item={item} title={entry.title} index={itemIndex} key={item.src} />)}
+              </div>
+              {entry.documentUrl && <a className="project-detail-gallery-link" href={assetHref(entry.documentUrl)} target="_blank" rel="noreferrer">{entry.documentLabel || "Open project document"} ↗</a>}
+            </div>
+          </section>
+          <section className="project-detail-section project-detail-final-output reveal" id="detail-final-output">
+            <ProjectDetailSectionHeading label="04 / final output" title={entry.finalOutputHeading || "The finished work."} />
+            <div className="project-detail-section-body">
+              <p>{entry.finalOutputIntro}</p>
+              <div className={`project-detail-gallery project-detail-gallery-${entry.finalOutputItems.length}`}>
+                {entry.finalOutputItems.map((item, itemIndex) => <StructuredMediaItem item={item} title={entry.title} index={itemIndex} key={item.src} />)}
+              </div>
+            </div>
+          </section>
+        </>}
+        <section className={`project-detail-section project-detail-impact reveal${entry.impactStory ? " project-detail-impact-editorial" : ""}`} id="detail-impact">
+          <ProjectDetailSectionHeading label={entry.mediaPresentation === "instagram-phone" ? "impact" : `${hasSplitWork ? "05" : "04"} / impact`} title={entry.impactHeading || "What it made possible."} />
+          <div className="project-detail-section-body">
+            {entry.impactStory && <p className="project-detail-impact-lede">{entry.impact}</p>}
+            {entry.impactMetrics && (
+              <dl className="project-detail-metrics">
+                {entry.impactMetrics.map((metric) => (
+                  <div key={metric.label}><dt>{metric.label}</dt><dd>{metric.value}</dd></div>
+                ))}
+              </dl>
+            )}
+            {!entry.impactStory && <p>{entry.impact}</p>}
+            {entry.impactStory && <div className="project-detail-impact-story">
+              <div>
+                <h3>{entry.impactStory.heading}</h3>
+                <p>{entry.impactStory.body}</p>
+                {entry.impactStory.note && <p>{entry.impactStory.note}</p>}
+              </div>
+              <figure>
+                <img src={assetHref(entry.impactStory.image)} alt={entry.impactStory.imageAlt || ""} loading="lazy" />
+                {entry.impactStory.imageCaption && <figcaption>{entry.impactStory.imageCaption}</figcaption>}
+              </figure>
+            </div>}
+            {entry.impactSource && <small className="project-detail-impact-source">{entry.impactSource}</small>}
+            {entry.publicEngagementSource && <small className="project-detail-impact-source">{entry.publicEngagementSource}</small>}
+          </div>
+        </section>
+        <nav className="project-detail-next reveal" aria-label="Continue exploring projects">
+          <span>{next ? "Next project" : "Back to the collection"}</span>
+          <a href={routeHref(next ? projectDetailRoute(project, next.chapter, next.index) : projectRoute)} onClick={(event) => navigate(event, "/", next ? projectDetailRoute(project, next.chapter, next.index) : projectRoute)}>{next ? next.entry.title : `All ${project.title} projects`} <span aria-hidden="true">↗</span></a>
+        </nav>
+      </article>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+function CaseStudyFeatureSection({ project, section, sectionIndex }) {
+  const railRef = useRef(null);
+  const scrollRail = (direction) => {
+    const rail = railRef.current;
+    const item = rail?.querySelector("figure");
+    if (!rail || !item) return;
+    const gap = parseFloat(window.getComputedStyle(rail).columnGap) || 0;
+    rail.scrollBy({ left: direction * (item.getBoundingClientRect().width + gap), behavior: "smooth" });
+  };
+
+  return (
+    <section className="immersive-project-chapter reveal" id={`project-feature-${sectionIndex}`} aria-labelledby={`${project.slug}-feature-${sectionIndex}`}>
+      <header className="immersive-chapter-heading">
+        <p><span>{String(sectionIndex + 1).padStart(2, "0")}</span>{section.eyebrow}</p>
+        <div>
+          <h2 id={`${project.slug}-feature-${sectionIndex}`}>{section.title}</h2>
+          {section.description && <p>{section.description}</p>}
+        </div>
+      </header>
+      {section.items.length > 1 && (
+        <div className="immersive-gallery-controls" aria-label={`${section.title} gallery controls`}>
+          <span>{section.items.length} project assets</span>
+          <div><button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${section.title} asset`}>←</button><button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${section.title} asset`}>→</button></div>
+        </div>
+      )}
+      <div ref={railRef} className={`immersive-media-rail immersive-media-${section.layout || "wide"}`}>
+        {section.items.map((item, itemIndex) => (
+          <figure className="immersive-media-item" key={item.src || item.videoId} style={{ "--media-aspect": item.aspect || "16 / 10" }}>
+            <div className="immersive-media-frame">
+              {item.type === "youtube" ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${item.videoId}`}
+                  title={item.title || section.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              ) : item.type === "vimeo" ? (
+                <iframe
+                  src={`https://player.vimeo.com/video/${item.videoId}?dnt=1`}
+                  title={item.title || section.title}
+                  loading="lazy"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              ) : item.type === "video" ? (
+                <video controls playsInline preload="metadata" poster={item.poster ? assetHref(item.poster) : undefined} aria-label={item.caption || `${section.title} video ${itemIndex + 1}`}>
+                  <source src={assetHref(item.src)} type={item.mime || "video/mp4"} />
+                  Your browser does not support embedded video.
+                </video>
+              ) : (
+                <ZoomableImage src={item.src} alt={item.alt || ""} />
+              )}
+            </div>
+            {item.caption && <figcaption><span>{String(itemIndex + 1).padStart(2, "0")}</span>{item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<Arrow /></a> : item.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CaseStudyPage({ clock, navigate, project }) {
+  if (project.caseStudyVariant === "structured") {
+    return <StructuredCaseStudyPage clock={clock} navigate={navigate} project={project} />;
+  }
+
+  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
+  const backLabel = project.parentTitle || "selected work";
+  const sections = [
+    { id: "project-overview", label: "Overview" },
+    ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
+    ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
+    { id: "project-impact", label: "Impact" },
+  ];
+  const visibleProjects = workProjects.filter((item) => item.showInWork !== false);
+  const projectIndex = visibleProjects.findIndex((item) => item.slug === project.slug);
+  const nextProject = projectIndex >= 0 ? visibleProjects[(projectIndex + 1) % visibleProjects.length] : null;
+
+  return (
+    <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}`}>
+      <ProjectProgressHUD sections={sections} label={`${project.title} project journey`} />
+      <article className="case-study immersive-case-study">
+        <header className="immersive-project-hero" id="project-overview">
+          <div className="immersive-project-hero-media reveal reveal-fast" style={{ "--aspect": project.aspect || "16 / 10" }}>
+            <ProjectVisual project={project} />
+            <span className="immersive-project-counter">01 / {String(sections.length).padStart(2, "0")}</span>
+          </div>
+          <div className="immersive-project-hero-copy reveal">
+            <a className="case-study-back" href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}><span aria-hidden="true">←</span> {backLabel}</a>
+            <p>{project.status && <span className="case-study-status">{project.status}</span>}{project.coverEyebrow}</p>
+            <h1>{project.title}</h1>
+            <div className="case-study-intro">{project.description}</div>
+            <div className="immersive-project-actions">
+              {project.sourceUrl && <a className="case-study-source" href={/^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl)} target="_blank" rel="noreferrer">{project.sourceLabel || "View source"} <Arrow /></a>}
+              <a href="#project-impact" onClick={(event) => { event.preventDefault(); document.getElementById("project-impact")?.scrollIntoView({ behavior: "smooth" }); }}>See the outcome <span aria-hidden="true">↓</span></a>
+            </div>
+          </div>
+        </header>
+        <section className="immersive-project-brief reveal" aria-label="Project brief">
+          <div>
+            <span>Project thesis</span>
+            <h2>{project.thesis || project.description}</h2>
+          </div>
+          <dl>
+            <div><dt>Role</dt><dd>{project.role}</dd></div>
+            <div><dt>Organization</dt><dd>{project.organization}</dd></div>
+            <div><dt>Timeline</dt><dd>{project.period}</dd></div>
+          </dl>
+        </section>
+        {project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
+        {project.mediaSections?.map((section, sectionIndex) => <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
         {project.subprojects?.length > 0 && (
-          <section className="case-study-subprojects reveal" aria-labelledby={`${project.slug}-projects`}>
+          <section className="case-study-subprojects immersive-project-collection reveal" id="project-collection" aria-labelledby={`${project.slug}-projects`}>
             <div className="case-study-subprojects-heading">
-              <p>Featured projects</p>
-              <h2 id={`${project.slug}-projects`}>Explore the Loblaw work.</h2>
+              <p>{project.subprojectsEyebrow || "Featured projects"}</p>
+              <h2 id={`${project.slug}-projects`}>{project.subprojectsTitle || "Explore the Loblaw work."}</h2>
             </div>
             <div className="case-study-subproject-grid">
               {project.subprojects.map((subproject, index) => (
@@ -766,11 +2164,315 @@ function CaseStudyPage({ clock, navigate, project }) {
             </div>
           </section>
         )}
-        <section className="case-study-impact reveal" aria-labelledby={`${project.slug}-impact`}>
-          <h2 id={`${project.slug}-impact`}>Selected impact</h2>
+        <section className="case-study-impact immersive-project-impact reveal" id="project-impact" aria-labelledby={`${project.slug}-impact`}>
+          <div><span>Outcome</span><h2 id={`${project.slug}-impact`}>What the work made possible.</h2></div>
           <ol>
-            {project.impact.map((item) => <li key={item}>{item}</li>)}
+            {project.impact.map((item, index) => <li key={item}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}
           </ol>
+        </section>
+        <nav className="immersive-project-next reveal" aria-label="Continue exploring projects">
+          <span>{nextProject ? "Next project" : "Continue exploring"}</span>
+          <a href={routeHref(nextProject ? `project/${nextProject.slug}` : "work")} onClick={(event) => navigate(event, "/", nextProject ? `project/${nextProject.slug}` : "work")}>{nextProject ? nextProject.title : "Return to selected work"} <span aria-hidden="true">↗</span></a>
+        </nav>
+      </article>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+const utopiaScenes = [
+  {
+    id: "collection",
+    number: "01",
+    label: "Collection",
+    kicker: "Start with the collection",
+    title: "A room of records needed a path back to people.",
+    body: "The first version gave the collection a home, but it was still only a shell. The real product challenge was turning physical LPs into trustworthy listings without making Alexander the permanent operator.",
+    image: "/projects/work/utopia-vinyl/catalogue-evolution.png",
+    alt: "Utopia Vinyl catalogue evolving from an empty prototype into shoppable stock",
+    caption: "From empty catalogue to recognizable, shoppable inventory",
+    tags: ["Collection structure", "Real record photography", "Clear catalogue facts"],
+    background: "#e9e4da",
+    accent: "#a64737",
+    ink: "#1f2528",
+  },
+  {
+    id: "seller",
+    number: "02",
+    label: "Seller",
+    kicker: "Design for the person doing the work",
+    title: "The seller workflow had to feel calm and forgiving.",
+    body: "The upload flow was shaped around Tim's eyesight, comfort, and inventory routine. Larger targets, visible photo previews, draft checks, and optional AI assistance make each listing easier to prepare and review.",
+    image: "/projects/work/utopia-vinyl/seller-workflow.png",
+    alt: "Accessible seller workflow from the Utopia Vinyl project review",
+    caption: "A practical path from record photography to a reviewed listing",
+    tags: ["Accessible controls", "AI on demand", "Manual review", "Batch publishing"],
+    background: "#dce8e6",
+    accent: "#236c66",
+    ink: "#182a29",
+  },
+  {
+    id: "model",
+    number: "03",
+    label: "Model",
+    kicker: "Choose the operating model",
+    title: "Checkout begins with an honest promise.",
+    body: "Utopia Vinyl uses one independent storefront and manual bank-transfer orders. The interface explains that choice clearly, then connects browsing, reservation, payment confirmation, and fulfilment as one understandable routine.",
+    image: "/projects/work/utopia-vinyl/commerce-model.png",
+    alt: "Utopia Vinyl commerce model connecting storefront, order, payment, and fulfilment",
+    caption: "Storefront to fulfilment, with every handoff made visible",
+    tags: ["Browse", "Reserve LPs", "Confirm transfer", "Ship order"],
+    background: "#e4e9ed",
+    accent: "#325d6e",
+    ink: "#18252d",
+  },
+  {
+    id: "buyer",
+    number: "04",
+    label: "Buyer",
+    kicker: "Test the path",
+    title: "A buyer should not have to create an account.",
+    body: "Testing shifted the work from adding features to removing friction. Guest checkout became unmistakable, the cart survived browsing and login, and different LPs could travel together in one combined order.",
+    image: "/projects/work/utopia-vinyl/buyer-journey.png",
+    alt: "Buyer journey improvements for guest checkout and cart persistence",
+    caption: "Real tester feedback clarified the route to one combined guest order",
+    tags: ["Guest checkout", "Persistent cart", "One combined order", "Visible order status"],
+    background: "#eee0d8",
+    accent: "#b44a35",
+    ink: "#2b211e",
+  },
+  {
+    id: "learning",
+    number: "05",
+    label: "Learning",
+    kicker: "Measure, then improve",
+    title: "The store became a working selling routine.",
+    body: "Orders, analytics, support questions, search visibility, and reliability checks now feed the next iteration. The outcome is reported as an honest snapshot of an evolving product, not as unsupported causal uplift.",
+    image: "/projects/work/utopia-vinyl/results.png",
+    alt: "Utopia Vinyl outcome snapshot from November 4, 2026",
+    caption: "A measured snapshot for an ongoing independent-commerce product",
+    tags: ["Order evidence", "Careful analytics", "Search visibility", "Continuous improvement"],
+    background: "#cfd8d1",
+    accent: "#2f6550",
+    ink: "#18241f",
+  },
+];
+
+function UtopiaVinylPage({ clock, navigate, project }) {
+  const pageRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const [activeScene, setActiveScene] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const page = pageRef.current;
+      if (!page) return;
+
+      const pageTop = page.getBoundingClientRect().top + window.scrollY;
+      const available = Math.max(page.scrollHeight - window.innerHeight, 1);
+      const ratio = Math.min(Math.max((window.scrollY - pageTop) / available, 0), 1);
+      const nextProgress = Math.round(ratio * 100);
+      page.style.setProperty("--utopia-scroll", String(nextProgress));
+      setProgress((current) => current === nextProgress ? current : nextProgress);
+
+      const marker = window.innerHeight * 0.56;
+      let nextScene = 0;
+      utopiaScenes.forEach((scene, index) => {
+        const section = document.getElementById(`utopia-${scene.id}`);
+        if (!section) return;
+
+        const rect = section.getBoundingClientRect();
+        const travel = Math.max(rect.height - window.innerHeight, 1);
+        const sceneProgress = Math.min(Math.max(-rect.top / travel, 0), 1);
+        section.style.setProperty("--scene-progress", sceneProgress.toFixed(3));
+        section.style.setProperty("--scene-copy-lift", `${((0.5 - sceneProgress) * 16).toFixed(2)}px`);
+        section.style.setProperty("--scene-image-lift", `${((0.5 - sceneProgress) * 34).toFixed(2)}px`);
+        section.style.setProperty("--scene-image-scale", (1.025 - sceneProgress * 0.035).toFixed(3));
+        section.style.setProperty("--scene-drift", `${((0.5 - sceneProgress) * 88).toFixed(2)}px`);
+        if (rect.top <= marker) nextScene = index;
+      });
+      setActiveScene((current) => current === nextScene ? current : nextScene);
+    };
+
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, []);
+
+  const scrollToScene = (scene) => document.getElementById(`utopia-${scene.id}`)?.scrollIntoView({ behavior: "smooth" });
+  const reportUrl = /^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl);
+
+  return (
+    <main className="main-content utopia-page" ref={pageRef}>
+      <nav className="utopia-journey" aria-label="Utopia Vinyl project chapters">
+        <div className="utopia-journey-status">
+          <span>Journey progress</span>
+          <strong>{String(progress).padStart(2, "0")}%</strong>
+        </div>
+        <div className="utopia-progress-track" role="progressbar" aria-label="Case study progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress}>
+          <i style={{ width: `${progress}%` }} />
+        </div>
+        <ol>
+          {utopiaScenes.map((scene, index) => (
+            <li className={activeScene === index ? "active" : ""} key={scene.id}>
+              <button type="button" onClick={() => scrollToScene(scene)} aria-current={activeScene === index ? "step" : undefined}>
+                <span>{scene.number}</span>{scene.label}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <header className="utopia-hero" aria-labelledby="utopia-title">
+        <div className="utopia-hero-copy">
+          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span aria-hidden="true">←</span> selected work</a>
+          <div>
+            <p><span>Ongoing</span> Product design · Independent commerce</p>
+            <h1 id="utopia-title">Utopia<br />Vinyl</h1>
+            <p className="utopia-hero-lede">Reconnecting a family collection with returning collectors and first-time buyers.</p>
+          </div>
+          <div className="utopia-hero-actions">
+            <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Begin the journey <span aria-hidden="true">↓</span></button>
+            <a href={reportUrl} target="_blank" rel="noreferrer">Open full report <Arrow /></a>
+          </div>
+        </div>
+        <div className="utopia-hero-art" aria-hidden="true">
+          <div className="utopia-record">
+            <div className="utopia-record-label"><span>UTOPIA</span><strong>VINYL</strong><small>TAIPEI · 2026</small></div>
+          </div>
+          <figure className="utopia-cover-sheet">
+            <img src={assetHref(project.image)} alt="" />
+          </figure>
+          <span className="utopia-sound-wave"><i /><i /><i /><i /><i /><i /><i /><i /></span>
+        </div>
+        <div className="utopia-hero-index"><span>01</span><span>24</span></div>
+      </header>
+
+      <section className="utopia-origin" aria-labelledby="utopia-origin-title">
+        <p>THE STARTING POINT</p>
+        <div>
+          <h2 id="utopia-origin-title">This started as a family problem, not a portfolio brief.</h2>
+          <p>Alexander's father had more vinyl records than he could connect to buyers. The work grew from a catalogue experiment into a complete product system for listing, ordering, payment confirmation, fulfilment, and support.</p>
+        </div>
+        <dl>
+          <div><dt>Collection</dt><dd>Physical LPs waiting to be rediscovered</dd></div>
+          <div><dt>People</dt><dd>A seller who needed calm tools and buyers who needed confidence</dd></div>
+          <div><dt>Role</dt><dd>Product direction, interface, brand, feedback, and AI-assisted delivery</dd></div>
+        </dl>
+      </section>
+
+      <div className="utopia-chapters">
+        {utopiaScenes.map((scene, index) => (
+          <section
+            className={`utopia-scene${activeScene === index ? " is-active" : ""}`}
+            id={`utopia-${scene.id}`}
+            style={{ "--scene-bg": scene.background, "--scene-accent": scene.accent, "--scene-ink": scene.ink }}
+            aria-labelledby={`utopia-${scene.id}-title`}
+            key={scene.id}
+          >
+            <div className="utopia-scene-sticky">
+              <div className="utopia-scene-copy">
+                <p className="utopia-scene-kicker"><span>{scene.number}</span>{scene.kicker}</p>
+                <h2 id={`utopia-${scene.id}-title`}>{scene.title}</h2>
+                <p className="utopia-scene-body">{scene.body}</p>
+                <ul>{scene.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
+              </div>
+              <figure className="utopia-report-frame">
+                <div className="utopia-report-bar"><span>Alexander Chen / Utopia Vinyl</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
+                <img src={assetHref(scene.image)} alt={scene.alt} loading={index === 0 ? "eager" : "lazy"} />
+                <figcaption><span>{scene.number}</span>{scene.caption}</figcaption>
+              </figure>
+              <span className="utopia-scene-word" aria-hidden="true">{scene.label}</span>
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <section className="utopia-outcome" id="utopia-outcome" aria-labelledby="utopia-outcome-title">
+        <div className="utopia-outcome-record" aria-hidden="true"><i /><span>UTOPIA<br />VINYL</span></div>
+        <div className="utopia-outcome-copy">
+          <p>OUTCOME SNAPSHOT · NOVEMBER 4, 2026</p>
+          <h2 id="utopia-outcome-title">A small store became a working commerce system.</h2>
+          <p>The store is still evolving. These numbers describe the recorded snapshot, while the product continues to learn from buyers, search visibility, support questions, and the realities of fulfilment.</p>
+        </div>
+        <dl className="utopia-metrics">
+          <div><dt>NT$8,590</dt><dd>confirmed paid order totals, including shipping</dd></div>
+          <div><dt>9</dt><dd>orders placed through the evolving store</dd></div>
+          <div><dt>15</dt><dd>LPs sold from the family collection</dd></div>
+          <div><dt>1,774</dt><dd>page views across 408 visitors</dd></div>
+        </dl>
+        <div className="utopia-outcome-actions">
+          <a href={reportUrl} target="_blank" rel="noreferrer">Read the complete 24-page project review <Arrow /></a>
+          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↑</span></a>
+        </div>
+      </section>
+
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+function IcffCollectionPage({ clock, navigate, project }) {
+  const activeSection = useIcffHubActiveSection();
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <main className="main-content icff-hub-page">
+      <article className="icff-hub" aria-labelledby="icff-hub-title">
+        <nav className="icff-hub-mobile-nav" aria-label="ICFF collection navigation">
+          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Back to work</a>
+          <a className={activeSection === "icff-role" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-role")}>Role</a>
+          <a className={activeSection === "icff-organization" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-organization")}>Organization</a>
+          <a className={activeSection === "icff-timeline" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-timeline")}>Timeline</a>
+          <a className={activeSection === "icff-featured-projects" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-featured-projects")}>Featured Projects</a>
+        </nav>
+
+        <div className="icff-hub-cover reveal reveal-fast">
+          <img src={assetHref(project.image)} alt={project.imageAlt} fetchPriority="high" />
+        </div>
+        <header className="icff-hub-header reveal">
+          <p>{project.coverEyebrow}</p>
+          <h1 id="icff-hub-title">{project.title}</h1>
+          <div>{project.description}</div>
+        </header>
+
+        <div className="icff-hub-facts">
+          <section className="icff-hub-fact reveal" id="icff-role">
+            <p>Role</p>
+            <div><h2>{project.role}</h2><p>Leading opening-night coverage and supporting celebrity-focused photography across the festival.</p></div>
+          </section>
+          <section className="icff-hub-fact reveal" id="icff-organization">
+            <p>Organization</p>
+            <div><h2>{project.organization}</h2><p>Photography created across selected ICFF festival events in Toronto.</p></div>
+          </section>
+          <section className="icff-hub-fact reveal" id="icff-timeline">
+            <p>Timeline</p>
+            <div><h2>{project.period}</h2><p>Selected events documented across two festival years.</p></div>
+          </section>
+        </div>
+
+        <section className="icff-hub-projects reveal" id="icff-featured-projects" aria-labelledby="icff-featured-title">
+          <div className="icff-hub-projects-heading">
+            <p>{project.subprojectsEyebrow}</p>
+            <h2 id="icff-featured-title">{project.subprojectsTitle}</h2>
+          </div>
+          <div className="icff-hub-project-grid">
+            {project.subprojects.map((subproject, index) => <ProjectCard project={subproject} index={index} key={subproject.slug} />)}
+          </div>
         </section>
       </article>
       <MobileFooter clock={clock} />
@@ -778,27 +2480,228 @@ function CaseStudyPage({ clock, navigate, project }) {
   );
 }
 
+function IcffGalleryPage({ clock, navigate, project }) {
+  const activeSection = useIcffActiveSection();
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
+  const backLabel = project.parentSlug ? "Back to ICFF" : "Back to work";
+  const portraits = project.gallery.filter((photo) => photo.orientation !== "landscape");
+  const landscapes = project.gallery.filter((photo) => photo.orientation === "landscape");
+  const selectedPhoto = lightboxIndex === null ? null : project.gallery[lightboxIndex];
+
+  useEffect(() => {
+    if (lightboxIndex === null) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setLightboxIndex(null);
+      if (event.key === "ArrowLeft") setLightboxIndex((current) => (current - 1 + project.gallery.length) % project.gallery.length);
+      if (event.key === "ArrowRight") setLightboxIndex((current) => (current + 1) % project.gallery.length);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxIndex, project.gallery.length]);
+
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const renderPhoto = (photo, index, group) => (
+    <figure className="icff-gallery-item reveal" key={photo.src} style={{ "--delay": `${Math.min((index % 4) * 55, 165)}ms` }}>
+      <button className="icff-photo-frame icff-photo-button" type="button" onClick={() => setLightboxIndex(project.gallery.indexOf(photo))} aria-label={`View ${photo.alt}`}>
+        <img
+          src={assetHref(photo.src)}
+          alt={photo.alt}
+          loading={group === "portrait" && index < 4 ? "eager" : "lazy"}
+          fetchPriority={group === "portrait" && index === 0 ? "high" : "auto"}
+          decoding="async"
+        />
+      </button>
+    </figure>
+  );
+
+  return (
+    <main className="main-content icff-page">
+      <article aria-labelledby="icff-title">
+        <nav className="icff-mobile-subnav" aria-label="ICFF page navigation">
+          <a href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}>{backLabel}</a>
+          <a className={activeSection === "icff-context" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-context")}>context</a>
+          <a className={activeSection === "icff-photoshoot" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-photoshoot")}>photoshoot</a>
+        </nav>
+        <header className="icff-intro reveal reveal-fast" id="icff-context">
+          <div className="icff-intro-copy">
+            <p className="icff-eyebrow">ICFF · Lavazza IncluCity Festival</p>
+            <h1 id="icff-title">{project.title}</h1>
+            <p className="icff-lede">{project.description}</p>
+            <div className="icff-credit">
+              <span>{project.role}</span>
+              <span>Toronto, Canada</span>
+            </div>
+            <div className="icff-context-grid" aria-label="Project details">
+              <div><span>team</span><p>ICFF creative and production team</p></div>
+              <div><span>my role</span><p>{project.role}</p></div>
+              <div><span>focus</span><p>Editorial portraits<br />Candid festival storytelling</p></div>
+              <div><span>duration</span><p>{project.period}</p></div>
+            </div>
+          </div>
+        </header>
+
+        <section className="icff-photoshoot" id="icff-photoshoot" aria-label="ICFF Lavazza IncluCity Festival photo gallery">
+          <div className="icff-gallery icff-gallery-portraits">
+            {portraits.map((photo, index) => renderPhoto(photo, index, "portrait"))}
+          </div>
+          {landscapes.length > 0 && (
+            <div className="icff-gallery-landscapes">
+              {landscapes.map((photo, index) => renderPhoto(photo, index, "landscape"))}
+            </div>
+          )}
+        </section>
+        {selectedPhoto && (
+          <div className="icff-lightbox" role="dialog" aria-modal="true" aria-label="Expanded ICFF photograph" onMouseDown={(event) => event.target === event.currentTarget && setLightboxIndex(null)}>
+            <button className="icff-lightbox-close" type="button" onClick={() => setLightboxIndex(null)} aria-label="Close photo viewer" autoFocus>Close</button>
+            <button className="icff-lightbox-control icff-lightbox-previous" type="button" onClick={() => setLightboxIndex((current) => (current - 1 + project.gallery.length) % project.gallery.length)} aria-label="View previous photograph">←</button>
+            <img src={assetHref(selectedPhoto.src)} alt={selectedPhoto.alt} />
+            <button className="icff-lightbox-control icff-lightbox-next" type="button" onClick={() => setLightboxIndex((current) => (current + 1) % project.gallery.length)} aria-label="View next photograph">→</button>
+          </div>
+        )}
+      </article>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
 function AboutPage({ clock }) {
+  const highlightTerms = [
+    "clear, consistent, and human",
+    "AI-enabled workflows",
+    "design systems",
+    "reusable patterns",
+    "systems thinking",
+    "maker mindset",
+    "systems",
+  ];
+  const highlightPattern = new RegExp(`(${highlightTerms.join("|")})`, "gi");
+  const highlightedCopy = (copy) => copy.split(highlightPattern).map((part, index) => (
+    highlightTerms.some((term) => term.toLowerCase() === part.toLowerCase())
+      ? <strong className="about-keyword" key={`${part}-${index}`}>{part}</strong>
+      : part
+  ));
+
   return (
     <main className="main-content about-page">
       <section className="about-section">
         <p className="section-label reveal reveal-fast">{about.eyebrow}</p>
         <div className="about-layout">
-          <div className="about-collage reveal">
-            <div className="snapshot snapshot-one"><span>currently</span><b>making useful things</b></div>
-            <div className="snapshot snapshot-two"><i /><i /><i /></div>
-            <div className="snapshot snapshot-three"><span>notes from<br />somewhere new</span></div>
-            <div className="snapshot snapshot-four"><div className="mini-face" /></div>
+          <div className="about-portrait reveal">
+            <img
+              src={assetHref("/projects/about/alexander-chen-portrait.jpg")}
+              alt="Alexander Chen wearing a black suit in an industrial interior"
+            />
           </div>
           <div className="about-copy reveal">
-            {about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            <p className="about-role">{about.role}</p>
+            <h1 className="about-headline">{highlightedCopy(about.headline)}</h1>
+            <div className="about-bio">
+              {about.paragraphs.map((paragraph) => <p key={paragraph}>{highlightedCopy(paragraph)}</p>)}
+            </div>
             <div className="about-cta">
-              <h1>{about.callout}</h1>
-              <p>{about.availability} Reach me at <a href={`mailto:${profile.email}`}>{profile.email}</a>.</p>
+              <p>{about.cta}</p>
+              <a href={`mailto:${profile.email}`}>Let's work together <Arrow /></a>
             </div>
           </div>
         </div>
       </section>
+      <section className="about-resume-section reveal" aria-labelledby="about-experience-title">
+        <header className="about-section-heading">
+          <p>experience</p>
+          <h2 id="about-experience-title">Where strategy became something people could use.</h2>
+        </header>
+        <ol className="about-experience-list">
+          {about.experience.map((item, index) => (
+            <li key={`${item.organization}-${item.role}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{item.organization}</h3>
+                <p>{item.role}{item.location ? ` · ${item.location}` : ""}</p>
+              </div>
+              <div className="about-experience-impact">
+                <p>{item.summary}</p>
+                <ul>{item.metrics.map((metric) => <li key={metric}>{metric}</li>)}</ul>
+              </div>
+              <time>{item.period}</time>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section className="about-foundation reveal" aria-labelledby="about-foundation-title">
+        <header className="about-section-heading">
+          <p>foundation</p>
+          <h2 id="about-foundation-title">A multidisciplinary toolkit, grounded in design.</h2>
+        </header>
+        <div className="about-foundation-grid">
+          <div className="about-education">
+            <h3>Education</h3>
+            {about.education.map((item) => (
+              <div key={item.program}>
+                <p>{item.program}</p>
+                <span>{item.school}</span>
+                <time>{item.period}</time>
+              </div>
+            ))}
+          </div>
+          <dl className="about-capabilities">
+            {about.capabilities.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.items}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+      <MobileFooter clock={clock} />
+    </main>
+  );
+}
+
+function AoStudioPage({ clock }) {
+  return (
+    <main className="main-content ao-studio-page">
+      <section className="ao-studio-hero reveal reveal-fast">
+        <div className="ao-studio-hero-brand">
+          <img src={assetHref("/projects/ao-studio/ao-studio-wordmark-dark.png")} alt="AO Studio" />
+        </div>
+        <div className="ao-studio-hero-copy">
+          <p>independent creative production agency</p>
+          <h1>Creative work,<br />built with intention.</h1>
+          <p className="ao-studio-intro">AO Studio is my creative production agency, a home for thoughtful brand, content, and digital work. I shaped the identity and built the website in-house from the ground up.</p>
+          <a className="ao-studio-link" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">
+            Visit AO Studio <Arrow />
+          </a>
+        </div>
+      </section>
+
+      <section className="ao-studio-story reveal" aria-labelledby="ao-studio-story-title">
+        <div>
+          <p className="ao-studio-kicker">built in-house</p>
+          <h2 id="ao-studio-story-title">A studio shaped end to end.</h2>
+        </div>
+        <p>I developed AO Studio as both a creative practice and a digital product. From its visual identity and positioning to the design and development of its website, I shaped the experience end to end. The result is a flexible platform for creative production, collaboration, and future work.</p>
+      </section>
+
+      <section className="ao-studio-details reveal" aria-label="AO Studio details">
+        <div><span>my role</span><p>Founder · Creative Director · Designer · Developer</p></div>
+        <div><span>focus</span><p>Brand identity · Content · Digital experiences</p></div>
+        <div><span>website</span><p><a href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">aostudioinfo.com <Arrow /></a></p></div>
+      </section>
+
+      <div className="ao-studio-signoff reveal" aria-label="AO Studio">
+        <img src={assetHref("/projects/ao-studio/ao-studio-app-icon.png")} alt="AO Studio app icon" />
+      </div>
       <MobileFooter clock={clock} />
     </main>
   );
@@ -814,10 +2717,17 @@ function MobileFooter({ clock }) {
 }
 
 export default function App() {
-  const { page, navigate } = usePage();
+  const { page, route, navigate } = usePage();
   const clock = useClock();
-  const selectedProject = projectFromRoute(page);
+  const selectedDetail = detailFromRoute(page);
+  const selectedProject = selectedDetail?.project || projectFromRoute(page);
+  const selectedPhotographyAlbum = page.startsWith("playground/photography/")
+    ? photographySessions.find((album) => page === `playground/photography/${album.id}`)
+    : null;
   const isPlayground = page.startsWith("playground");
+  const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
+  const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
+  const isUtopia = selectedProject?.slug === "utopia-vinyl";
 
   useEffect(() => {
     document.documentElement.classList.add("js");
@@ -832,7 +2742,7 @@ export default function App() {
       },
       { rootMargin: "0px 0px -8%", threshold: 0.06 },
     );
-    const observe = () => document.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => observer.observe(item));
+    const observe = () => document.querySelectorAll(".reveal:not(.is-visible), .experience-reveal:not(.is-visible)").forEach((item) => observer.observe(item));
     const frame = window.requestAnimationFrame(observe);
     return () => {
       window.cancelAnimationFrame(frame);
@@ -841,31 +2751,55 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    if (page === "about") document.title = `${profile.name} — About`;
-    else if (page === "playground/photography") document.title = `${profile.name} — My Art`;
-    else if (page === "playground/design") document.title = `${profile.name} — My Design`;
-    else if (page === "playground") document.title = `${profile.name} — Playground`;
-    else if (selectedProject) document.title = `${selectedProject.title} — ${profile.name}`;
-    else document.title = `${profile.name} — Digital Designer & Content Strategist`;
-  }, [page, selectedProject]);
+    if (page === "about") document.title = `${profile.name} | About`;
+    else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
+    else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
+    else if (page === "playground/photography") document.title = `${profile.name} | My Art`;
+    else if (page === "playground/design") document.title = `${profile.name} | My Design`;
+    else if (page === "playground/fa-adventure") document.title = `${profile.name} | My FA Adventure`;
+    else if (page === "playground/alexs-life") document.title = `Alex's Life | ${profile.name}`;
+    else if (page === "playground/alexs-life-hifi") document.title = `Alex's Life High Fidelity | ${profile.name}`;
+    else if (page === "playground") document.title = `${profile.name} | Playground`;
+    else if (selectedDetail) document.title = `${selectedDetail.entry.title} | ${profile.name}`;
+    else if (selectedProject) document.title = `${selectedProject.title} | ${profile.name}`;
+    else document.title = `${profile.name} | Digital Designer & Content Strategist`;
+  }, [page, selectedProject, selectedDetail, selectedPhotographyAlbum]);
 
   return (
     <div className="site-shell">
-      {!isPlayground && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && <Sidebar page={page} navigate={navigate} />}
-      {!isPlayground && <MobileHeader page={page} navigate={navigate} />}
+      {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
+      {!isPlayground && (selectedDetail ? <ProjectDetailSidebar clock={clock} navigate={navigate} detail={selectedDetail} route={page} /> : isIcffGallery ? <IcffSidebar clock={clock} navigate={navigate} project={selectedProject} /> : isIcffHub ? <IcffHubSidebar clock={clock} navigate={navigate} project={selectedProject} /> : <Sidebar page={page} route={route} navigate={navigate} />)}
+      {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
       {page === "about" ? (
         <AboutPage clock={clock} />
+      ) : page === "ao-studio" ? (
+        <AoStudioPage clock={clock} />
       ) : page === "playground/photography" ? (
         <PhotographyPage clock={clock} navigate={navigate} />
+      ) : selectedPhotographyAlbum ? (
+        <PhotographyAlbumPage album={selectedPhotographyAlbum} clock={clock} navigate={navigate} />
       ) : page === "playground/design" ? (
         <DesignPage clock={clock} navigate={navigate} />
+      ) : page === "playground/fa-adventure" ? (
+        <FAAdventurePage clock={clock} navigate={navigate} />
+      ) : page === "playground/alexs-life" ? (
+        <AlexLifeGame clock={clock} navigate={navigate} />
+      ) : page === "playground/alexs-life-hifi" ? (
+        <AlexLifeGameV2 navigate={navigate} />
       ) : page === "playground" ? (
         <PlaygroundPage clock={clock} navigate={navigate} />
+      ) : selectedDetail ? (
+        <ProjectDetailPage clock={clock} navigate={navigate} detail={selectedDetail} />
+      ) : selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured" ? (
+        <IcffCollectionPage clock={clock} navigate={navigate} project={selectedProject} />
+      ) : selectedProject?.slug === "icff-distillery-opening-night-2025" ? (
+        <IcffGalleryPage clock={clock} navigate={navigate} project={selectedProject} />
+      ) : selectedProject?.slug === "utopia-vinyl" ? (
+        <UtopiaVinylPage clock={clock} navigate={navigate} project={selectedProject} />
       ) : selectedProject ? (
         <CaseStudyPage clock={clock} navigate={navigate} project={selectedProject} />
       ) : (
-        <HomePage clock={clock} />
+        <HomePage clock={clock} navigate={navigate} />
       )}
       {!isPlayground && <div className="desktop-clock">{clock}</div>}
     </div>
