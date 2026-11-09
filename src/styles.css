@@ -2086,6 +2086,23 @@ p, h1, h2, h3, ol { margin: 0; }
 .immersive-project-brief dl > div { display: grid; grid-template-columns: 86px 1fr; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--ink-08); }
 .immersive-project-brief dt { color: var(--tech-purple); font-family: "IBM Plex Mono", monospace; font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
 .immersive-project-brief dd { margin: 0; color: var(--ink-65); font-size: 12px; line-height: 1.5; }
+.immersive-project-index { scroll-margin-top: 32px; padding: 0 clamp(28px, 7vw, 104px) clamp(100px, 12vw, 170px); }
+.immersive-project-index > header { display: grid; grid-template-columns: minmax(130px, .34fr) minmax(0, 1.66fr); gap: 32px; align-items: start; padding-top: clamp(22px, 3vw, 42px); border-top: 1px solid var(--ink-08); }
+.immersive-project-index > header span { color: var(--tech-purple); font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+.immersive-project-index > header h2 { max-width: 12ch; font-size: clamp(42px, 5vw, 72px); font-weight: 500; letter-spacing: -.07em; line-height: .94; text-wrap: balance; }
+.immersive-project-index > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: clamp(46px, 7vw, 82px); }
+.immersive-project-index a { position: relative; display: grid; min-width: 0; grid-template-columns: 38% 28px minmax(0, 1fr) 24px; gap: 18px; align-items: center; overflow: hidden; padding: 14px; border: 1px solid var(--ink-08); border-radius: 20px; background: rgba(255,255,255,.72); box-shadow: 0 18px 56px rgba(22,20,40,.07); transition: border-color 240ms ease, box-shadow 300ms ease, transform 500ms var(--ease); }
+.immersive-project-index a:hover, .immersive-project-index a:focus-visible { border-color: rgba(115,87,255,.42); box-shadow: 0 28px 72px rgba(22,20,40,.13); transform: translateY(-6px); }
+.immersive-project-index figure { position: relative; overflow: hidden; aspect-ratio: 4 / 3; margin: 0; border-radius: 13px; background: #e9eaf2; }
+.immersive-project-index img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+.immersive-project-index a:hover img, .immersive-project-index a:focus-visible img { transform: scale(1.045); }
+.immersive-project-index a > span { align-self: start; padding-top: 8px; color: var(--tech-purple); font-family: "IBM Plex Mono", monospace; font-size: 8px; }
+.immersive-project-index a > div { min-width: 0; }
+.immersive-project-index a p { color: var(--tech-purple); font-family: "IBM Plex Mono", monospace; font-size: 8px; letter-spacing: .03em; text-transform: uppercase; }
+.immersive-project-index a h3 { margin-top: 12px; font-size: clamp(22px, 2.1vw, 34px); font-weight: 500; letter-spacing: -.055em; line-height: .98; text-wrap: balance; }
+.immersive-project-index a small { display: block; max-width: 38ch; margin-top: 13px; color: var(--ink-50); font-size: 10px; line-height: 1.5; }
+.immersive-project-index a > b { display: grid; width: 24px; aspect-ratio: 1; place-content: center; border: 1px solid rgba(115,87,255,.24); border-radius: 50%; color: var(--tech-purple); font-size: 10px; font-weight: 400; transition: background 220ms ease, color 220ms ease, transform 300ms var(--ease); }
+.immersive-project-index a:hover > b, .immersive-project-index a:focus-visible > b { background: var(--tech-purple); color: #fff; transform: translateY(4px); }
 .immersive-proof-strip, .structured-proof-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--ink-08); border-bottom: 1px solid var(--ink-08); background: rgba(255,255,255,.5); }
 .immersive-proof-strip article, .structured-proof-strip article { min-height: 240px; padding: 29px clamp(22px, 3vw, 42px); }
 .immersive-proof-strip article + article, .structured-proof-strip article + article { border-left: 1px solid var(--ink-08); }
@@ -2112,6 +2129,9 @@ p, h1, h2, h3, ol { margin: 0; }
 .immersive-media-item figcaption { display: flex; gap: 16px; padding: 17px 4px 0; color: var(--ink-50); font-size: 10px; line-height: 1.45; }
 .immersive-media-item figcaption > span { color: var(--tech-purple); font-family: "IBM Plex Mono", monospace; font-size: 8px; }
 .immersive-media-item figcaption a { display: inline-flex; align-items: center; gap: 8px; }
+.immersive-client-quote { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(180px, .45fr); gap: 34px; align-items: end; margin: clamp(70px, 9vw, 118px) 0 0; padding: clamp(34px, 5vw, 62px); border-radius: 22px; background: radial-gradient(circle at 84% 12%, rgba(115,87,255,.28), transparent 32%), #11111b; color: #fff; }
+.immersive-client-quote p { max-width: 24ch; font-size: clamp(31px, 4.2vw, 62px); font-weight: 500; letter-spacing: -.064em; line-height: .98; text-wrap: balance; }
+.immersive-client-quote cite { color: rgba(255,255,255,.54); font-family: "IBM Plex Mono", monospace; font-size: 9px; font-style: normal; line-height: 1.5; text-transform: uppercase; }
 .immersive-project-collection { scroll-margin-top: 32px; padding: clamp(100px, 12vw, 170px) clamp(28px, 7vw, 104px); }
 .immersive-project-impact { display: grid; grid-template-columns: minmax(260px, .6fr) minmax(0, 1.4fr); gap: 60px; margin-top: 0; padding: clamp(100px, 12vw, 170px) clamp(28px, 7vw, 104px); border: 0; background: radial-gradient(circle at 82% 18%, rgba(115,87,255,.23), transparent 31%), #11111b; color: #fff; }
 .immersive-project-impact > div > span { color: #9f8cff; font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
@@ -2165,6 +2185,11 @@ p, h1, h2, h3, ol { margin: 0; }
   .immersive-project-hero-copy h1, .structured-case-study-hero-copy h1 { font-size: clamp(54px, 16vw, 82px); }
   .immersive-project-brief { grid-template-columns: 1fr; gap: 52px; padding: 104px 24px; }
   .immersive-project-brief h2 { font-size: clamp(42px, 12vw, 62px); }
+  .immersive-project-index { padding: 0 24px 100px; }
+  .immersive-project-index > header { grid-template-columns: 1fr; gap: 20px; }
+  .immersive-project-index > div { grid-template-columns: 1fr; }
+  .immersive-project-index a { grid-template-columns: 34% 20px minmax(0, 1fr) 24px; gap: 12px; }
+  .immersive-project-index a small { display: none; }
   .immersive-proof-strip, .structured-proof-strip { grid-template-columns: 1fr; }
   .immersive-proof-strip article, .structured-proof-strip article { min-height: 0; padding: 24px; }
   .immersive-proof-strip article + article, .structured-proof-strip article + article { border-top: 1px solid var(--ink-08); border-left: 0; }
@@ -2176,6 +2201,7 @@ p, h1, h2, h3, ol { margin: 0; }
   .immersive-media-rail { grid-auto-columns: 88%; gap: 13px; }
   .immersive-media-portrait-pair { grid-auto-columns: 82%; }
   .immersive-media-frame { border-radius: 13px; }
+  .immersive-client-quote { grid-template-columns: 1fr; gap: 40px; padding: 34px 24px; }
   .immersive-project-collection { padding: 100px 24px; }
   .immersive-project-impact { grid-template-columns: 1fr; gap: 48px; padding: 108px 24px; }
   .immersive-project-impact > div h2 { font-size: clamp(48px, 14vw, 70px); }

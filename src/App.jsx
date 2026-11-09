@@ -2097,6 +2097,12 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
           </figure>
         ))}
       </div>
+      {section.quote && (
+        <blockquote className="immersive-client-quote">
+          <p>“{section.quote.text}”</p>
+          <cite>{section.quote.attribution}</cite>
+        </blockquote>
+      )}
     </section>
   );
 }
@@ -2110,6 +2116,7 @@ function CaseStudyPage({ clock, navigate, project }) {
   const backLabel = project.parentTitle || "selected work";
   const sections = [
     { id: "project-overview", label: "Overview" },
+    ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
     ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
     ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
     { id: "project-impact", label: "Impact" },
@@ -2149,6 +2156,33 @@ function CaseStudyPage({ clock, navigate, project }) {
             <div><dt>Timeline</dt><dd>{project.period}</dd></div>
           </dl>
         </section>
+        {project.projectCollection?.length > 0 && (
+          <nav className="immersive-project-index reveal" id="project-collection-index" aria-label={`${project.title} project collection`}>
+            <header>
+              <span>{project.projectCollectionEyebrow || "Project collection"}</span>
+              <h2>{project.projectCollectionTitle || "Explore the partnership."}</h2>
+            </header>
+            <div>
+              {project.projectCollection.map((item) => (
+                <a href={`#${item.target}`} key={item.title} onClick={(event) => {
+                  event.preventDefault();
+                  document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
+                }}>
+                  <figure>
+                    <img src={assetHref(item.image)} alt={item.imageAlt || ""} loading="lazy" />
+                  </figure>
+                  <span>{item.number}</span>
+                  <div>
+                    <p>{item.meta}</p>
+                    <h3>{item.title}</h3>
+                    <small>{item.summary}</small>
+                  </div>
+                  <b aria-hidden="true">↓</b>
+                </a>
+              ))}
+            </div>
+          </nav>
+        )}
         {project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
         {project.mediaSections?.map((section, sectionIndex) => <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
         {project.subprojects?.length > 0 && (
