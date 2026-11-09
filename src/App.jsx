@@ -320,24 +320,24 @@ function ContactLinks() {
   );
 }
 
-function Sidebar({ page, route, navigate }) {
+function Sidebar({ page, route, navigate, clock }) {
   return (
-    <aside className="sidebar">
-      <div className="sidebar-top">
+    <aside className="sidebar global-topbar">
+      <div className="topbar-primary">
         <a className="brand reveal reveal-fast" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <NavigationLinks page={page} route={route} navigate={navigate} />
+        <ContactLinks />
+      </div>
+      <div className="topbar-secondary">
         <div className="profile-copy reveal">
           <p>{profile.role}</p>
           <p>{profile.bio}</p>
         </div>
-        <div className="reveal">
-          <NavigationLinks page={page} route={route} navigate={navigate} />
-          <div className="rule" />
-          <ContactLinks />
+        <div className="sidebar-meta reveal">
+          <span>©{new Date().getFullYear()} {profile.name.toLowerCase()}</span>
+          <span>updated {profile.updated}</span>
+          <span>{clock}</span>
         </div>
-      </div>
-      <div className="sidebar-meta reveal">
-        <span>©{new Date().getFullYear()} {profile.name.toLowerCase()}</span>
-        <span>last updated&nbsp; {profile.updated}</span>
       </div>
     </aside>
   );
@@ -2779,6 +2779,7 @@ export default function App() {
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const isUtopia = selectedProject?.slug === "utopia-vinyl";
+  const usesTopbar = !isPlayground && !selectedDetail && !isIcffGallery && !isIcffHub;
 
   useEffect(() => {
     document.documentElement.classList.add("js");
@@ -2817,9 +2818,9 @@ export default function App() {
   }, [page, selectedProject, selectedDetail, selectedPhotographyAlbum]);
 
   return (
-    <div className="site-shell">
+    <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}`}>
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && (selectedDetail ? <ProjectDetailSidebar clock={clock} navigate={navigate} detail={selectedDetail} route={page} /> : isIcffGallery ? <IcffSidebar clock={clock} navigate={navigate} project={selectedProject} /> : isIcffHub ? <IcffHubSidebar clock={clock} navigate={navigate} project={selectedProject} /> : <Sidebar page={page} route={route} navigate={navigate} />)}
+      {!isPlayground && (selectedDetail ? <ProjectDetailSidebar clock={clock} navigate={navigate} detail={selectedDetail} route={page} /> : isIcffGallery ? <IcffSidebar clock={clock} navigate={navigate} project={selectedProject} /> : isIcffHub ? <IcffHubSidebar clock={clock} navigate={navigate} project={selectedProject} /> : <Sidebar page={page} route={route} navigate={navigate} clock={clock} />)}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
       {page === "about" ? (
         <AboutPage clock={clock} />
@@ -2852,7 +2853,7 @@ export default function App() {
       ) : (
         <HomePage clock={clock} navigate={navigate} />
       )}
-      {!isPlayground && <div className="desktop-clock">{clock}</div>}
+      {!isPlayground && !usesTopbar && <div className="desktop-clock">{clock}</div>}
     </div>
   );
 }
