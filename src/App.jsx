@@ -844,27 +844,110 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
   );
 }
 
+function HomeHero({ clock }) {
+  const [motionPaused, setMotionPaused] = useState(false);
+  const [cameraAimed, setCameraAimed] = useState(false);
+
+  const updateParallax = (event) => {
+    if (motionPaused || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width - 0.5).toFixed(3);
+    const y = ((event.clientY - bounds.top) / bounds.height - 0.5).toFixed(3);
+    event.currentTarget.style.setProperty("--hero-pointer-x", x);
+    event.currentTarget.style.setProperty("--hero-pointer-y", y);
+  };
+
+  const resetParallax = (event) => {
+    event.currentTarget.style.setProperty("--hero-pointer-x", 0);
+    event.currentTarget.style.setProperty("--hero-pointer-y", 0);
+  };
+
+  return (
+    <section
+      className={`home-hero home-hero-draft${motionPaused ? " is-paused" : ""}`}
+      aria-labelledby="home-hero-title"
+      onPointerMove={updateParallax}
+      onPointerLeave={resetParallax}
+    >
+      <div className="home-hero-grid" aria-hidden="true" />
+      <div className="home-hero-glow home-hero-glow-purple" aria-hidden="true" />
+      <div className="home-hero-glow home-hero-glow-blue" aria-hidden="true" />
+      <div className="home-hero-surname" aria-hidden="true">CHEN</div>
+
+      <div className="home-hero-topline">
+        <span>Alexander Chen · Toronto</span>
+        <div>
+          <span>{clock}</span>
+          <button
+            className="home-hero-motion-toggle"
+            type="button"
+            aria-pressed={motionPaused}
+            onClick={() => setMotionPaused((value) => !value)}
+          >
+            <span aria-hidden="true">{motionPaused ? "▶" : "Ⅱ"}</span>
+            {motionPaused ? "Play motion" : "Pause motion"}
+          </button>
+        </div>
+      </div>
+
+      <div className="home-hero-portrait-stage">
+        <div className="home-hero-orbit-ring" aria-hidden="true" />
+        <button
+          className="home-hero-avatar"
+          type="button"
+          aria-label="Aim the chibi’s camera"
+          aria-pressed={cameraAimed}
+          onClick={() => setCameraAimed((value) => !value)}
+        >
+          <span className="home-hero-avatar-art">
+            <img
+              className="home-hero-avatar-idle"
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-chibi.webp")}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+            />
+            <img
+              className="home-hero-avatar-camera"
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-camera.webp")}
+              alt=""
+              decoding="async"
+            />
+            <img
+              className="home-hero-avatar-blink"
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-blink.webp")}
+              alt=""
+              decoding="async"
+            />
+          </span>
+        </button>
+        <div className="home-hero-orbit" aria-label="Creative disciplines">
+          <span>Product systems</span>
+          <span>Social strategy</span>
+          <span>Visual stories</span>
+          <span>UX + content</span>
+        </div>
+      </div>
+
+      <div className="home-hero-copy">
+        <p>{profile.hero.eyebrow}</p>
+        <h1 id="home-hero-title">{profile.hero.headline}</h1>
+        <p className="home-hero-summary">{profile.hero.summary}</p>
+        <div className="home-hero-actions">
+          <a href={routeHref("work")}>View selected projects <span aria-hidden="true">↓</span></a>
+          <a href={`mailto:${profile.email}`}>Start a conversation <Arrow /></a>
+        </div>
+      </div>
+
+      <p className="home-hero-index"><span>01</span> Multidisciplinary designer in Toronto</p>
+    </section>
+  );
+}
+
 function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
-      <section className="home-hero" aria-labelledby="home-hero-title">
-        <img className="home-hero-image" src={assetHref(profile.hero.image)} alt={profile.hero.imageAlt} />
-        <div className="home-hero-shade" aria-hidden="true" />
-        <div className="home-hero-topline">
-          <span>Alexander Chen</span>
-          <span>{clock}</span>
-        </div>
-        <div className="home-hero-copy">
-          <p>{profile.hero.eyebrow}</p>
-          <h1 id="home-hero-title">{profile.hero.headline}</h1>
-          <p className="home-hero-summary">{profile.hero.summary}</p>
-          <div className="home-hero-actions">
-            <a href={routeHref("work")}>View selected projects <span aria-hidden="true">↓</span></a>
-            <a href={`mailto:${profile.email}`}>Start a conversation <Arrow /></a>
-          </div>
-        </div>
-        <p className="home-hero-index"><span>01</span> Multidisciplinary designer in Toronto</p>
-      </section>
+      <HomeHero clock={clock} />
 
       <section className="home-collaborators" aria-labelledby="home-collaborators-title">
         <div className="home-collaborators-heading">
