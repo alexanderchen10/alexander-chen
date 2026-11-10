@@ -616,6 +616,7 @@ export const workProjects = [
   },
   {
     slug: "loblaw-employer-brand",
+    showInWork: false,
     title: "Loblaw Companies Limited",
     description: "An employer-brand system spanning campaign creative, career-site banners, and a redesigned global talent-acquisition hub.",
     organization: "Loblaw Companies Limited",
