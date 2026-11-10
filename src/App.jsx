@@ -270,7 +270,7 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
       <ol className="numbered-links">
         <li>
           <a href={routeHref("work")} className={route !== "experience" && (page === "home" || page.startsWith("project/")) ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
-            <span>01.</span><span>work</span>
+            <span>01.</span><span>projects</span>
           </a>
         </li>
         <li>
@@ -700,7 +700,30 @@ function ProjectColumns({ projects }) {
   );
 }
 
-function HomeExperience() {
+function ExperienceProjectCard({ project, navigate }) {
+  const projectRoute = `project/${project.slug}`;
+
+  return (
+    <a
+      className="home-experience-project"
+      href={routeHref(projectRoute)}
+      onClick={(event) => navigate(event, "/", projectRoute)}
+      aria-label={`Open the ${project.title} case study`}
+    >
+      <div className="home-experience-project-media">
+        <ProjectVisual project={project} surface="card" />
+      </div>
+      <div className="home-experience-project-copy">
+        <p>Related project</p>
+        <h4>{project.title}</h4>
+        <span>{project.description}</span>
+      </div>
+      <strong>Open case study <Arrow /></strong>
+    </a>
+  );
+}
+
+function HomeExperience({ navigate }) {
   const updateHighlightGlow = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
@@ -715,31 +738,35 @@ function HomeExperience() {
         <p className="home-experience-note">Scroll through six roles spanning client success, marketing, systems, community, and creative production.</p>
       </header>
       <div className="home-experience-list">
-        {about.experience.map((experience, index) => (
-          <article className="home-experience-item experience-reveal" key={`${experience.organization}-${experience.role}`} style={{ "--experience-order": index }}>
-            <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-            <div className="home-experience-side">
-              <span className="home-experience-badge" aria-hidden="true"><span>{experience.badge}</span></span>
-              <p>{experience.period}</p>
-            </div>
-            <div className="home-experience-content">
-              <header>
-                <h3>{experience.role}</h3>
-                <p>{experience.organization}{experience.location && <><span aria-hidden="true"> · </span>{experience.location}</>}</p>
-              </header>
-              <p className="home-experience-summary">{experience.summary}</p>
-              <ol className="home-experience-highlights">
-                {experience.highlights.map((highlight, highlightIndex) => (
-                  <li key={highlight.value} style={{ "--highlight-order": highlightIndex }} onPointerMove={updateHighlightGlow}>
-                    <span>Highlight {String(highlightIndex + 1).padStart(2, "0")}</span>
-                    <strong>{highlight.value}</strong>
-                    <p>{highlight.detail}</p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </article>
-        ))}
+        {about.experience.map((experience, index) => {
+          const relatedProject = experience.projectSlug ? workProjects.find((project) => project.slug === experience.projectSlug) : null;
+          return (
+            <article className="home-experience-item experience-reveal" key={`${experience.organization}-${experience.role}`} style={{ "--experience-order": index }}>
+              <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+              <div className="home-experience-side">
+                <span className="home-experience-badge" aria-hidden="true"><span>{experience.badge}</span></span>
+                <p>{experience.period}</p>
+              </div>
+              <div className="home-experience-content">
+                <header>
+                  <h3>{experience.role}</h3>
+                  <p>{experience.organization}{experience.location && <><span aria-hidden="true"> · </span>{experience.location}</>}</p>
+                </header>
+                <p className="home-experience-summary">{experience.summary}</p>
+                <ol className="home-experience-highlights">
+                  {experience.highlights.map((highlight, highlightIndex) => (
+                    <li key={highlight.value} style={{ "--highlight-order": highlightIndex }} onPointerMove={updateHighlightGlow}>
+                      <span>Highlight {String(highlightIndex + 1).padStart(2, "0")}</span>
+                      <strong>{highlight.value}</strong>
+                      <p>{highlight.detail}</p>
+                    </li>
+                  ))}
+                </ol>
+                {relatedProject && <ExperienceProjectCard project={relatedProject} navigate={navigate} />}
+              </div>
+            </article>
+          );
+        })}
         <footer className="home-experience-resume reveal" aria-label="Resume education, capabilities, and contact details">
           <header>
             <div>
@@ -782,10 +809,10 @@ function HomeExperience() {
   );
 }
 
-function CollaboratorCard({ collaborator, index, navigate }) {
+function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) {
   const content = <>
     <div className="home-collaborator-mark">
-      <img src={assetHref(collaborator.logo)} alt={`${collaborator.name} logo`} loading="lazy" />
+      <img src={assetHref(collaborator.logo)} alt={`${collaborator.name} logo`} loading="eager" decoding="async" />
     </div>
     <div className="home-collaborator-meta">
       <span>{String(index + 1).padStart(2, "0")}</span>
@@ -793,18 +820,23 @@ function CollaboratorCard({ collaborator, index, navigate }) {
     </div>
   </>;
 
-  const style = { "--logo-scale": collaborator.scale ?? 1 };
-  if (!collaborator.projectSlug) return <article className="home-collaborator" role="listitem" style={style}>{content}</article>;
+  const style = {
+    "--logo-scale": collaborator.scale ?? 1,
+    "--logo-bg": collaborator.background || "#ffffff",
+    "--logo-fg": collaborator.foreground || "#171713",
+  };
+  if (!collaborator.projectSlug) return <article className="home-collaborator" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined} style={style}>{content}</article>;
 
   const projectRoute = `project/${collaborator.projectSlug}`;
   return (
-    <article className="home-collaborator-item" role="listitem">
+    <article className="home-collaborator-item" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined}>
       <a
         className="home-collaborator home-collaborator-linked"
         href={routeHref(projectRoute)}
         onClick={(event) => navigate(event, "/", projectRoute)}
         style={style}
         aria-label={`View ${collaborator.name} portfolio project`}
+        tabIndex={duplicate ? -1 : undefined}
       >
         {content}
       </a>
@@ -827,7 +859,7 @@ function HomePage({ clock, navigate }) {
           <h1 id="home-hero-title">{profile.hero.headline}</h1>
           <p className="home-hero-summary">{profile.hero.summary}</p>
           <div className="home-hero-actions">
-            <a href={routeHref("work")}>View selected work <span aria-hidden="true">↓</span></a>
+            <a href={routeHref("work")}>View selected projects <span aria-hidden="true">↓</span></a>
             <a href={`mailto:${profile.email}`}>Start a conversation <Arrow /></a>
           </div>
         </div>
@@ -842,19 +874,33 @@ function HomePage({ clock, navigate }) {
             <p>A selection of organizations I’ve collaborated with across in-house, studio, event, and campaign work.</p>
           </div>
         </div>
-        <div className="home-collaborator-grid" role="list" aria-label="Organizations Alexander Chen has worked with">
-          {profile.collaborators.map((collaborator, index) => <CollaboratorCard collaborator={collaborator} index={index} navigate={navigate} key={collaborator.name} />)}
+        <div className="home-collaborator-marquee" role="list" aria-label="Organizations Alexander Chen has worked with">
+          <div className="home-collaborator-track">
+            {[0, 1].map((loop) => (
+              <div className="home-collaborator-set" aria-hidden={loop === 1 || undefined} key={loop}>
+                {profile.collaborators.map((collaborator, index) => (
+                  <CollaboratorCard
+                    collaborator={collaborator}
+                    index={index}
+                    navigate={navigate}
+                    duplicate={loop === 1}
+                    key={`${loop}-${collaborator.name}`}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <section id="work" className="portfolio-section home-work-section">
         <div className="home-work-heading reveal">
-          <p className="section-label">work</p>
-          <p>Selected roles and projects across brand systems, digital products, community, and visual storytelling.</p>
+          <p className="section-label">projects</p>
+          <p>Selected independent, client, and creative projects across digital products, brand systems, and visual storytelling.</p>
         </div>
         <ProjectColumns projects={workProjects} />
       </section>
-      <HomeExperience />
+      <HomeExperience navigate={navigate} />
       <MobileFooter clock={clock} />
     </main>
   );
