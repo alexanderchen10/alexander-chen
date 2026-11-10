@@ -700,7 +700,7 @@ function ProjectColumns({ projects }) {
   );
 }
 
-function ExperienceProjectCard({ project, navigate }) {
+function ExperienceProjectLink({ project, navigate }) {
   const projectRoute = `project/${project.slug}`;
 
   return (
@@ -708,65 +708,147 @@ function ExperienceProjectCard({ project, navigate }) {
       className="home-experience-project"
       href={routeHref(projectRoute)}
       onClick={(event) => navigate(event, "/", projectRoute)}
-      aria-label={`Open the ${project.title} case study`}
     >
-      <div className="home-experience-project-media">
-        <ProjectVisual project={project} surface="card" />
-      </div>
-      <div className="home-experience-project-copy">
-        <p>Related project</p>
-        <h4>{project.title}</h4>
-        <span>{project.description}</span>
-      </div>
-      <strong>Open case study <Arrow /></strong>
+      <span>{project.title}</span>
+      <Arrow />
     </a>
   );
 }
 
 function HomeExperience({ navigate }) {
-  const updateHighlightGlow = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
-    event.currentTarget.style.setProperty("--my", `${event.clientY - bounds.top}px`);
-  };
+  const cardStack = useRef(null);
+
+  useEffect(() => {
+    if (typeof ResizeObserver === "undefined" || typeof IntersectionObserver === "undefined") return;
+
+    const stack = cardStack.current;
+    const cards = Array.from(stack.children);
+    const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
+    const clampProgress = (value) => Math.max(0, Math.min(1, value));
+    let isOnScreen = false;
+    let frame = 0;
+
+    const queueStackUpdate = () => {
+      if (!isOnScreen || !motion.matches || frame) return;
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        if (!isOnScreen || !motion.matches) return;
+
+        // The wrappers stay level, so rotations on the card faces cannot change these measurements.
+        const deckTop = parseFloat(getComputedStyle(stack).getPropertyValue("--experience-deck-top"));
+        const entryDistance = Math.max(1, window.innerHeight - deckTop);
+        const bounds = cards.map((card) => card.getBoundingClientRect());
+        cards.forEach((card, index) => {
+          const { top, bottom } = bounds[index];
+          const next = bounds[index + 1];
+          const arrival = index === 0 ? 1 : clampProgress(1 - (top - deckTop) / entryDistance);
+          const visibleHeight = Math.max(1, bottom - Math.max(top, deckTop));
+          const cover = next ? clampProgress((bottom - next.top) / visibleHeight) : 0;
+          card.style.setProperty("--experience-arrival", arrival.toFixed(3));
+          card.style.setProperty("--experience-cover", cover.toFixed(3));
+          card.toggleAttribute("data-covered", cover === 1);
+        });
+      });
+    };
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach(({ target }) => {
+        target.style.setProperty("--experience-card-height", `${target.offsetHeight}px`);
+      });
+      queueStackUpdate();
+    });
+    cards.forEach((card) => resizeObserver.observe(card));
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isOnScreen = entry.isIntersecting;
+      queueStackUpdate();
+    });
+    const revealFocusedLink = ({ target }) => {
+      if (motion.matches && target.matches(":focus-visible")) {
+        target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
+      }
+    };
+    stack.classList.add("is-deck");
+    visibilityObserver.observe(stack);
+    window.addEventListener("scroll", queueStackUpdate, { passive: true });
+    window.addEventListener("resize", queueStackUpdate);
+    stack.addEventListener("focusin", revealFocusedLink);
+    stack.addEventListener("focusout", queueStackUpdate);
+    motion.addEventListener("change", queueStackUpdate);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", queueStackUpdate);
+      window.removeEventListener("resize", queueStackUpdate);
+      stack.removeEventListener("focusin", revealFocusedLink);
+      stack.removeEventListener("focusout", queueStackUpdate);
+      motion.removeEventListener("change", queueStackUpdate);
+      stack.classList.remove("is-deck");
+      visibilityObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
     <section id="experience" className="home-experience" aria-labelledby="home-experience-title">
       <header className="home-experience-heading">
-        <p><span aria-hidden="true" />02 / experience</p>
-        <h2 id="home-experience-title">Professional experience</h2>
-        <p className="home-experience-note">Scroll through six roles spanning client success, marketing, systems, community, and creative production.</p>
+        <p className="home-experience-kicker">02 / experience</p>
+        <h2 id="home-experience-title"><span>Professional</span>{" "}<span>experience</span></h2>
+        <p className="home-experience-note">Six roles spanning client success, marketing, brand systems, community, and creative production.</p>
       </header>
+      <div className="home-experience-ticker" aria-hidden="true">
+        <div>
+          {[0, 1].map((copy) => (
+            <span key={copy}>Client success · Brand systems · Digital strategy · Creative production · </span>
+          ))}
+        </div>
+      </div>
       <div className="home-experience-list">
-        {about.experience.map((experience, index) => {
-          const relatedProject = experience.projectSlug ? workProjects.find((project) => project.slug === experience.projectSlug) : null;
-          return (
-            <article className="home-experience-item experience-reveal" key={`${experience.organization}-${experience.role}`} style={{ "--experience-order": index }}>
-              <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-              <div className="home-experience-side">
-                <span className="home-experience-badge" aria-hidden="true"><span>{experience.badge}</span></span>
-                <p>{experience.period}</p>
+        <div className="home-experience-stack" ref={cardStack}>
+          {about.experience.map((experience, index) => {
+            const relatedProjects = (experience.projectSlugs || [])
+              .map((slug) => projectFromRoute(`project/${slug}`))
+              .filter(Boolean);
+
+            return (
+              <div
+                className="home-experience-card"
+                key={`${experience.organization}-${experience.role}`}
+                style={{ "--experience-deal-direction": index % 2 === 0 ? -1 : 1 }}
+              >
+                <article className="home-experience-item" aria-labelledby={`home-experience-company-${index}`}>
+                  <div className="home-experience-side">
+                    <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")} / {String(about.experience.length).padStart(2, "0")}</span>
+                    <h3 id={`home-experience-company-${index}`}>{experience.organization}</h3>
+                    <p>{experience.period}</p>
+                    {experience.location && <p>{experience.location}</p>}
+                  </div>
+                  <div className="home-experience-content">
+                    <h4>{experience.role}</h4>
+                    <p className="home-experience-summary">{experience.summary}</p>
+                    <ul className="home-experience-highlights">
+                      {experience.highlights.map((highlight) => (
+                        <li key={highlight.value}>
+                          <strong>{highlight.value}</strong>
+                          <p>{highlight.detail}</p>
+                        </li>
+                      ))}
+                    </ul>
+                    {relatedProjects.length > 0 && (
+                      <nav className="home-experience-projects" aria-label={`Related projects at ${experience.organization}`}>
+                        <p>Selected work</p>
+                        {relatedProjects.map((project) => (
+                          <ExperienceProjectLink key={project.slug} project={project} navigate={navigate} />
+                        ))}
+                      </nav>
+                    )}
+                  </div>
+                </article>
               </div>
-              <div className="home-experience-content">
-                <header>
-                  <h3>{experience.role}</h3>
-                  <p>{experience.organization}{experience.location && <><span aria-hidden="true"> · </span>{experience.location}</>}</p>
-                </header>
-                <p className="home-experience-summary">{experience.summary}</p>
-                <ol className="home-experience-highlights">
-                  {experience.highlights.map((highlight, highlightIndex) => (
-                    <li key={highlight.value} style={{ "--highlight-order": highlightIndex }} onPointerMove={updateHighlightGlow}>
-                      <span>Highlight {String(highlightIndex + 1).padStart(2, "0")}</span>
-                      <strong>{highlight.value}</strong>
-                      <p>{highlight.detail}</p>
-                    </li>
-                  ))}
-                </ol>
-                {relatedProject && <ExperienceProjectCard project={relatedProject} navigate={navigate} />}
-              </div>
-            </article>
-          );
-        })}
+            );
+          })}
+        </div>
         <footer className="home-experience-resume reveal" aria-label="Resume education, capabilities, and contact details">
           <header>
             <div>
@@ -812,7 +894,7 @@ function HomeExperience({ navigate }) {
 function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) {
   const content = <>
     <div className="home-collaborator-mark">
-      <img src={assetHref(collaborator.logo)} alt={`${collaborator.name} logo`} loading="eager" decoding="async" />
+      <img src={assetHref(collaborator.logo)} alt={`${collaborator.name} logo`} loading="lazy" decoding="async" fetchPriority="low" />
     </div>
     <div className="home-collaborator-meta">
       <span>{String(index + 1).padStart(2, "0")}</span>
@@ -844,9 +926,10 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
   );
 }
 
-function HomeHero({ clock }) {
+function HomeHero() {
   const [motionPaused, setMotionPaused] = useState(false);
   const [cameraAimed, setCameraAimed] = useState(false);
+  const [givenName, ...surname] = profile.name.split(" ");
 
   const updateParallax = (event) => {
     if (motionPaused || event.pointerType === "touch") return;
@@ -864,7 +947,7 @@ function HomeHero({ clock }) {
 
   return (
     <section
-      className={`home-hero home-hero-draft${motionPaused ? " is-paused" : ""}`}
+      className={`home-hero${motionPaused ? " is-paused" : ""}`}
       aria-labelledby="home-hero-title"
       onPointerMove={updateParallax}
       onPointerLeave={resetParallax}
@@ -872,26 +955,30 @@ function HomeHero({ clock }) {
       <div className="home-hero-grid" aria-hidden="true" />
       <div className="home-hero-glow home-hero-glow-purple" aria-hidden="true" />
       <div className="home-hero-glow home-hero-glow-blue" aria-hidden="true" />
-      <div className="home-hero-surname" aria-hidden="true">CHEN</div>
 
-      <div className="home-hero-topline">
-        <span>Alexander Chen · Toronto</span>
-        <div>
-          <span>{clock}</span>
-          <button
-            className="home-hero-motion-toggle"
-            type="button"
-            aria-pressed={motionPaused}
-            onClick={() => setMotionPaused((value) => !value)}
-          >
-            <span aria-hidden="true">{motionPaused ? "▶" : "Ⅱ"}</span>
-            {motionPaused ? "Play motion" : "Pause motion"}
-          </button>
+      <div className="home-hero-copy">
+        <p className="home-hero-eyebrow">{profile.hero.eyebrow}</p>
+        <h1 id="home-hero-title">
+          <span>{givenName}</span>{" "}
+          <span className="home-hero-surname">{surname.join(" ")}</span>
+        </h1>
+        <div className="home-hero-actions">
+          <a href={routeHref("work")}>See the work <span aria-hidden="true">↓</span></a>
+          <a href={assetHref("/resume.pdf")} target="_blank" rel="noreferrer">Open résumé <Arrow /></a>
         </div>
       </div>
 
       <div className="home-hero-portrait-stage">
         <div className="home-hero-orbit-ring" aria-hidden="true" />
+        <button
+          className="home-hero-motion-toggle"
+          type="button"
+          aria-pressed={motionPaused}
+          onClick={() => setMotionPaused((value) => !value)}
+        >
+          <span aria-hidden="true">{motionPaused ? "▶" : "Ⅱ"}</span>
+          {motionPaused ? "Play motion" : "Pause motion"}
+        </button>
         <button
           className="home-hero-avatar"
           type="button"
@@ -929,17 +1016,22 @@ function HomeHero({ clock }) {
         </div>
       </div>
 
-      <div className="home-hero-copy">
-        <p>{profile.hero.eyebrow}</p>
-        <h1 id="home-hero-title">{profile.hero.headline}</h1>
-        <p className="home-hero-summary">{profile.hero.summary}</p>
-        <div className="home-hero-actions">
-          <a href={routeHref("work")}>View selected projects <span aria-hidden="true">↓</span></a>
-          <a href={`mailto:${profile.email}`}>Start a conversation <Arrow /></a>
+      <div className="home-hero-details">
+        <div className="home-hero-focus">
+          <p className="home-hero-detail-label">Focus</p>
+          <p className="home-hero-summary">{profile.hero.summary}</p>
         </div>
+        <dl className="home-hero-current">
+          <div>
+            <dt className="home-hero-detail-label">Based in</dt>
+            <dd>{profile.location}, Canada</dd>
+          </div>
+          <div>
+            <dt className="home-hero-detail-label">Now building</dt>
+            <dd><a href={routeHref("project/utopia-vinyl")}>Utopia Vinyl <Arrow /></a></dd>
+          </div>
+        </dl>
       </div>
-
-      <p className="home-hero-index"><span>01</span> Multidisciplinary designer in Toronto</p>
     </section>
   );
 }
@@ -947,7 +1039,7 @@ function HomeHero({ clock }) {
 function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
-      <HomeHero clock={clock} />
+      <HomeHero />
 
       <section className="home-collaborators" aria-labelledby="home-collaborators-title">
         <div className="home-collaborators-heading">
@@ -1168,7 +1260,7 @@ function PlaygroundPage({ clock, navigate }) {
       <section
         className="playground-stage"
         aria-labelledby="playground-title"
-        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-background-moving.gif")})` }}
+        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-background-moving.webp")})` }}
       >
         <h1 className="playground-title" id="playground-title">Playground</h1>
         <p className="playground-kicker">personal archive · ongoing</p>
@@ -1558,7 +1650,7 @@ function FAAdventurePage({ clock, navigate }) {
       <section
         className="fa-hero"
         aria-labelledby="fa-adventure-title"
-        style={{ "--fa-background": `url(${assetHref("/projects/playground/playground-background-moving.gif")})` }}
+        style={{ "--fa-background": `url(${assetHref("/projects/playground/playground-background-moving.webp")})` }}
       >
         <div className="fa-hero-copy reveal reveal-fast">
           <a className="fa-back" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}>
@@ -1663,7 +1755,7 @@ function StructuredMediaItem({ item, title, index, presentation }) {
               <video
                 controls
                 playsInline
-                preload="metadata"
+                preload={item.poster ? "none" : "metadata"}
                 poster={item.poster ? assetHref(item.poster) : undefined}
                 aria-label={item.caption || `${title} video ${index + 1}`}
               >
@@ -1688,7 +1780,7 @@ function StructuredMediaItem({ item, title, index, presentation }) {
           <video
             controls
             playsInline
-            preload="metadata"
+            preload={item.poster ? "none" : "metadata"}
             poster={item.poster ? assetHref(item.poster) : undefined}
             aria-label={item.caption || `${title} video ${index + 1}`}
           >
@@ -2244,7 +2336,7 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
                   allowFullScreen
                 />
               ) : item.type === "video" ? (
-                <video controls playsInline preload="metadata" poster={item.poster ? assetHref(item.poster) : undefined} aria-label={item.caption || `${section.title} video ${itemIndex + 1}`}>
+                <video controls playsInline preload={item.poster ? "none" : "metadata"} poster={item.poster ? assetHref(item.poster) : undefined} aria-label={item.caption || `${section.title} video ${itemIndex + 1}`}>
                   <source src={assetHref(item.src)} type={item.mime || "video/mp4"} />
                   Your browser does not support embedded video.
                 </video>
@@ -2936,7 +3028,7 @@ export default function App() {
       },
       { rootMargin: "0px 0px -8%", threshold: 0.06 },
     );
-    const observe = () => document.querySelectorAll(".reveal:not(.is-visible), .experience-reveal:not(.is-visible)").forEach((item) => observer.observe(item));
+    const observe = () => document.querySelectorAll(".reveal:not(.is-visible)").forEach((item) => observer.observe(item));
     const frame = window.requestAnimationFrame(observe);
     return () => {
       window.cancelAnimationFrame(frame);

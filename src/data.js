@@ -23,7 +23,7 @@ export const profile = {
     { name: "123Dentist", logo: "/brands/123dentist.svg", scale: 0.84, background: "#eefaff", foreground: "#087ca6" },
     { name: "VEERAH", logo: "/brands/veerah.png", scale: 0.82, background: "#ffffff", foreground: "#111111" },
     { name: "Flippa", logo: "/brands/flippa.svg", scale: 0.8, background: "#edf8f2", foreground: "#146b48" },
-    { name: "University of Toronto", logo: "/brands/university-of-toronto.png", scale: 0.92, background: "#ffffff", foreground: "#163b69" },
+    { name: "University of Toronto", logo: "/brands/university-of-toronto.webp", scale: 0.92, background: "#ffffff", foreground: "#163b69" },
     { name: "No Frills", logo: "/brands/no-frills.png", scale: 0.9, background: "#fff7d6", foreground: "#d9291c" },
     { name: "Real Canadian Superstore", logo: "/brands/real-canadian-superstore.webp", scale: 0.94, background: "#f4f7ff", foreground: "#104ba4" },
     { name: "Loblaw Companies Limited", logo: "/projects/work/loblaw/loblaw-companies-limited-logo.png", scale: 0.82, background: "#f0f1f2", foreground: "#4c5158" },
@@ -1155,6 +1155,7 @@ export const about = {
     },
     {
       organization: "AO Studio Ltd.",
+      projectSlugs: ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity"],
       location: "Toronto, Canada",
       badge: "AO",
       role: "Founder & Creative Marketing Consultant",
@@ -1169,7 +1170,7 @@ export const about = {
     },
     {
       organization: "T&T Supermarket Inc.",
-      projectSlug: "tt-supermarket",
+      projectSlugs: ["tt-supermarket"],
       location: "Markham, Canada",
       badge: "T&T",
       role: "Marketing Specialist, Media & Communications",
@@ -1185,6 +1186,7 @@ export const about = {
     },
     {
       organization: "Loblaw Companies Limited",
+      projectSlugs: ["loblaw-employer-brand"],
       location: "Brampton, Canada",
       badge: "LCL",
       role: "Creative Specialist, Talent Strategy & Employer Branding",
@@ -1214,7 +1216,7 @@ export const about = {
     },
     {
       organization: "Syntax Capital",
-      projectSlug: "aves-lair-community",
+      projectSlugs: ["aves-lair-community"],
       location: "Remote",
       badge: "SC",
       role: "Community Engagement Intern",
