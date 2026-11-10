@@ -989,20 +989,20 @@ function HomeHero() {
           <span className="home-hero-avatar-art">
             <img
               className="home-hero-avatar-idle"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-chibi.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-chibi-hd.webp")}
               alt=""
               fetchPriority="high"
               decoding="async"
             />
             <img
               className="home-hero-avatar-camera"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-camera.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-camera-hd.webp")}
               alt=""
               decoding="async"
             />
             <img
               className="home-hero-avatar-blink"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-blink.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-avatar-blink-hd.webp")}
               alt=""
               decoding="async"
             />
