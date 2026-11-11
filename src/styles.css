@@ -648,7 +648,7 @@ p, h1, h2, h3, ol { margin: 0; }
 .home-experience-project-preview-media {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--preview-aspect, 16 / 9);
   overflow: hidden;
   border-radius: 12px;
   background: #e7e5ec;

@@ -950,7 +950,7 @@ export const workProjects = [
   },
   {
     slug: "icff-lavazza-inclucity",
-    showInWork: true,
+    showInWork: false,
     title: "ICFF Lavazza IncluCity Festival",
     description: "Three photography stories from ICFF's 2024–2025 festival events, spanning opening-night energy, celebrated actors, and the moments surrounding each experience.",
     organization: "ICFF Lavazza IncluCity Festival",

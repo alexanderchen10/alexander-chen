@@ -702,7 +702,7 @@ function ProjectColumns({ projects }) {
 
 function ExperienceProjectLink({ project, navigate }) {
   const projectRoute = `project/${project.slug}`;
-  const showHoverPreview = project.slug === "corcoran-oakville-grand-opening";
+  const showHoverPreview = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity"].includes(project.slug);
 
   return (
     <a
@@ -714,7 +714,7 @@ function ExperienceProjectLink({ project, navigate }) {
       <Arrow className="home-experience-project-arrow" />
       {showHoverPreview && (
         <span className="home-experience-project-preview" aria-hidden="true">
-          <span className="home-experience-project-preview-media">
+          <span className="home-experience-project-preview-media" style={{ "--preview-aspect": project.aspect || "16 / 9" }}>
             <ProjectVisual project={project} surface="card" />
           </span>
           <span className="home-experience-project-preview-caption">
