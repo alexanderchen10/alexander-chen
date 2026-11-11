@@ -3252,42 +3252,192 @@ function IcffGalleryPage({ clock, navigate, project }) {
 }
 
 function EducationPage() {
+  const pageRef = useRef(null);
+  const degreeRef = useRef(null);
+  const threadsRef = useRef(null);
+  const [activeCredential, setActiveCredential] = useState(0);
+  const [activeThread, setActiveThread] = useState(0);
+  const yearDigits = "2024".split("");
+  const credentials = [
+    {
+      title: "UX Design Certificate",
+      organization: "Juno College of Technology · Remote, Canada",
+      detail: "A remote certificate grounded in UX foundations and practical interface work.",
+      status: "Completed · June 2023",
+      type: "Design",
+    },
+    {
+      title: "Flight Attendant Training",
+      organization: "Porter Airlines",
+      detail: "Professional training in aviation safety and passenger service.",
+      status: "Trained",
+      type: "Aviation",
+    },
+    {
+      title: "Smart Serve Ontario",
+      organization: "Ontario, Canada",
+      detail: "Ontario certification in responsible alcohol service.",
+      status: "Certified",
+      type: "Hospitality",
+    },
+  ];
+  const studyThreads = [
+    ["Digital enterprise", "Connects business goals, digital systems, and delivery."],
+    ["UX design", "Turns user needs into clearer flows and interfaces."],
+    ["Content strategy", "Shapes information so people can understand and act."],
+    ["Digital marketing", "Connects creative decisions to audience and performance."],
+    ["Visual storytelling", "Builds narratives through image, motion, and sequence."],
+    ["Project management", "Keeps collaborators, timelines, and deliverables aligned."],
+  ];
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const viewportHeight = window.innerHeight || 1;
+      const page = pageRef.current;
+      const degree = degreeRef.current;
+      const threads = threadsRef.current;
+
+      if (page) {
+        const rect = page.getBoundingClientRect();
+        const progress = Math.min(Math.max((viewportHeight - rect.top) / Math.max(rect.height, 1), 0), 1);
+        page.style.setProperty("--education-scroll", progress.toFixed(3));
+      }
+
+      if (degree) {
+        const rect = degree.getBoundingClientRect();
+        const unfold = Math.min(Math.max((viewportHeight - rect.top) / Math.max(viewportHeight * .72, 1), 0), 1);
+        degree.style.setProperty("--education-unfold", unfold.toFixed(3));
+      }
+
+      if (threads) {
+        const rect = threads.getBoundingClientRect();
+        const progress = Math.min(Math.max((viewportHeight * .82 - rect.top) / Math.max(rect.height * .72, 1), 0), 1);
+        threads.querySelectorAll(".education-thread-button").forEach((thread, index) => {
+          const lit = Math.min(Math.max(progress * studyThreads.length - index, 0), 1);
+          thread.style.setProperty("--thread-lit", lit.toFixed(3));
+        });
+      }
+    };
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [studyThreads.length]);
+
+  const moveDegree = (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.min(Math.max((event.clientX - bounds.left) / bounds.width, 0), 1);
+    const y = Math.min(Math.max((event.clientY - bounds.top) / bounds.height, 0), 1);
+    event.currentTarget.style.setProperty("--education-tilt-x", ((x - .5) * 2).toFixed(3));
+    event.currentTarget.style.setProperty("--education-tilt-y", ((y - .5) * 2).toFixed(3));
+    event.currentTarget.style.setProperty("--education-shine-x", `${(x * 100).toFixed(1)}%`);
+    event.currentTarget.style.setProperty("--education-shine-y", `${(y * 100).toFixed(1)}%`);
+  };
+  const resetDegree = (event) => {
+    event.currentTarget.style.setProperty("--education-tilt-x", "0");
+    event.currentTarget.style.setProperty("--education-tilt-y", "0");
+    event.currentTarget.style.setProperty("--education-shine-x", "78%");
+    event.currentTarget.style.setProperty("--education-shine-y", "12%");
+  };
+
   return (
-    <main className="main-content education-page">
+    <main className="main-content education-page" ref={pageRef}>
       <header className="education-intro">
         <p className="section-label">Education</p>
         <h1>Learning that shapes<br />the way I work.</h1>
         <p>Digital Enterprise Management at the University of Toronto, with a foundation in UX design and a hands-on creative practice.</p>
       </header>
-      <section className="education-degree" aria-labelledby="education-degree-title">
-        <div className="education-degree-top">
-          <img src={assetHref("/brands/university-of-toronto.webp")} alt="University of Toronto" />
-          <span className="education-seal" aria-label="Class of 2024">U OF T<br /><span aria-hidden="true">✧</span><br />CLASS OF 2024</span>
-        </div>
-        <h2 id="education-degree-title">Honours Bachelor <em>of Arts</em></h2>
-        <span className="education-year" aria-hidden="true">2024</span>
-        <div className="education-degree-bottom">
-          <a href="https://www.utm.utoronto.ca/" target="_blank" rel="noreferrer">University of Toronto Mississauga <Arrow /></a>
-          <p>Graduated · June 2024</p>
-          <ul className="education-tags" aria-label="Program of study"><li>Digital Enterprise Management Specialist</li></ul>
-        </div>
-      </section>
+      <div className="education-degree-stage">
+        <section
+          className="education-degree"
+          aria-labelledby="education-degree-title"
+          onPointerMove={moveDegree}
+          onPointerLeave={resetDegree}
+          onBlur={resetDegree}
+          ref={degreeRef}
+          tabIndex={0}
+        >
+          <span className="education-degree-sheen" aria-hidden="true" />
+          <div className="education-degree-top">
+            <img src={assetHref("/brands/university-of-toronto.webp")} alt="University of Toronto" />
+            <span className="education-seal" aria-label="Class of 2024"><span>U OF T · CLASS OF 2024 ·</span><i aria-hidden="true">✦</i></span>
+          </div>
+          <div className="education-degree-main">
+            <h2 id="education-degree-title"><span>Honours Bachelor</span> <em>of Arts</em></h2>
+            <span className="education-year" aria-hidden="true">
+              {yearDigits.map((digit, index) => (
+                <span className="education-year-digit" style={{ "--year-digit": digit, "--year-index": index }} key={`${digit}-${index}`}>
+                  <span>{Array.from({ length: 10 }, (_, number) => <i key={number}>{number}</i>)}</span>
+                </span>
+              ))}
+            </span>
+          </div>
+          <div className="education-degree-bottom">
+            <a href="https://www.utm.utoronto.ca/" target="_blank" rel="noreferrer">University of Toronto Mississauga <Arrow /></a>
+            <p>Graduated · June 2024</p>
+            <ul className="education-tags" aria-label="Program of study"><li>Digital Enterprise Management Specialist</li></ul>
+          </div>
+          <p className="education-card-hint" aria-hidden="true">move across the card</p>
+        </section>
+      </div>
       <section className="education-beyond" aria-labelledby="education-beyond-title">
-        <h2 id="education-beyond-title">Beyond the degree</h2>
-        <article className="education-certificate">
-          <div><h3>UX Design Certificate</h3><p>Juno College of Technology · Remote, Canada</p></div>
-          <span>Completed · June 2023</span>
-        </article>
-        <article className="education-certificate">
-          <div><h3>Flight Attendant Training</h3><p>Porter Airlines · Aviation safety &amp; passenger service</p></div>
-        </article>
-        <article className="education-certificate">
-          <div><h3>Smart Serve Ontario</h3><p>Responsible alcohol service</p></div>
-        </article>
+        <div className="education-section-heading">
+          <h2 id="education-beyond-title">Beyond the degree</h2>
+          <p>Hover or select an entry to see how it extends my practice.</p>
+        </div>
+        <div className="education-credentials">
+          {credentials.map((credential, index) => {
+            const active = activeCredential === index;
+            return (
+              <article className={`education-certificate${active ? " is-active" : ""}`} key={credential.title}>
+                <button type="button" aria-pressed={active} onClick={() => setActiveCredential(index)} onPointerEnter={() => setActiveCredential(index)} onFocus={() => setActiveCredential(index)}>
+                  <span className="education-certificate-number">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="education-certificate-copy"><strong>{credential.title}</strong><small>{credential.organization}</small></span>
+                  <span className="education-certificate-type">{credential.type}</span>
+                  <span className="education-certificate-status"><i aria-hidden="true" />{credential.status}</span>
+                  <span className="education-certificate-arrow" aria-hidden="true">↗</span>
+                </button>
+              </article>
+            );
+          })}
+        </div>
+        <div className="education-credential-detail" aria-live="polite">
+          <span>{credentials[activeCredential].type}</span>
+          <p>{credentials[activeCredential].detail}</p>
+        </div>
       </section>
-      <section className="education-threads" aria-labelledby="education-threads-title">
-        <h2 id="education-threads-title">Study threads</h2>
-        <ul className="education-tags">{["Digital enterprise", "UX design", "Content strategy", "Digital marketing", "Visual storytelling", "Project management"].map((thread) => <li key={thread}>{thread}</li>)}</ul>
+      <section className="education-threads" aria-labelledby="education-threads-title" ref={threadsRef}>
+        <div className="education-section-heading">
+          <h2 id="education-threads-title">Study threads</h2>
+          <p>These themes light up as the work moves from strategy to delivery.</p>
+        </div>
+        <div className="education-thread-words">
+          {studyThreads.map(([thread], index) => (
+            <button
+              className={`education-thread-button${activeThread === index ? " is-active" : ""}`}
+              type="button"
+              aria-pressed={activeThread === index}
+              onClick={() => setActiveThread(index)}
+              onPointerEnter={() => setActiveThread(index)}
+              onFocus={() => setActiveThread(index)}
+              key={thread}
+            >
+              {thread}<span aria-hidden="true"> / </span>
+            </button>
+          ))}
+        </div>
+        <p className="education-thread-detail" aria-live="polite"><span>{String(activeThread + 1).padStart(2, "0")}</span>{studyThreads[activeThread][1]}</p>
       </section>
     </main>
   );

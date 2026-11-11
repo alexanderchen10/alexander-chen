@@ -2941,41 +2941,122 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media(prefers-reduced-motion:reduce){.gta-bar{transition:none}}
 
 
-/* Education: editorial degree card and continuing study. */
-.education-page { max-width: 1320px; margin-inline: auto; padding-top: 150px; }
-.education-intro { margin-bottom: 56px; max-width: 800px; }
-.education-intro h1 { margin: 18px 0 24px; font-size: clamp(42px, 6vw, 80px); line-height: 1.02; letter-spacing: -.065em; }
-.education-intro > p:last-child { max-width: 600px; font-size: 18px; color: var(--ink-65); }
-.education-degree { position: relative; overflow: hidden; isolation: isolate; padding: clamp(24px, 4vw, 54px); color: #fff; background: linear-gradient(125deg, #10134f, #2521a5 65%, #3932c2); box-shadow: 0 24px 70px #14135418; }
-.education-degree::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 25% 0%, #ffffff20, transparent 55%); }
-.education-degree-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.education-degree-top img { width: 190px; max-width: 52%; height: 80px; object-fit: contain; background: #fff; padding: 10px; border-radius: 4px; }
-.education-seal { width: 92px; height: 92px; border: 1px solid #ffffff60; border-radius: 50%; display: grid; place-content: center; text-align: center; font-size: 8px; letter-spacing: .15em; line-height: 1.6; color: #e5d0a2; transform: rotate(12deg); }
-.education-seal span { font-size: 26px; }
-.education-degree h2 { margin: 38px 0 100px; max-width: 900px; font-family: Georgia, serif; font-size: clamp(36px, 5.3vw, 72px); line-height: 1.1; letter-spacing: -.05em; }
-.education-degree h2 em { color: #e5d0a2; font-weight: 400; }
-.education-year { position: absolute; top: 47%; right: 5%; font-size: clamp(70px, 11vw, 145px); line-height: 1; letter-spacing: -.07em; color: transparent; -webkit-text-stroke: 1px #ffffff45; }
-.education-degree-bottom { position: relative; }
-.education-degree-bottom a { display: inline-flex; gap: 18px; align-items: center; font-weight: 600; text-decoration: underline; text-underline-offset: 5px; }
-.education-degree-bottom p { margin: 14px 0; color: #ffffffba; }
-.education-tags { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 0; }
-.education-tags li { padding: 9px 16px; border-radius: 30px; background: #ffffff18; font-size: 14px; }
-.education-beyond, .education-threads { margin-top: 64px; }
-.education-beyond h2, .education-threads h2 { font-size: 28px; letter-spacing: -.045em; margin-bottom: 24px; }
-.education-certificate { padding: 30px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: #eeebff; border-left: 3px solid #3932c2; }
-.education-certificate h3 { font-size: 25px; letter-spacing: -.04em; }
-.education-certificate + .education-certificate { margin-top: 16px; }
-.education-certificate p { margin-top: 8px; color: var(--ink-65); }
-.education-certificate > span { font-size: 13px; white-space: nowrap; }
-.education-threads .education-tags li { background: #eae8ef; }
+/* Education: scroll, pointer, selection, and keyboard interaction system. */
+.education-page { --education-scroll: 0; max-width: 1440px; overflow-x: clip; margin-inline: auto; padding-top: clamp(132px, 14vw, 190px); }
+.education-intro { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); align-items: end; gap: 20px clamp(20px,2.4vw,40px); margin-bottom: clamp(52px,7vw,96px); }
+.education-intro .section-label { grid-column: 1 / -1; margin: 0; }
+.education-intro h1 { grid-column: 1 / 9; margin: 0; font-size: clamp(52px,8.2vw,116px); line-height: .88; letter-spacing: -.075em; transform: translateX(calc((var(--education-scroll) - .12) * 5vw)); transition: transform 160ms linear; }
+.education-intro > p:last-child { grid-column: 9 / 13; max-width: 34ch; margin: 0; color: var(--ink-65); font-size: clamp(16px,1.35vw,20px); line-height: 1.5; text-wrap: pretty; }
+.education-degree-stage { perspective: 1600px; perspective-origin: 50% 18%; }
+.education-degree { --education-unfold: 0; --education-tilt-x: 0; --education-tilt-y: 0; --education-shine-x: 78%; --education-shine-y: 12%; position: relative; display: grid; gap: clamp(32px,4.4vw,68px); overflow: hidden; isolation: isolate; padding: clamp(28px,4.8vw,70px); border: 1px solid rgba(255,255,255,.24); border-radius: 28px; background: radial-gradient(680px circle at var(--education-shine-x) var(--education-shine-y),rgba(255,255,255,.2),transparent 58%),linear-gradient(132deg,#0b0d3e 0%,#241c9c 55%,#4831d0 100%); box-shadow: 0 34px 90px rgba(27,22,88,.2); color: #fff; outline: none; transform-origin: 50% 100%; transform: rotateX(calc((1 - var(--education-unfold)) * 22deg + var(--education-tilt-y) * -4deg)) rotateY(calc(var(--education-tilt-x) * 5deg)) scale(calc(.93 + var(--education-unfold) * .07)); transition: transform .42s var(--ease),box-shadow .35s ease; will-change: transform; }
+.education-degree:focus-visible { box-shadow: 0 0 0 3px #fff,0 0 0 6px var(--tech-purple),0 34px 90px rgba(27,22,88,.24); }
+.education-degree::before { position: absolute; z-index: -2; inset: 0; background-image: linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px); background-size: 48px 48px; mask-image: linear-gradient(135deg,#000,transparent 72%); content: ""; }
+.education-degree::after { position: absolute; z-index: -1; inset: auto -12% -48% 38%; height: 72%; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; box-shadow: 0 0 0 48px rgba(255,255,255,.025),0 0 0 96px rgba(255,255,255,.02); content: ""; }
+.education-degree-sheen { position: absolute; z-index: 0; inset: -70%; background: linear-gradient(115deg,transparent 44%,rgba(255,255,255,.13) 50%,transparent 56%); pointer-events: none; animation: education-sheen 7s ease-in-out infinite; }
+.education-degree-top,.education-degree-main,.education-degree-bottom,.education-card-hint { position: relative; z-index: 1; }
+.education-degree-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.education-degree-top img { width: clamp(170px,21vw,310px); max-width: 62%; height: clamp(68px,8vw,104px); padding: 10px 14px; border-radius: 6px; background: #fff; object-fit: contain; }
+.education-seal { position: relative; display: grid; width: clamp(82px,8vw,116px); aspect-ratio: 1; flex: 0 0 auto; place-items: center; border: 1px solid rgba(255,255,255,.46); border-radius: 50%; color: #f0cf86; text-align: center; animation: education-seal-spin 24s linear infinite; }
+.education-seal::after { position: absolute; inset: 14%; border: 1px dashed rgba(255,255,255,.34); border-radius: inherit; content: ""; }
+.education-seal span { max-width: 8ch; font-size: 7px; font-weight: 650; letter-spacing: .14em; line-height: 1.55; }
+.education-seal i { position: absolute; display: grid; inset: 35%; place-items: center; font-size: 20px; font-style: normal; animation: education-seal-spin 24s linear infinite reverse; }
+.education-degree-main { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: clamp(24px,4vw,64px); }
+.education-degree h2 { max-width: 11ch; margin: 0; font-family: Georgia,serif; font-size: clamp(48px,7.3vw,106px); font-weight: 400; line-height: .9; letter-spacing: -.065em; }
+.education-degree h2 span,.education-degree h2 em { display: block; }
+.education-degree h2 span { animation: education-copy-rise .95s var(--ease) both; }
+.education-degree h2 em { color: #f0cf86; font-weight: 400; animation: education-copy-rise 1.05s var(--ease) .1s both; }
+.education-year { display: flex; align-self: end; color: transparent; font-size: clamp(76px,10.6vw,154px); font-weight: 600; line-height: 1; letter-spacing: -.075em; -webkit-text-stroke: 1px rgba(255,255,255,.48); font-variant-numeric: tabular-nums; }
+.education-year-digit { display: block; height: 1em; overflow: hidden; }
+.education-year-digit > span { display: flex; flex-direction: column; animation: education-digit-roll 1.28s cubic-bezier(.16,1,.3,1) calc(.32s + var(--year-index) * 90ms) both; }
+.education-year-digit i { display: block; height: 1em; font-style: normal; }
+.education-degree-bottom { display: grid; grid-template-columns: minmax(220px,.9fr) auto minmax(260px,1fr); align-items: center; gap: 14px clamp(18px,2.6vw,38px); }
+.education-degree-bottom a { display: inline-flex; width: fit-content; align-items: center; gap: 9px; font-size: clamp(14px,1.2vw,17px); font-weight: 600; text-decoration: underline rgba(255,255,255,.38); text-underline-offset: 5px; transition: gap .3s var(--ease),color .3s ease,text-decoration-color .3s ease; }
+.education-degree-bottom a:hover,.education-degree-bottom a:focus-visible { gap: 15px; color: #f0cf86; text-decoration-color: currentColor; }
+.education-degree-bottom p { margin: 0; color: rgba(255,255,255,.72); font-size: clamp(14px,1.15vw,17px); }
+.education-tags { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.education-degree .education-tags { justify-content: flex-end; }
+.education-tags li { padding: 9px 16px; border-radius: 30px; background: rgba(255,255,255,.1); font-size: 13px; transition: background .3s ease,color .3s ease,transform .3s var(--ease); }
+.education-degree .education-tags li:hover { background: #f0cf86; color: #10134f; transform: translateY(-2px); }
+.education-card-hint { justify-self: end; margin: -18px 0 0; color: rgba(255,255,255,.42); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+.education-beyond,.education-threads { margin-top: clamp(86px,10vw,154px); }
+.education-section-heading { display: grid; grid-template-columns: minmax(0,1fr) minmax(250px,.44fr); align-items: end; gap: 24px 48px; margin-bottom: 30px; }
+.education-section-heading h2 { margin: 0; font-size: clamp(32px,4.2vw,58px); font-weight: 500; letter-spacing: -.06em; line-height: .96; }
+.education-section-heading p { max-width: 38ch; margin: 0; color: var(--ink-50); font-size: 13px; line-height: 1.5; }
+.education-credentials { display: grid; gap: 10px; }
+.education-certificate { position: relative; overflow: hidden; border: 1px solid rgba(31,29,28,.08); border-radius: 18px; background: #f4f2fb; isolation: isolate; }
+.education-certificate::before { position: absolute; z-index: -1; inset: 0; background: linear-gradient(110deg,#2c1d8f,#5136d7); content: ""; transform: scaleX(0); transform-origin: 0 50%; transition: transform .62s cubic-bezier(.16,1,.3,1); }
+.education-certificate:is(:hover,:focus-within,.is-active)::before { transform: scaleX(1); }
+.education-certificate button { display: grid; width: 100%; grid-template-columns: 46px minmax(280px,1.35fr) minmax(100px,.42fr) minmax(150px,.5fr) 24px; align-items: center; gap: clamp(12px,2vw,30px); padding: clamp(22px,2.6vw,36px) clamp(20px,3.2vw,46px); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: color .35s ease; }
+.education-certificate:is(:hover,:focus-within,.is-active) button { color: #fff; }
+.education-certificate button:focus-visible { outline: 2px solid var(--tech-blue); outline-offset: -5px; }
+.education-certificate-number,.education-certificate-type,.education-certificate-status { font-size: 10px; letter-spacing: .04em; text-transform: uppercase; }
+.education-certificate-number { color: var(--tech-purple); transition: color .35s ease; }
+.education-certificate-copy { display: grid; gap: 8px; transition: transform .52s cubic-bezier(.16,1,.3,1); }
+.education-certificate-copy strong { font-size: clamp(22px,2.8vw,40px); font-weight: 500; letter-spacing: -.055em; line-height: 1; }
+.education-certificate-copy small { color: var(--ink-50); font-size: 12px; line-height: 1.4; transition: color .35s ease; }
+.education-certificate-type { color: var(--ink-50); }
+.education-certificate-status { display: inline-flex; align-items: center; justify-self: end; gap: 9px; font-weight: 600; white-space: nowrap; }
+.education-certificate-status i { width: 8px; height: 8px; border-radius: 50%; background: #3bbf76; box-shadow: 0 0 0 0 rgba(59,191,118,.45); animation: education-status-pulse 2.2s ease-out infinite; }
+.education-certificate-arrow { color: var(--tech-purple); font-size: 18px; transition: color .35s ease,transform .35s var(--ease); }
+.education-certificate:is(:hover,:focus-within,.is-active) :is(.education-certificate-number,.education-certificate-copy small,.education-certificate-type,.education-certificate-arrow) { color: rgba(255,255,255,.72); }
+.education-certificate:is(:hover,:focus-within,.is-active) .education-certificate-copy { transform: translateX(12px); }
+.education-certificate:is(:hover,:focus-within,.is-active) .education-certificate-arrow { transform: translate(3px,-3px); }
+.education-credential-detail { display: grid; grid-template-columns: minmax(120px,.32fr) minmax(0,1fr); gap: 24px 48px; margin-top: 12px; padding: 28px clamp(24px,3.2vw,46px); border-radius: 18px; background: #11122a; color: #fff; animation: education-detail-in .36s var(--ease) both; }
+.education-credential-detail span { color: #a99cff; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.education-credential-detail p { max-width: 760px; margin: 0; font-size: clamp(15px,1.35vw,19px); line-height: 1.55; }
+.education-thread-words { max-width: 21ch; font-size: clamp(38px,6.4vw,92px); font-weight: 500; letter-spacing: -.065em; line-height: 1.02; }
+.education-thread-button { --thread-lit: 0; display: inline; padding: 0; border: 0; background: transparent; color: rgba(19,20,40,calc(.15 + var(--thread-lit) * .72)); font: inherit; letter-spacing: inherit; line-height: inherit; text-align: left; cursor: pointer; transition: color .24s linear,text-shadow .24s ease; }
+.education-thread-button span { color: rgba(115,87,255,calc(.2 + var(--thread-lit) * .7)); font-weight: 400; }
+.education-thread-button:is(:hover,:focus-visible,.is-active) { color: var(--tech-navy); outline: none; text-shadow: 0 0 26px rgba(115,87,255,.18); }
+.education-thread-button:is(:hover,:focus-visible,.is-active) span { color: var(--tech-purple); }
+.education-thread-detail { display: grid; grid-template-columns: 42px minmax(0,650px); gap: 18px; margin: 40px 0 0; padding-top: 24px; border-top: 1px solid var(--ink-08); color: var(--ink-65); font-size: clamp(15px,1.4vw,19px); line-height: 1.55; }
+.education-thread-detail span { color: var(--tech-purple); font-size: 10px; letter-spacing: .04em; }
+@keyframes education-sheen { 0%,18% { transform: translateX(-38%) rotate(0deg); } 48%,100% { transform: translateX(38%) rotate(0deg); } }
+@keyframes education-seal-spin { to { transform: rotate(360deg); } }
+@keyframes education-copy-rise { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes education-digit-roll { from { transform: translateY(0); } to { transform: translateY(calc(var(--year-digit) * -1em)); } }
+@keyframes education-status-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(59,191,118,.4); } 50% { box-shadow: 0 0 0 7px rgba(59,191,118,0); } }
+@keyframes education-detail-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 960px) {
+  .education-intro { grid-template-columns: 1fr; }
+  .education-intro .section-label,.education-intro h1,.education-intro > p:last-child { grid-column: 1; }
+  .education-intro > p:last-child { margin-top: 10px; }
+  .education-degree-main { grid-template-columns: 1fr; }
+  .education-year { justify-self: end; margin-top: -12px; }
+  .education-degree-bottom { grid-template-columns: 1fr; justify-items: start; }
+  .education-degree .education-tags { justify-content: flex-start; }
+  .education-certificate button { grid-template-columns: 38px minmax(0,1fr) auto; }
+  .education-certificate-type { grid-column: 2; }
+  .education-certificate-status { grid-column: 3; grid-row: 1 / span 2; }
+  .education-certificate-arrow { display: none; }
+}
 @media (max-width: 700px) {
-  .education-page { padding-top: 120px; }
-  .education-intro { margin-bottom: 36px; }
-  .education-degree h2 { margin: 30px 0 100px; }
-  .education-year { top: 48%; }
-  .education-seal { width: 70px; height: 70px; font-size: 6px; }
-  .education-certificate { align-items: flex-start; flex-direction: column; padding: 24px; }
-  .education-beyond, .education-threads { margin-top: 40px; }
+  .education-page { padding-top: 112px; }
+  .education-intro { margin-bottom: 42px; }
+  .education-intro h1 { font-size: clamp(48px,15vw,72px); transform: none; }
+  .education-degree { gap: 28px; padding: 24px; border-radius: 20px; transform: none; }
+  .education-degree-top img { max-width: 66%; height: 64px; }
+  .education-seal { width: 66px; }
+  .education-seal span { font-size: 5px; }
+  .education-seal i { font-size: 14px; }
+  .education-degree h2 { font-size: clamp(42px,13vw,62px); }
+  .education-year { margin-top: 0; font-size: clamp(68px,24vw,94px); }
+  .education-card-hint { display: none; }
+  .education-section-heading { grid-template-columns: 1fr; gap: 14px; }
+  .education-beyond,.education-threads { margin-top: 74px; }
+  .education-certificate button { grid-template-columns: 30px minmax(0,1fr); gap: 14px; padding: 22px 18px; }
+  .education-certificate-number { align-self: start; padding-top: 5px; }
+  .education-certificate-type { grid-column: 2; }
+  .education-certificate-status { grid-column: 2; grid-row: auto; justify-self: start; }
+  .education-certificate-copy strong { font-size: 26px; }
+  .education-credential-detail { grid-template-columns: 1fr; gap: 10px; padding: 22px; }
+  .education-thread-words { max-width: none; font-size: clamp(37px,12vw,58px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .education-intro h1,.education-degree { transform: none; transition: none; }
+  .education-degree-sheen,.education-seal,.education-seal i,.education-degree h2 span,.education-degree h2 em,.education-year-digit > span,.education-certificate-status i,.education-credential-detail { animation: none; }
+  .education-year-digit > span { transform: translateY(calc(var(--year-digit) * -1em)); }
+  .education-certificate::before,.education-certificate-copy,.education-certificate-arrow { transition: none; }
 }
 
 
