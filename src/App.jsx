@@ -681,6 +681,33 @@ function ProjectVisual({ project, surface = "detail" }) {
 function ProjectCard({ project, index }) {
   const href = project.href || routeHref(`project/${project.slug}`);
   const external = /^https?:\/\//.test(href);
+  if (project.slug === "utopia-vinyl") return (
+    <article className="project-card project-card-utopia reveal" style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}>
+      <a href={href} aria-label="Read the Utopia Vinyl case study"><div className="project-media"><ProjectVisual project={project} surface="card" /></div></a>
+      <div className="project-copy">
+        <div className="project-copy-heading">
+          <h3><a href={href}>{project.title}</a></h3>
+          <div className="project-copy-meta"><span className="project-status">{project.status}</span><span>{project.period}</span></div>
+        </div>
+        <p className="project-card-role">{project.role}</p>
+        <p className="project-card-summary">{project.homeDescription}</p>
+        <div className="project-card-actions">
+          <a className="project-live-button" href={project.liveUrl} target="_blank" rel="noreferrer"><span className="project-live-dot" aria-hidden="true" />Visit live site <Arrow /></a>
+          <a className="project-case-link" href={href}>Read case study <Arrow /></a>
+        </div>
+        <section className="project-impact-summary" aria-label="Utopia Vinyl impact">
+          <div className="project-impact-heading"><span>Impact</span><span>As of {utopiaMetrics.asOf}</span></div>
+          <dl className="project-impact-metrics">
+            <div><dt>Valid orders</dt><dd>{utopiaMetrics.validOrders}</dd></div>
+            <div><dt>Displayed order total</dt><dd>{utopiaMetrics.orderTotal}</dd></div>
+            <div><dt>Paid · {utopiaMetrics.paidOrders} orders</dt><dd>{utopiaMetrics.paidTotal}</dd></div>
+            <div><dt>Awaiting payment · {utopiaMetrics.awaitingOrders} orders</dt><dd>{utopiaMetrics.awaitingTotal}</dd></div>
+          </dl>
+          <p className="project-impact-note">Order total includes paid and awaiting-payment orders. Cancelled and expired orders excluded.</p>
+        </section>
+      </div>
+    </article>
+  );
   return (
     <a
       className="project-card reveal"

@@ -251,6 +251,8 @@ export const workProjects = [
     slug: "utopia-vinyl",
     status: "Ongoing",
     title: "Utopia Vinyl",
+    liveUrl: "https://utopiavinyl.com.tw",
+    homeDescription: "How do you help an independent record seller with limited eyesight manage a physical collection online, while giving collectors the details they need to buy with confidence? I designed accessible listing tools and a clearer path from discovery to checkout.",
     description: "An evolving independent-commerce product that helps my father turn a physical vinyl collection into clear listings, confident orders, and a sustainable selling routine.",
     organization: "Independent family project",
     role: "Product Designer & Builder",
