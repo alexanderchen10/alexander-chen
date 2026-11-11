@@ -1556,15 +1556,42 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const Heading = embedded ? "h2" : "h1";
   const gameScene = useRef(null);
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
-  const [alexX, setAlexX] = useState(42);
+  const [alexPosition, setAlexPosition] = useState({ x: 42, y: 82 });
   const [alexFacing, setAlexFacing] = useState(1);
+  const [alexWalking, setAlexWalking] = useState(false);
   const [alexJumping, setAlexJumping] = useState(false);
+  const heldMoves = useRef(new Map());
   const jumpTimer = useRef(null);
+  const walkingPulseTimer = useRef(null);
   const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
 
-  const moveAlex = useCallback((direction) => {
-    setAlexFacing(direction);
-    setAlexX(position => Math.max(8, Math.min(92, position + direction * 4)));
+  const pulseWalking = useCallback(() => {
+    window.clearTimeout(walkingPulseTimer.current);
+    setAlexWalking(true);
+    walkingPulseTimer.current = window.setTimeout(() => {
+      if (!heldMoves.current.size) setAlexWalking(false);
+    }, 320);
+  }, []);
+
+  const nudgeAlex = useCallback((horizontal, vertical) => {
+    if (horizontal) setAlexFacing(horizontal);
+    setAlexPosition(position => ({
+      x: Math.max(8, Math.min(92, position.x + horizontal * 3.5)),
+      y: Math.max(54, Math.min(88, position.y + vertical * 3)),
+    }));
+    pulseWalking();
+  }, [pulseWalking]);
+
+  const beginMove = useCallback((token, horizontal, vertical) => {
+    heldMoves.current.set(token, { horizontal, vertical });
+    if (horizontal) setAlexFacing(horizontal);
+    window.clearTimeout(walkingPulseTimer.current);
+    setAlexWalking(true);
+  }, []);
+
+  const endMove = useCallback((token) => {
+    heldMoves.current.delete(token);
+    setAlexWalking(heldMoves.current.size > 0);
   }, []);
 
   const jumpAlex = useCallback(() => {
@@ -1575,26 +1602,95 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   }, []);
 
   useEffect(() => {
+    if (!alexWalking) return undefined;
+    let movementFrame;
+    let previousTime = window.performance.now();
+    const animateMovement = (currentTime) => {
+      const elapsed = Math.min((currentTime - previousTime) / 1000, .04);
+      previousTime = currentTime;
+      const movement = [...heldMoves.current.values()].reduce((total, direction) => ({
+        horizontal: total.horizontal + direction.horizontal,
+        vertical: total.vertical + direction.vertical,
+      }), { horizontal: 0, vertical: 0 });
+      if (movement.horizontal || movement.vertical) {
+        const magnitude = Math.hypot(movement.horizontal, movement.vertical) || 1;
+        const horizontal = movement.horizontal / magnitude;
+        const vertical = movement.vertical / magnitude;
+        if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
+        setAlexPosition(position => ({
+          x: Math.max(8, Math.min(92, position.x + horizontal * 18 * elapsed)),
+          y: Math.max(54, Math.min(88, position.y + vertical * 15 * elapsed)),
+        }));
+      }
+      movementFrame = window.requestAnimationFrame(animateMovement);
+    };
+    movementFrame = window.requestAnimationFrame(animateMovement);
+    return () => window.cancelAnimationFrame(movementFrame);
+  }, [alexWalking]);
+
+  useEffect(() => {
     const handleKeyDown = (event) => {
       const bounds = gameScene.current?.getBoundingClientRect();
       if (embedded && bounds && (bounds.top > window.innerHeight * .6 || bounds.bottom < window.innerHeight * .3)) return;
       const tagName = event.target?.tagName?.toLowerCase();
-      if (["input", "textarea", "select", "button"].includes(tagName) || event.target?.isContentEditable) return;
-      if (["ArrowLeft", "a", "A"].includes(event.key)) { event.preventDefault(); moveAlex(-1); }
-      if (["ArrowRight", "d", "D"].includes(event.key)) { event.preventDefault(); moveAlex(1); }
-      if (["ArrowUp", "w", "W", " "].includes(event.key)) { event.preventDefault(); jumpAlex(); }
+      const gameControl = event.target?.closest?.(".playground-pixel-character, .playground-game-controls");
+      if (["input", "textarea", "select"].includes(tagName) || (tagName === "button" && !gameControl) || event.target?.isContentEditable) return;
+      const key = event.key.toLowerCase();
+      const direction = {
+        arrowleft: [-1, 0], a: [-1, 0],
+        arrowright: [1, 0], d: [1, 0],
+        arrowup: [0, -1], w: [0, -1],
+        arrowdown: [0, 1], s: [0, 1],
+      }[key];
+      if (direction) {
+        event.preventDefault();
+        if (!event.repeat) beginMove(`key:${key}`, direction[0], direction[1]);
+      } else if (event.key === " ") {
+        event.preventDefault();
+        jumpAlex();
+      }
+    };
+    const handleKeyUp = (event) => {
+      const key = event.key.toLowerCase();
+      if (["arrowleft", "a", "arrowright", "d", "arrowup", "w", "arrowdown", "s"].includes(key)) {
+        endMove(`key:${key}`);
+      }
+    };
+    const stopMoving = () => {
+      heldMoves.current.clear();
+      setAlexWalking(false);
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [jumpAlex, moveAlex, embedded]);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", stopMoving);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", stopMoving);
+    };
+  }, [beginMove, endMove, jumpAlex, embedded]);
 
-  useEffect(() => () => window.clearTimeout(jumpTimer.current), []);
+  useEffect(() => () => {
+    window.clearTimeout(jumpTimer.current);
+    window.clearTimeout(walkingPulseTimer.current);
+  }, []);
 
   const chooseScene = (scene) => {
     setSceneId(scene.id);
-    setAlexX(scene.id === "taipei" ? 42 : 48);
+    setAlexPosition(scene.id === "taipei" ? { x: 42, y: 82 } : { x: 48, y: 82 });
     setAlexFacing(1);
+    heldMoves.current.clear();
+    setAlexWalking(false);
   };
+
+  const alexScale = .76 + ((alexPosition.y - 54) / 34) * .24;
+  const movementButtonProps = (name, horizontal, vertical) => ({
+    onPointerDown: (event) => beginMove(`pointer:${name}:${event.pointerId}`, horizontal, vertical),
+    onPointerUp: (event) => endMove(`pointer:${name}:${event.pointerId}`),
+    onPointerCancel: (event) => endMove(`pointer:${name}:${event.pointerId}`),
+    onPointerLeave: (event) => endMove(`pointer:${name}:${event.pointerId}`),
+    onClick: () => nudgeAlex(horizontal, vertical),
+  });
 
   return (
     <Wrapper className={embedded ? "about-playground" : "playground-page"} id={embedded ? "about-playground" : undefined}>
@@ -1617,7 +1713,10 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => chooseScene(scene)}>{scene.label}</button>
           ))}
         </div>
-        <div className={`playground-center playground-pixel-hub${alexJumping ? " is-jumping" : ""}`} style={{ "--alex-x": `${alexX}%`, "--alex-facing": alexFacing }}>
+        <div
+          className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
+          style={{ "--alex-x": `${alexPosition.x}%`, "--alex-y": `${alexPosition.y}%`, "--alex-facing": alexFacing, "--alex-scale": alexScale.toFixed(3) }}
+        >
           <button
             className="playground-pixel-character"
             type="button"
@@ -1629,11 +1728,13 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             <span className="playground-pixel-shadow" aria-hidden="true" />
           </button>
         </div>
-        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>A / D to move · W to jump</small></div>
+        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>WASD / arrows to move · Space to jump</small></div>
         <div className="playground-game-controls" role="group" aria-label="Move Pixel Alex">
-          <button type="button" aria-label="Move Alex left" onClick={() => moveAlex(-1)}>←</button>
-          <button type="button" aria-label="Make Alex jump" onClick={jumpAlex}>↑</button>
-          <button type="button" aria-label="Move Alex right" onClick={() => moveAlex(1)}>→</button>
+          <button type="button" className="control-up" aria-label="Move Alex up" {...movementButtonProps("up", 0, -1)}>↑</button>
+          <button type="button" className="control-left" aria-label="Move Alex left" {...movementButtonProps("left", -1, 0)}>←</button>
+          <button type="button" className="control-jump" aria-label="Make Alex jump" onClick={jumpAlex}>◆</button>
+          <button type="button" className="control-right" aria-label="Move Alex right" {...movementButtonProps("right", 1, 0)}>→</button>
+          <button type="button" className="control-down" aria-label="Move Alex down" {...movementButtonProps("down", 0, 1)}>↓</button>
         </div>
       </section>
     </Wrapper>
