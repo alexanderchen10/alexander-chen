@@ -248,6 +248,20 @@ export const utopiaMetrics = {
 
 export const workProjects = [
   {
+    slug: "gta-imaging",
+    title: "GTA Imaging",
+    organization: "GTA Imaging Inc.",
+    role: "Client Success & Email Marketing Specialist",
+    period: "October 2026",
+    description: "Redesigning B2B email to turn more readers into product explorers: 74 clickers versus 19, with a 3.5× click rate per delivered email.",
+    image: "/projects/work/gta-imaging/squarespace.png",
+    imageAlt: "GTA Imaging redesigned October newsletter",
+    coverEyebrow: "Client success · Email marketing",
+    homeMetric: "3.9× clickers · 3.5× click rate",
+    aspect: "16 / 10",
+    impact: ["74 recorded clickers versus 19 across two October campaigns."],
+  },
+  {
     slug: "utopia-vinyl",
     status: "Ongoing",
     title: "Utopia Vinyl",
@@ -1463,14 +1477,15 @@ export const about = {
   experience: [
     {
       organization: "GTA Imaging Inc.",
+      projectSlugs: ["gta-imaging"],
       location: "Toronto, Canada",
       badge: "GTA",
       role: "Client Success & Email Marketing Specialist",
       period: "Aug 2026–present",
       summary: "Improving customer journeys through stronger email content, automated onboarding, connected CRM workflows, and practical performance reporting.",
-      metrics: ["3.7× average clicks per campaign", "CTR increased from 0.3% to 1%", "CRM · Zapier · Google Gemini automation", "Excel macros · pivot tables · charts"],
+      metrics: ["3.9× recorded clickers", "Click rate: 0.41% → 1.42%", "CRM · Zapier · Google Gemini automation", "Excel macros · pivot tables · charts"],
       highlights: [
-        { value: "3.7× more clicks", detail: "in average clicks per campaign after diagnosing engagement gaps and redesigning email content and customer journeys; click-through rate increased from 0.3% to 1%." },
+        { value: "3.9× recorded clickers", detail: "across the October 5 and October 20 campaigns: 19 to 74 clickers. Click rate per delivered email increased from 0.41% to 1.42% after redesigning the newsletter around product discovery." },
         { value: "Automated onboarding", detail: "by mapping client touchpoints and connecting CRM, Zapier, and Google Gemini workflows for welcome content and trigger-based follow-ups." },
         { value: "KPI visibility", detail: "through a consolidated Excel tracker using macros, pivot tables, and charts to surface performance gaps and guide content and follow-up priorities." },
       ],

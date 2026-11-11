@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
+import GtaEmailCaseStudy from "./GtaEmailCaseStudy";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
 const Arrow = ({ className }) => <span className={className} aria-hidden="true">↗</span>;
@@ -3406,6 +3407,8 @@ export default function App() {
         <IcffGalleryPage clock={clock} navigate={navigate} project={selectedProject} />
       ) : selectedProject?.slug === "utopia-vinyl" ? (
         <UtopiaVinylPage clock={clock} navigate={navigate} project={selectedProject} />
+      ) : selectedProject?.slug === "gta-imaging" ? (
+        <GtaEmailCaseStudy />
       ) : selectedProject ? (
         <CaseStudyPage clock={clock} navigate={navigate} project={selectedProject} />
       ) : (
