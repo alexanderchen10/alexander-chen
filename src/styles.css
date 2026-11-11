@@ -596,6 +596,7 @@ p, h1, h2, h3, ol { margin: 0; }
   text-transform: uppercase;
 }
 .home-experience-project {
+  position: relative;
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -609,13 +610,78 @@ p, h1, h2, h3, ol { margin: 0; }
   scroll-margin-block-start: var(--experience-deck-top);
   transition: border-color 260ms ease, background 260ms ease;
 }
-.home-experience-project > span:last-child { transition: transform 300ms var(--ease); }
+.home-experience-project-arrow { transition: transform 300ms var(--ease); }
 .home-experience-project:hover, .home-experience-project:focus-visible {
   border-color: var(--experience-accent);
   background: #fff;
 }
-.home-experience-project:hover > span:last-child, .home-experience-project:focus-visible > span:last-child {
+.home-experience-project:hover > .home-experience-project-arrow, .home-experience-project:focus-visible > .home-experience-project-arrow {
   transform: translate(3px, -2px);
+}
+.home-experience-project-preview {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 14px);
+  left: 0;
+  display: block;
+  width: clamp(230px, 24vw, 310px);
+  padding: 8px;
+  border: 1px solid rgba(36, 29, 72, .14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 24px 64px rgba(24, 20, 57, .2);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(.96);
+  transform-origin: left bottom;
+  transition: opacity 180ms ease, transform 280ms var(--ease), visibility 180ms ease;
+  visibility: hidden;
+}
+.home-experience-project-preview::after {
+  position: absolute;
+  top: 100%;
+  left: 30px;
+  border: 8px solid transparent;
+  border-top-color: rgba(255, 255, 255, .96);
+  content: "";
+}
+.home-experience-project-preview-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e7e5ec;
+}
+.home-experience-project-preview-media .project-asset { object-fit: cover; }
+.home-experience-project-preview-caption {
+  display: grid;
+  gap: 3px;
+  padding: 10px 7px 6px;
+  color: var(--tech-navy);
+}
+.home-experience-project-preview-caption small {
+  color: var(--experience-accent);
+  font: 8px/1.3 "IBM Plex Mono", monospace;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+.home-experience-project-preview-caption strong {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -.02em;
+}
+.home-experience-project.has-preview:focus-visible .home-experience-project-preview {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-experience-project.has-preview:hover .home-experience-project-preview {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+  }
 }
 .home-experience-resume {
   margin-top: clamp(64px, 7vw, 110px);
@@ -2027,6 +2093,7 @@ p, h1, h2, h3, ol { margin: 0; }
   .home-experience-item { grid-template-columns: 1fr; gap: 22px; }
   .home-experience-side { padding-bottom: 18px; border-bottom: 1px solid var(--experience-line); }
   .home-experience-side h3 { margin-bottom: 8px; }
+  .home-experience-project-preview { display: none; }
   .home-experience-resume > header { align-items: flex-start; flex-direction: column; gap: 24px; }
   .home-experience-resume > header h3 { max-width: 12ch; font-size: clamp(34px, 10.4vw, 48px); }
   .home-resume-details-grid { grid-template-columns: 1fr; }

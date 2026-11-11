@@ -4,7 +4,7 @@ import { about, playgroundItems, profile, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
-const Arrow = () => <span aria-hidden="true">↗</span>;
+const Arrow = ({ className }) => <span className={className} aria-hidden="true">↗</span>;
 const BASE_URL = import.meta.env.BASE_URL;
 
 const routeHref = (route = "") => `${BASE_URL}${route ? `#${route}` : ""}`;
@@ -702,15 +702,27 @@ function ProjectColumns({ projects }) {
 
 function ExperienceProjectLink({ project, navigate }) {
   const projectRoute = `project/${project.slug}`;
+  const showHoverPreview = project.slug === "corcoran-oakville-grand-opening";
 
   return (
     <a
-      className="home-experience-project"
+      className={`home-experience-project${showHoverPreview ? " has-preview" : ""}`}
       href={routeHref(projectRoute)}
       onClick={(event) => navigate(event, "/", projectRoute)}
     >
       <span>{project.title}</span>
-      <Arrow />
+      <Arrow className="home-experience-project-arrow" />
+      {showHoverPreview && (
+        <span className="home-experience-project-preview" aria-hidden="true">
+          <span className="home-experience-project-preview-media">
+            <ProjectVisual project={project} surface="card" />
+          </span>
+          <span className="home-experience-project-preview-caption">
+            <small>AO Studio project</small>
+            <strong>{project.title}</strong>
+          </span>
+        </span>
+      )}
     </a>
   );
 }

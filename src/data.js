@@ -309,6 +309,7 @@ export const workProjects = [
   },
   {
     slug: "corcoran-oakville-grand-opening",
+    showInWork: false,
     title: "Corcoran Horizon Realty",
     description: "A multi-project content partnership spanning sponsored sports, real estate launches, social-first event coverage, and fast-turnaround editing.",
     thesis: "Build a flexible production system that could move from the energy of a sponsored sports event to the polish of a real estate office launch without losing speed or storytelling clarity.",
