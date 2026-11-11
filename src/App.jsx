@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
@@ -1541,16 +1541,54 @@ function PlaygroundNavigation({ clock, navigate }) {
 }
 
 const playgroundScenes = [
-  { id: "taipei", label: "Taipei", image: "/projects/playground/taipei-101-pixel-background.png" },
-  { id: "toronto", label: "Toronto", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
+  { id: "taipei", label: "Taiwan", chapter: "chapter 01 · origin", title: "Taipei, Taiwan", image: "/projects/playground/taipei-101-pixel-background.png" },
+  { id: "toronto", label: "Toronto", chapter: "chapter 02 · next stop", title: "Toronto, Canada", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
 ];
 
 function PlaygroundPage({ clock, navigate, embedded = false }) {
   const Wrapper = embedded ? "section" : "main";
   const Heading = embedded ? "h2" : "h1";
-  const [pixelAlexActive, setPixelAlexActive] = useState(false);
+  const gameScene = useRef(null);
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
+  const [alexX, setAlexX] = useState(42);
+  const [alexFacing, setAlexFacing] = useState(1);
+  const [alexJumping, setAlexJumping] = useState(false);
+  const jumpTimer = useRef(null);
   const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
+
+  const moveAlex = useCallback((direction) => {
+    setAlexFacing(direction);
+    setAlexX(position => Math.max(8, Math.min(92, position + direction * 4)));
+  }, []);
+
+  const jumpAlex = useCallback(() => {
+    window.clearTimeout(jumpTimer.current);
+    setAlexJumping(false);
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => setAlexJumping(true)));
+    jumpTimer.current = window.setTimeout(() => setAlexJumping(false), 680);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const bounds = gameScene.current?.getBoundingClientRect();
+      if (embedded && bounds && (bounds.top > window.innerHeight * .6 || bounds.bottom < window.innerHeight * .3)) return;
+      const tagName = event.target?.tagName?.toLowerCase();
+      if (["input", "textarea", "select", "button"].includes(tagName) || event.target?.isContentEditable) return;
+      if (["ArrowLeft", "a", "A"].includes(event.key)) { event.preventDefault(); moveAlex(-1); }
+      if (["ArrowRight", "d", "D"].includes(event.key)) { event.preventDefault(); moveAlex(1); }
+      if (["ArrowUp", "w", "W", " "].includes(event.key)) { event.preventDefault(); jumpAlex(); }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [jumpAlex, moveAlex, embedded]);
+
+  useEffect(() => () => window.clearTimeout(jumpTimer.current), []);
+
+  const chooseScene = (scene) => {
+    setSceneId(scene.id);
+    setAlexX(scene.id === "taipei" ? 42 : 48);
+    setAlexFacing(1);
+  };
 
   return (
     <Wrapper className={embedded ? "about-playground" : "playground-page"} id={embedded ? "about-playground" : undefined}>
@@ -1558,33 +1596,39 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       {embedded && <header className="about-section-heading"><p>playground</p><h2>Made from curiosity.</h2><p>Photography, design experiments, games, and stories beyond the brief.</p></header>}
       <section
         className="playground-stage"
+        ref={gameScene}
         aria-labelledby="playground-title"
         style={{ "--playground-background": `url(${assetHref(activeScene.image)})` }}
       >
+        <div className="playground-world" key={activeScene.id} aria-hidden="true" />
+        <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
+        <Heading className="playground-title" id="playground-title">Alex’s Playground</Heading>
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
         <div className="playground-scene-switcher" role="group" aria-label="Choose a Playground location">
           <span>location</span>
           {playgroundScenes.map(scene => (
-            <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => setSceneId(scene.id)}>{scene.label}</button>
+            <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => chooseScene(scene)}>{scene.label}</button>
           ))}
         </div>
-        <div className={`playground-center playground-pixel-hub${pixelAlexActive ? " is-active" : ""}`}>
+        <div className={`playground-center playground-pixel-hub${alexJumping ? " is-jumping" : ""}`} style={{ "--alex-x": `${alexX}%`, "--alex-facing": alexFacing }}>
           <button
             className="playground-pixel-character"
             type="button"
-            aria-label={pixelAlexActive ? "Let Pixel Alex rest" : "Wake up Pixel Alex"}
-            aria-pressed={pixelAlexActive}
-            onClick={() => setPixelAlexActive(active => !active)}
+            aria-label="Make Pixel Alex jump"
+            onClick={jumpAlex}
           >
             <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
             <img src={assetHref("/projects/playground/pixel-chibi-alex.png")} alt="Pixel-art Chibi Alex holding a laptop and cinema camera" />
             <span className="playground-pixel-shadow" aria-hidden="true" />
           </button>
-          <Heading id="playground-title">Playground</Heading>
-          <p className="playground-hub-label">{pixelAlexActive ? "camera ready · explore away" : "tap alex · drag anything"}</p>
         </div>
-        {playgroundItems.map((item, index) => <PlaygroundItem index={index} item={item} key={item.id} />)}
+        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>A / D to move · W to jump</small></div>
+        <div className="playground-game-controls" role="group" aria-label="Move Pixel Alex">
+          <button type="button" aria-label="Move Alex left" onClick={() => moveAlex(-1)}>←</button>
+          <button type="button" aria-label="Make Alex jump" onClick={jumpAlex}>↑</button>
+          <button type="button" aria-label="Move Alex right" onClick={() => moveAlex(1)}>→</button>
+        </div>
       </section>
     </Wrapper>
   );
