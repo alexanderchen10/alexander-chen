@@ -918,6 +918,28 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .playground-title { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .playground-kicker { top: 26px; left: 28px; font-family: var(--font-body); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
 .playground-note { top: 26px; right: 28px; max-width: 210px; font-size: 11px; line-height: 1.4; text-align: right; }
+.playground-scene-switcher {
+  position: absolute;
+  z-index: 9;
+  top: 18px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  background: rgba(29,24,38,.74);
+  box-shadow: 0 10px 24px rgba(25,18,24,.18);
+  color: rgba(255,255,255,.72);
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+}
+.playground-scene-switcher > span { padding: 0 8px; font-family: var(--font-body); font-size: 7px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.playground-scene-switcher button { min-height: 25px; border: 0; border-radius: 999px; padding: 5px 9px; background: transparent; color: rgba(255,255,255,.62); font-family: var(--font-body); font-size: 8px; line-height: 1; cursor: pointer; transition: background 180ms ease, color 180ms ease, transform 180ms ease; }
+.playground-scene-switcher button:hover, .playground-scene-switcher button:focus-visible { color: #fff; transform: translateY(-1px); }
+.playground-scene-switcher button[aria-pressed="true"] { background: #fffaf3; color: #292233; }
+.playground-scene-switcher button:focus-visible { outline: 2px solid #b59bff; outline-offset: 2px; }
 .playground-center {
   position: absolute;
   z-index: 5;
@@ -2329,6 +2351,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .playground-stage { display: grid; min-height: 0; grid-template-columns: 1fr 1fr; gap: 42px 12px; padding: 28px 14px 48px; }
   .playground-kicker, .playground-note { position: static; grid-column: 1 / -1; }
   .playground-note { display: none; }
+  .playground-scene-switcher { top: 15px; right: 14px; left: auto; transform: none; }
+  .playground-scene-switcher > span { display: none; }
   .playground-center { position: relative; top: auto; left: auto; grid-column: 1 / -1; min-height: 310px; align-content: center; transform: none; }
   .playground-person { transform: scale(.9); transform-origin: bottom center; }
   .plaything { position: relative; inset: auto; width: auto; min-width: 0; animation: none; }

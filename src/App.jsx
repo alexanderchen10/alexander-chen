@@ -1564,8 +1564,15 @@ function PlaygroundNavigation({ clock, navigate }) {
   );
 }
 
+const playgroundScenes = [
+  { id: "taipei", label: "Taipei", image: "/projects/playground/taipei-101-pixel-background.png" },
+  { id: "toronto", label: "Toronto", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
+];
+
 function PlaygroundPage({ clock, navigate }) {
   const [pixelAlexActive, setPixelAlexActive] = useState(false);
+  const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
+  const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
 
   return (
     <main className="playground-page">
@@ -1573,10 +1580,16 @@ function PlaygroundPage({ clock, navigate }) {
       <section
         className="playground-stage"
         aria-labelledby="playground-title"
-        style={{ "--playground-background": `url(${assetHref("/projects/playground/taipei-101-pixel-background.png")})` }}
+        style={{ "--playground-background": `url(${assetHref(activeScene.image)})` }}
       >
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
+        <div className="playground-scene-switcher" role="group" aria-label="Choose a Playground location">
+          <span>location</span>
+          {playgroundScenes.map(scene => (
+            <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => setSceneId(scene.id)}>{scene.label}</button>
+          ))}
+        </div>
         <div className={`playground-center playground-pixel-hub${pixelAlexActive ? " is-active" : ""}`}>
           <button
             className="playground-pixel-character"
