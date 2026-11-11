@@ -3409,6 +3409,20 @@ function projectProgressFor(project, detail) {
     };
   }
 
+  if (project.slug === "gta-imaging") {
+    return {
+      label: `${project.title} project journey`,
+      sections: [
+        { id: "gta-overview", label: "Overview" },
+        { id: "gta-design", label: "Redesign" },
+        { id: "gta-results", label: "Results" },
+        { id: "gta-changes", label: "What changed" },
+        { id: "gta-products", label: "Product discovery" },
+        { id: "gta-next", label: "Next steps" },
+      ],
+    };
+  }
+
   return {
     label: `${project.title} project journey`,
     sections: project.caseStudyVariant === "structured"
@@ -3470,7 +3484,7 @@ export default function App() {
   }, [page, selectedProject, selectedDetail, selectedPhotographyAlbum]);
 
   return (
-    <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}`}>
+    <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
       {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
