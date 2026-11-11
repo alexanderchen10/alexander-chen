@@ -2941,7 +2941,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .education-degree { position: relative; overflow: hidden; isolation: isolate; padding: clamp(24px, 4vw, 54px); color: #fff; background: linear-gradient(125deg, #10134f, #2521a5 65%, #3932c2); box-shadow: 0 24px 70px #14135418; }
 .education-degree::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 25% 0%, #ffffff20, transparent 55%); }
 .education-degree-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.education-degree-top img { width: 190px; max-width: 52%; height: 80px; object-fit: contain; filter: grayscale(1) brightness(0) invert(1); }
+.education-degree-top img { width: 190px; max-width: 52%; height: 80px; object-fit: contain; background: #fff; padding: 10px; border-radius: 4px; }
 .education-seal { width: 92px; height: 92px; border: 1px solid #ffffff60; border-radius: 50%; display: grid; place-content: center; text-align: center; font-size: 8px; letter-spacing: .15em; line-height: 1.6; color: #e5d0a2; transform: rotate(12deg); }
 .education-seal span { font-size: 26px; }
 .education-degree h2 { margin: 38px 0 100px; max-width: 900px; font-family: Georgia, serif; font-size: clamp(36px, 5.3vw, 72px); line-height: 1.1; letter-spacing: -.05em; }
