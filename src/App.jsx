@@ -1503,12 +1503,14 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const Wrapper = embedded ? "section" : "main";
   const Heading = embedded ? "h2" : "h1";
   const gameScene = useRef(null);
+  const alexActor = useRef(null);
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
   const [alexPosition, setAlexPosition] = useState({ x: 42, y: 82 });
   const [alexFacing, setAlexFacing] = useState(1);
   const [alexWalking, setAlexWalking] = useState(false);
   const [alexJumping, setAlexJumping] = useState(false);
   const heldMoves = useRef(new Map());
+  const alexVelocity = useRef({ x: 0, y: 0 });
   const jumpTimer = useRef(null);
   const walkingPulseTimer = useRef(null);
   const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
@@ -1523,6 +1525,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
 
   const nudgeAlex = useCallback((horizontal, vertical) => {
     if (horizontal) setAlexFacing(horizontal);
+    alexVelocity.current = { x: horizontal * 11, y: vertical * 9 };
     setAlexPosition(position => ({
       x: Math.max(8, Math.min(92, position.x + horizontal * 3.5)),
       y: Math.max(54, Math.min(88, position.y + vertical * 3)),
@@ -1539,7 +1542,6 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
 
   const endMove = useCallback((token) => {
     heldMoves.current.delete(token);
-    setAlexWalking(heldMoves.current.size > 0);
   }, []);
 
   const jumpAlex = useCallback(() => {
@@ -1550,7 +1552,6 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   }, []);
 
   useEffect(() => {
-    if (!alexWalking) return undefined;
     let movementFrame;
     let previousTime = window.performance.now();
     const animateMovement = (currentTime) => {
@@ -1560,21 +1561,45 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
         horizontal: total.horizontal + direction.horizontal,
         vertical: total.vertical + direction.vertical,
       }), { horizontal: 0, vertical: 0 });
-      if (movement.horizontal || movement.vertical) {
-        const magnitude = Math.hypot(movement.horizontal, movement.vertical) || 1;
-        const horizontal = movement.horizontal / magnitude;
-        const vertical = movement.vertical / magnitude;
-        if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
-        setAlexPosition(position => ({
-          x: Math.max(8, Math.min(92, position.x + horizontal * 18 * elapsed)),
-          y: Math.max(54, Math.min(88, position.y + vertical * 15 * elapsed)),
-        }));
+      const hasInput = Boolean(movement.horizontal || movement.vertical);
+      const magnitude = Math.hypot(movement.horizontal, movement.vertical) || 1;
+      const inputX = movement.horizontal / magnitude;
+      const inputY = movement.vertical / magnitude;
+      const maxSpeedX = 18;
+      const maxSpeedY = 15;
+      const targetX = inputX * maxSpeedX;
+      const targetY = inputY * maxSpeedY;
+      const response = hasInput ? 13 : 8.5;
+      const blend = 1 - Math.exp(-response * elapsed);
+      const velocity = alexVelocity.current;
+      velocity.x += (targetX - velocity.x) * blend;
+      velocity.y += (targetY - velocity.y) * blend;
+      if (!hasInput && Math.abs(velocity.x) < .04) velocity.x = 0;
+      if (!hasInput && Math.abs(velocity.y) < .04) velocity.y = 0;
+      const speedRatio = Math.min(1, Math.hypot(velocity.x / maxSpeedX, velocity.y / maxSpeedY));
+      const isMoving = speedRatio > .025;
+      setAlexWalking(isMoving);
+      if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
+      if (alexActor.current) {
+        const stepDuration = Math.round(500 - speedRatio * 180);
+        alexActor.current.style.setProperty("--alex-step-duration", `${stepDuration}ms`);
+        alexActor.current.style.setProperty("--alex-dust-duration", `${stepDuration * 2}ms`);
+        alexActor.current.style.setProperty("--alex-lean", `${(velocity.x / maxSpeedX * 2.4).toFixed(2)}deg`);
+      }
+      if (isMoving) {
+        setAlexPosition(position => {
+          const nextX = Math.max(8, Math.min(92, position.x + velocity.x * elapsed));
+          const nextY = Math.max(54, Math.min(88, position.y + velocity.y * elapsed));
+          if ((nextX === 8 && velocity.x < 0) || (nextX === 92 && velocity.x > 0)) velocity.x = 0;
+          if ((nextY === 54 && velocity.y < 0) || (nextY === 88 && velocity.y > 0)) velocity.y = 0;
+          return { x: nextX, y: nextY };
+        });
       }
       movementFrame = window.requestAnimationFrame(animateMovement);
     };
     movementFrame = window.requestAnimationFrame(animateMovement);
     return () => window.cancelAnimationFrame(movementFrame);
-  }, [alexWalking]);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -1606,6 +1631,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     };
     const stopMoving = () => {
       heldMoves.current.clear();
+      alexVelocity.current = { x: 0, y: 0 };
       setAlexWalking(false);
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -1628,6 +1654,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     setAlexPosition(scene.id === "taipei" ? { x: 42, y: 82 } : { x: 48, y: 82 });
     setAlexFacing(1);
     heldMoves.current.clear();
+    alexVelocity.current = { x: 0, y: 0 };
     setAlexWalking(false);
   };
 
@@ -1662,6 +1689,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
           ))}
         </div>
         <div
+          ref={alexActor}
           className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
           style={{ "--alex-x": `${alexPosition.x}%`, "--alex-y": `${alexPosition.y}%`, "--alex-facing": alexFacing, "--alex-scale": alexScale.toFixed(3) }}
         >
@@ -1672,7 +1700,12 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             onClick={jumpAlex}
           >
             <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
-            <img src={assetHref("/projects/playground/pixel-chibi-alex.png")} alt="Pixel-art Chibi Alex holding a laptop and cinema camera" />
+            <span
+              className="playground-character-sprite"
+              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-walk-cycle.png")})` }}
+              aria-hidden="true"
+            />
+            <span className="playground-step-dust" aria-hidden="true"><i /><i /><i /></span>
             <span className="playground-pixel-shadow" aria-hidden="true" />
           </button>
         </div>

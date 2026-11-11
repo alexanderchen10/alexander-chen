@@ -975,15 +975,17 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   color: inherit;
   cursor: pointer;
   isolation: isolate;
+  transform: rotate(var(--alex-lean, 0deg));
+  transform-origin: 50% 92%;
+  transition: transform 100ms linear;
 }
-.playground-pixel-character > img {
+.playground-character-sprite {
   position: relative;
   z-index: 2;
   display: block;
-  width: auto;
+  width: clamp(155px, 17vw, 238px);
   height: clamp(155px, 17vw, 238px);
-  max-width: 100%;
-  object-fit: contain;
+  background: var(--alex-walk-sprite) 0 0 / 200% 200% no-repeat;
   image-rendering: pixelated;
   filter: drop-shadow(9px 11px 6px rgba(23,16,29,.32));
   transform: scaleX(var(--alex-facing, 1));
@@ -991,7 +993,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   animation: pixel-alex-idle 1.6s steps(2, end) infinite;
   transition: filter 180ms ease, transform 180ms steps(2, end);
 }
-.playground-pixel-character:hover > img, .playground-pixel-character:focus-visible > img { filter: drop-shadow(9px 14px 7px rgba(23,16,29,.38)) saturate(1.12); transform: translateY(-4px) scaleX(var(--alex-facing, 1)); }
+.playground-pixel-character:hover .playground-character-sprite, .playground-pixel-character:focus-visible .playground-character-sprite { filter: drop-shadow(9px 14px 7px rgba(23,16,29,.38)) saturate(1.12); }
 .playground-pixel-character:focus-visible { outline: 2px dashed rgba(255,248,232,.95); outline-offset: 8px; }
 .playground-pixel-shadow {
   position: absolute;
@@ -1010,22 +1012,25 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .playground-pixel-burst i:nth-child(2) { top: 22%; right: 4%; background: #b59bff; box-shadow: 10px 0 #b59bff, 0 10px #b59bff; }
 .playground-pixel-burst i:nth-child(3) { right: 12%; bottom: 12%; }
 .playground-pixel-burst i:nth-child(4) { bottom: 22%; left: 2%; background: #b59bff; box-shadow: 10px 0 #b59bff, 0 10px #b59bff; }
-.playground-pixel-hub.is-jumping .playground-pixel-character > img { animation: pixel-alex-hop 620ms steps(4, end) both; }
-.playground-pixel-hub.is-walking:not(.is-jumping) .playground-pixel-character > img { animation: pixel-alex-walk 360ms steps(4, end) infinite; }
-.playground-pixel-hub.is-walking .playground-pixel-shadow { animation: pixel-alex-walk-shadow 360ms steps(4, end) infinite; }
+.playground-step-dust { position: absolute; z-index: 3; right: 20%; bottom: 3px; left: 20%; height: 22px; pointer-events: none; }
+.playground-step-dust i { position: absolute; bottom: 0; left: 50%; width: 4px; height: 4px; background: rgba(255,226,176,.78); box-shadow: 5px 2px rgba(255,226,176,.5); opacity: 0; }
+.playground-step-dust i:nth-child(2) { margin-left: -18px; transform: scale(.7); }
+.playground-step-dust i:nth-child(3) { margin-left: 14px; transform: scale(.55); }
+.playground-pixel-hub.is-jumping .playground-character-sprite { animation: pixel-alex-hop 620ms steps(4, end) both; }
+.playground-pixel-hub.is-walking:not(.is-jumping) .playground-character-sprite { animation: pixel-alex-sprite-walk var(--alex-step-duration, 380ms) steps(1, end) infinite; }
+.playground-pixel-hub.is-walking .playground-pixel-shadow { animation: pixel-alex-walk-shadow var(--alex-step-duration, 380ms) steps(4, end) infinite; }
+.playground-pixel-hub.is-walking .playground-step-dust i { animation: pixel-step-dust var(--alex-dust-duration, 760ms) steps(4, end) infinite; }
+.playground-pixel-hub.is-walking .playground-step-dust i:nth-child(2) { animation-delay: -190ms; }
+.playground-pixel-hub.is-walking .playground-step-dust i:nth-child(3) { animation-delay: -380ms; }
 .playground-pixel-hub.is-jumping .playground-pixel-burst i { animation: pixel-spark-pop 760ms steps(4, end) both; }
 .playground-pixel-hub.is-jumping .playground-pixel-burst i:nth-child(2) { animation-delay: 80ms; }
 .playground-pixel-hub.is-jumping .playground-pixel-burst i:nth-child(3) { animation-delay: 150ms; }
 .playground-pixel-hub.is-jumping .playground-pixel-burst i:nth-child(4) { animation-delay: 220ms; }
 @keyframes pixel-alex-idle { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
-@keyframes pixel-alex-walk {
-  0%, 100% { transform: translate3d(-3px, 0, 0) rotate(-1.5deg) scaleX(var(--alex-facing, 1)); }
-  25% { transform: translate3d(0, -7px, 0) rotate(0) scaleX(var(--alex-facing, 1)) scaleY(.98); }
-  50% { transform: translate3d(3px, 0, 0) rotate(1.5deg) scaleX(var(--alex-facing, 1)); }
-  75% { transform: translate3d(0, -7px, 0) rotate(0) scaleX(var(--alex-facing, 1)) scaleY(.98); }
-}
+@keyframes pixel-alex-sprite-walk { 0%, 24.99% { background-position: 0 0; } 25%, 49.99% { background-position: 100% 0; } 50%, 74.99% { background-position: 0 100%; } 75%, 100% { background-position: 100% 100%; } }
 @keyframes pixel-alex-walk-shadow { 0%, 50%, 100% { transform: scaleX(.82) skewX(-12deg); opacity: .28; } 25%, 75% { transform: scaleX(1) skewX(-12deg); opacity: .38; } }
 @keyframes pixel-alex-hop { 0% { transform: translateY(0) rotate(0) scaleX(var(--alex-facing, 1)); } 45% { transform: translateY(-22px) rotate(-2deg) scaleX(var(--alex-facing, 1)); } 70% { transform: translateY(-22px) rotate(2deg) scaleX(var(--alex-facing, 1)); } 100% { transform: translateY(0) rotate(0) scaleX(var(--alex-facing, 1)); } }
+@keyframes pixel-step-dust { 0%, 44% { opacity: 0; translate: 0 0; } 50% { opacity: .8; translate: 0 0; } 75% { opacity: .34; translate: -11px -6px; } 100% { opacity: 0; translate: -18px -9px; } }
 @keyframes pixel-spark-pop { 0% { opacity: 0; transform: scale(.25) rotate(0); } 35%, 70% { opacity: 1; transform: scale(1) rotate(90deg); } 100% { opacity: 0; transform: scale(.25) rotate(180deg); } }
 .playground-game-hud { position: absolute; z-index: 8; bottom: 22px; left: 28px; display: grid; min-width: 190px; gap: 3px; padding: 10px 13px; border: 1px solid rgba(255,255,255,.22); background: rgba(26,21,34,.72); box-shadow: 0 10px 26px rgba(20,16,24,.17); color: #fffaf3; backdrop-filter: blur(10px); }
 .playground-game-hud span, .playground-game-hud small { font-family: var(--font-body); font-size: 7px; letter-spacing: .07em; text-transform: uppercase; }
@@ -2393,7 +2398,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .playground-scene-switcher > span { display: none; }
   .playground-center { position: absolute; top: var(--alex-y, 82%); bottom: auto; left: var(--alex-x, 42%); min-height: 0; transform: translate(-50%, -100%) scale(var(--alex-scale, 1)); }
   .playground-pixel-hub { width: clamp(96px, 29vw, 126px); }
-  .playground-pixel-character > img { height: clamp(145px, 45vw, 188px); }
+  .playground-character-sprite { width: clamp(145px, 45vw, 188px); height: clamp(145px, 45vw, 188px); }
   .playground-game-hud { bottom: 14px; left: 14px; min-width: 0; max-width: 165px; padding: 8px 10px; }
   .playground-game-hud strong { font-size: 9px; }
   .playground-game-hud small { display: none; }
@@ -3265,7 +3270,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .home-playground-grid img { display: block; width: 100%; height: 210px; object-fit: contain; }
 .home-playground-grid a > span { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
 @media (max-width: 760px) { .navigation-beam { display: none; } .home-hero-portrait-stage { height: clamp(280px, 85vw, 350px); } .home-hero-avatar { width: min(94%, 370px, 94cqh); } .home-toolkit-section, .home-playground-section { margin-top: 64px; } .home-playground-intro { grid-template-columns: 1fr; } .home-playground-pixel { min-height: 270px; grid-template-columns: minmax(120px, .9fr) minmax(120px, .7fr); } .home-playground-pixel-art { height: 240px; } .home-playground-grid { grid-template-columns: 1fr; } .home-playground-grid img { height: 180px; } }
-@media (prefers-reduced-motion: reduce) { .navigation-beam, .home-playground-grid a, .home-playground-pixel, .home-playground-pixel-art img, .playground-world, .playground-cloud-layer i, .playground-pixel-character > img, .playground-pixel-shadow, .playground-pixel-hub.is-walking .playground-pixel-character > img, .playground-pixel-hub.is-jumping .playground-pixel-character > img, .playground-pixel-hub.is-jumping .playground-pixel-burst i { animation: none; transition: none; } .home-playground-pixel:hover, .home-playground-pixel:focus-visible, .home-playground-pixel:hover .home-playground-pixel-art img, .home-playground-pixel:focus-visible .home-playground-pixel-art img, .playground-pixel-character:hover > img, .playground-pixel-character:focus-visible > img { transform: scaleX(var(--alex-facing, 1)); } }
+@media (prefers-reduced-motion: reduce) { .navigation-beam, .home-playground-grid a, .home-playground-pixel, .home-playground-pixel-art img, .playground-world, .playground-cloud-layer i, .playground-character-sprite, .playground-step-dust i, .playground-pixel-shadow, .playground-pixel-hub.is-walking .playground-character-sprite, .playground-pixel-hub.is-jumping .playground-character-sprite, .playground-pixel-hub.is-jumping .playground-pixel-burst i { animation: none; transition: none; } .home-playground-pixel:hover, .home-playground-pixel:focus-visible, .home-playground-pixel:hover .home-playground-pixel-art img, .home-playground-pixel:focus-visible .home-playground-pixel-art img, .playground-pixel-character:hover .playground-character-sprite, .playground-pixel-character:focus-visible .playground-character-sprite { transform: scaleX(var(--alex-facing, 1)); } }
 
 /* Visible chapter names and a high-contrast active step across every project. */
 .project-progress-hud.project-progress-hud-topbar{grid-template-columns:minmax(190px,.6fr) minmax(100px,1fr);gap:12px 24px}
