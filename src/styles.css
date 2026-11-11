@@ -3160,3 +3160,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media (pointer: coarse) {
  .project-progress-hud.project-progress-compact nav button { flex-basis: 44px; width: 44px; min-width: 44px; height: 44px; }
 }
+
+.global-topbar:has(.project-progress-compact) { overflow: visible; }
+.global-topbar:has(.project-progress-compact)::before { border-radius: inherit; }

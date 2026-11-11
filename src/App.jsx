@@ -209,7 +209,9 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
 
   if (!sections.length) return null;
 
-  const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const previewSection = previewIndex !== null ? sections[previewIndex] : null;
+  const previewSummary = previewSection ? (previewSection.summary || document.getElementById(previewSection.id)?.querySelector("h1, h2, h3")?.textContent || previewSection.label) : "";
+  const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 
   return (
     <aside className={`project-progress-hud project-progress-compact${embedded ? " project-progress-hud-topbar" : ""}`} aria-label={label}>
@@ -241,7 +243,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
           </button>
         ))}
       </nav>
-      {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{sections[previewIndex].label}</div>}
+      {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{previewSummary}</div>}
     </aside>
   );
 }
