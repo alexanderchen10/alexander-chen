@@ -1134,9 +1134,57 @@ function HomeHero() {
 function CollaboratorCarousel({ navigate }) {
   const railRef = useRef(null);
   const [edges, setEdges] = useState({ start: true, end: false });
+  const resumeAt = useRef(0);
+  const pauseAutoplay = () => { resumeAt.current = performance.now() + 4000; };
   useEffect(() => {
     const rail = railRef.current;
-    const update = () => setEdges({ start: rail.scrollLeft < 2, end: rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2 });
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame, previous = 0, position = rail.scrollLeft, direction = 1, held = false, hovered = false;
+    const pause = () => { resumeAt.current = performance.now() + 4000; };
+    const down = () => { held = true; pause(); };
+    const up = () => { held = false; pause(); };
+    const enter = (event) => { if (event.pointerType === "mouse") hovered = true; };
+    const leave = () => { hovered = false; pause(); };
+    const tick = (now) => {
+      const elapsed = previous ? Math.min(now - previous, 50) : 0;
+      previous = now;
+      if (motion.matches || document.hidden || held || hovered || now < resumeAt.current) {
+        position = rail.scrollLeft;
+      } else {
+        const maximum = rail.scrollWidth - rail.clientWidth;
+        position = Math.max(0, Math.min(maximum, position + direction * elapsed * 0.032));
+        rail.scrollLeft = position;
+        if (position >= maximum) direction = -1;
+        else if (position <= 0) direction = 1;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    rail.addEventListener("pointerdown", down);
+    rail.addEventListener("pointerenter", enter);
+    rail.addEventListener("pointerleave", leave);
+    rail.addEventListener("wheel", pause, { passive: true });
+    rail.addEventListener("focusin", pause);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+      rail.removeEventListener("pointerdown", down);
+      rail.removeEventListener("pointerenter", enter);
+      rail.removeEventListener("pointerleave", leave);
+      rail.removeEventListener("wheel", pause);
+      rail.removeEventListener("focusin", pause);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, []);
+  useEffect(() => {
+    const rail = railRef.current;
+    const update = () => {
+      const start = rail.scrollLeft < 2;
+      const end = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+      setEdges((current) => current.start === start && current.end === end ? current : { start, end });
+    };
     update();
     rail.addEventListener("scroll", update, { passive: true });
     const observer = new ResizeObserver(update);
@@ -1144,6 +1192,7 @@ function CollaboratorCarousel({ navigate }) {
     return () => { rail.removeEventListener("scroll", update); observer.disconnect(); };
   }, []);
   const move = (direction) => {
+    pauseAutoplay();
     const rail = railRef.current;
     rail.scrollBy({ left: direction * rail.clientWidth * 0.8, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   };

@@ -2897,3 +2897,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .home-collaborator-track { padding-inline: 24px; }
   .home-collaborator-marquee { scroll-padding-inline: 24px; }
 }
+
+/* Native scroll position drives both autoplay and manual swiping. */
+.home-collaborator-marquee { scroll-snap-type: none; }
