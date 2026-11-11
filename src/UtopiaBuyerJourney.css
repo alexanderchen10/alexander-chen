@@ -1,0 +1,177 @@
+.utopia-buyer-journey {
+  container-type: inline-size;
+  background: #f8f8fc;
+  color: #22223c;
+  font-family: var(--font-body, sans-serif);
+}
+
+.utopia-buyer-journey-inner {
+  padding: clamp(22px, 4cqi, 30px);
+}
+
+.utopia-buyer-journey-heading > p:first-child {
+  margin: 0 0 14px;
+  color: #6752ba;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.utopia-buyer-journey-heading h3 {
+  max-width: 21ch;
+  margin: 0;
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(27px, 4.8cqi, 36px);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1.1;
+}
+
+.utopia-buyer-journey-heading > p:last-child {
+  max-width: 48ch;
+  margin: 12px 0 0;
+  color: #56576d;
+  font-size: clamp(13px, 2.2cqi, 15px);
+  line-height: 1.6;
+}
+
+.utopia-buyer-journey-steps {
+  display: grid;
+  gap: 0;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.utopia-buyer-journey-steps > li {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid #dcdce9;
+  border-radius: 10px;
+  transition: background 220ms ease;
+}
+
+.utopia-buyer-journey-steps > li::before {
+  position: absolute;
+  z-index: 1;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #476def, #8b5bea);
+  opacity: 0;
+  content: "";
+  transform: scaleX(.04);
+  transform-origin: left center;
+  transition: transform 500ms cubic-bezier(.2,.7,.2,1), opacity 180ms ease;
+}
+
+.utopia-buyer-journey-steps > li.is-active { background: #eaeafa; }
+.utopia-buyer-journey-steps > li.is-active::before { opacity: 1; transform: scaleX(1); }
+.utopia-buyer-step-number, .utopia-buyer-step-copy { position: relative; z-index: 1; transition: transform 350ms cubic-bezier(.2,.7,.2,1); }
+.utopia-buyer-journey-steps > li.is-active > .utopia-buyer-step-number,
+.utopia-buyer-journey-steps > li.is-active > .utopia-buyer-step-copy { transform: translateX(5px); }
+.utopia-buyer-journey-steps > li.is-active .utopia-buyer-step-number { border-color: #6553cf; background: #6553cf; color: #fff; }
+.utopia-buyer-journey-steps > li.is-active h4 { color: #4d42b6; }
+.utopia-buyer-step-select { position: absolute; z-index: 3; inset: 0; min-width: 44px; min-height: 44px; margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+.utopia-buyer-step-select:focus-visible { outline: 2px solid #6752d0; outline-offset: 3px; }
+
+.utopia-buyer-step-number {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-items: center;
+  border: 1px solid #d2c9ed;
+  border-radius: 50%;
+  color: #6752ba;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  transition: background 220ms ease, color 220ms ease, border-color 220ms ease, transform 350ms cubic-bezier(.2,.7,.2,1);
+}
+
+.utopia-buyer-journey-steps h4 {
+  margin: 3px 0 0;
+  font-size: clamp(16px, 2.5cqi, 18px);
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.3;
+  transition: color 220ms ease;
+}
+
+.utopia-buyer-journey-steps p {
+  max-width: 50ch;
+  margin: 7px 0 0;
+  color: #56576d;
+  font-size: clamp(12px, 2cqi, 14px);
+  line-height: 1.6;
+}
+
+.utopia-buyer-checkout-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.utopia-buyer-checkout-choices > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d9d3eb;
+  border-radius: 14px;
+  background: #efedf8;
+}
+
+.utopia-buyer-checkout-choices strong {
+  font-size: clamp(13px, 2.2cqi, 15px);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.utopia-buyer-checkout-choices span {
+  color: #56576d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.utopia-buyer-journey-note {
+  margin: 6px 0 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #e7e5f2;
+  color: #4f496f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@container (max-width: 380px) {
+  .utopia-buyer-journey-steps > li { grid-template-columns: 26px minmax(0, 1fr); gap: 10px; }
+  .utopia-buyer-step-number { width: 26px; height: 26px; }
+  .utopia-buyer-checkout-choices { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 1101px) and (min-height: 800px) {
+  .utopia-buyer-journey-inner { padding: 24px; }
+  .utopia-buyer-journey-heading h3 { font-size: 32px; }
+  .utopia-buyer-journey-steps { margin-top: 18px; }
+  .utopia-buyer-journey-steps > li { padding-block: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .utopia-buyer-journey-steps > li,
+  .utopia-buyer-journey-steps > li::before,
+  .utopia-buyer-step-number,
+  .utopia-buyer-step-copy,
+  .utopia-buyer-journey-steps h4 { transition: none; }
+  .utopia-buyer-journey-steps > li.is-active > .utopia-buyer-step-number,
+  .utopia-buyer-journey-steps > li.is-active > .utopia-buyer-step-copy { transform: none; }
+}

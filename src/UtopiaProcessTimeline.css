@@ -1,0 +1,48 @@
+.utopia-process-timeline {
+  container-type: inline-size;
+  background: #f8f8fc;
+  color: #22223c;
+  font-family: var(--font-body, sans-serif);
+}
+.utopia-process-inner { padding: clamp(22px, 4cqi, 30px); }
+.utopia-process-heading > p { margin: 0 0 12px; color: #6752ba; font-size: 10px; font-weight: 500; letter-spacing: .06em; line-height: 1.5; text-transform: uppercase; }
+.utopia-process-heading h3 { max-width: 25ch; margin: 0; font-family: var(--font-display, sans-serif); font-size: clamp(26px, 4.4cqi, 32px); font-weight: 500; letter-spacing: -.04em; line-height: 1.12; }
+.utopia-process-decisions { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 16px; margin: 24px 0 0; }
+.utopia-process-decisions > div { padding-top: 12px; border-top: 1px solid #dcdce9; }
+.utopia-process-decisions dt { color: #706b83; font-size: 10px; letter-spacing: .04em; text-transform: uppercase; }
+.utopia-process-decisions dd { margin: 7px 0 0; font-size: clamp(13px, 2.2cqi, 15px); font-weight: 500; line-height: 1.4; }
+.utopia-process-decisions > div:last-child dt { color: #5740b5; }
+.utopia-process-reason { margin: 16px 0 0; color: #56576d; font-size: clamp(12px, 2cqi, 14px); line-height: 1.6; }
+.utopia-process-hint { margin: 24px 0 8px; color: #706b83; font-size: 10px; line-height: 1.5; }
+.utopia-process-hint span { display: inline-block; margin-left: 5px; color: #7155e8; }
+.utopia-process-track { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(var(--process-count), minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.utopia-process-track::before, .utopia-process-track::after { position: absolute; z-index: -1; top: 19px; left: 0; height: 2px; content: ""; }
+.utopia-process-track::before { width: 100%; background: #ded9ee; }
+.utopia-process-track::after { width: 0; background: #7155e8; transition: width 450ms ease; }
+.utopia-process-timeline.is-visible .utopia-process-track::after { width: var(--process-progress); }
+.utopia-process-track li { min-width: 0; }
+.utopia-process-step { display: grid; width: 100%; min-height: 96px; justify-items: start; align-content: start; gap: 12px; padding: 0 6px 12px 0; border: 0; border-radius: 9px; background: transparent; color: #56576d; font: inherit; font-size: clamp(12px, 2.1cqi, 15px); font-weight: 500; line-height: 1.4; text-align: left; cursor: pointer; }
+.utopia-process-step > span:last-child { transition: transform 220ms ease, color 220ms ease; }
+.utopia-process-number { display: grid; width: 38px; height: 38px; place-content: center; border: 1px solid #d2c9ed; border-radius: 50%; background: #f8f8fc; color: #6752ba; font-size: 11px; font-variant-numeric: tabular-nums; transition: background 220ms ease, color 220ms ease, border-color 220ms ease; }
+.utopia-process-step[aria-pressed="true"] { color: #4931b0; }
+.is-reached .utopia-process-number { border-color: #9e8ae7; background: #ede7ff; }
+.utopia-process-step[aria-pressed="true"] .utopia-process-number { border-color: #7155e8; background: #7155e8; color: #fff; }
+.utopia-process-step:hover > span:last-child, .utopia-process-step:focus-visible > span:last-child { transform: translateX(4px); color: #4931b0; }
+.utopia-process-step:focus-visible { outline: 2px solid #7155e8; outline-offset: 4px; }
+.utopia-process-detail { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; min-height: 94px; margin-top: 8px; padding: 16px; border: 1px solid #d9d3eb; border-radius: 14px; background: #eeebf8; }
+.utopia-process-detail-index { color: #6752ba; font-size: 11px; line-height: 1.8; font-variant-numeric: tabular-nums; }
+.utopia-process-detail strong { color: #35265d; font-size: 14px; font-weight: 500; line-height: 1.4; }
+.utopia-process-detail p { max-width: 52ch; margin: 6px 0 0; color: #56516e; font-size: 12px; line-height: 1.6; }
+@container (max-width: 480px) {
+  .utopia-process-decisions { gap: 12px; }
+  .utopia-process-track { grid-template-columns: 1fr; gap: 0; }
+  .utopia-process-track::before, .utopia-process-track::after { top: 0; bottom: 0; left: 18px; width: 2px; height: auto; }
+  .utopia-process-track::after { height: 0; bottom: auto; transition: height 450ms ease; }
+  .utopia-process-timeline.is-visible .utopia-process-track::after { width: 2px; height: var(--process-progress); }
+  .utopia-process-step { min-height: 64px; grid-template-columns: 38px minmax(0, 1fr); align-items: center; gap: 14px; padding-bottom: 12px; font-size: 14px; }
+  .utopia-process-detail { min-height: 118px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .utopia-process-track::after, .utopia-process-number, .utopia-process-step > span:last-child { transition: none; }
+  .utopia-process-step:hover > span:last-child, .utopia-process-step:focus-visible > span:last-child { transform: none; }
+}

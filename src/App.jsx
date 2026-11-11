@@ -3,6 +3,10 @@ import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import GtaEmailCaseStudy from "./GtaEmailCaseStudy";
+import UtopiaBuyerJourney from "./UtopiaBuyerJourney";
+import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
+import UtopiaSalesChart from "./UtopiaSalesChart";
+import "./UtopiaJourneyToggle.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
 const Arrow = ({ className }) => <span className={className} aria-hidden="true">↗</span>;
@@ -193,6 +197,7 @@ function useProjectProgress(sections = []) {
 
 function ProjectProgressHUD({ sections, label = "Project journey", embedded = false }) {
   const { progress, activeId } = useProjectProgress(sections);
+  const [barOnly, setBarOnly] = useState(false);
   const chapterNav = useRef(null);
   const [previewIndex, setPreviewIndex] = useState(null);
   const tooltipId = `chapter-tip-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
@@ -203,9 +208,11 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
       const left = active.offsetLeft - nav.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
       nav.scrollTo({ left: Math.max(0, left), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
-  }, [activeId]);
+  }, [activeId, barOnly]);
   const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
   const activeSection = sections[activeIndex] || sections[0];
+  const isUtopiaJourney = label === "Utopia Vinyl project journey";
+  const chapterNavId = `utopia-journey-chapters-${embedded ? "desktop" : "mobile"}`;
 
   if (!sections.length) return null;
 
@@ -214,7 +221,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
   const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 
   return (
-    <aside className={`project-progress-hud project-progress-compact${embedded ? " project-progress-hud-topbar" : ""}`} aria-label={label}>
+    <aside className={`project-progress-hud project-progress-compact${embedded ? " project-progress-hud-topbar" : ""}${isUtopiaJourney ? " utopia-journey-hud" : ""}${isUtopiaJourney && barOnly ? " is-bar-only" : ""}`} aria-label={label}>
       <div className="project-progress-copy">
         <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
         <strong>{activeSection?.label}</strong>
@@ -223,7 +230,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
       <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
         <i style={{ width: `${progress}%` }} />
       </div>
-      <nav ref={chapterNav} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
+      <nav ref={chapterNav} id={isUtopiaJourney ? chapterNavId : undefined} hidden={isUtopiaJourney && barOnly} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
         {sections.map((section, index) => (
           <button
             type="button"
@@ -243,6 +250,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
           </button>
         ))}
       </nav>
+      {isUtopiaJourney && <button className="project-progress-toggle" type="button" aria-expanded={!barOnly} aria-controls={chapterNavId} onClick={() => { setBarOnly((current) => !current); setPreviewIndex(null); }}>{barOnly ? "Show sections" : "Bar only"}<span aria-hidden="true">{barOnly ? "+" : "−"}</span></button>}
       {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{previewSummary}</div>}
     </aside>
   );
@@ -773,12 +781,10 @@ function ProjectCard({ project, index }) {
         <section className="project-impact-summary" aria-label="Utopia Vinyl impact">
           <div className="project-impact-heading"><span>Impact</span><span>As of {utopiaMetrics.asOf}</span></div>
           <dl className="project-impact-metrics">
-            <div><dt>Valid orders</dt><dd>{utopiaMetrics.validOrders}</dd></div>
-            <div><dt>Displayed order total</dt><dd>{utopiaMetrics.orderTotal}</dd></div>
-            <div><dt>Paid · {utopiaMetrics.paidOrders} orders</dt><dd>{utopiaMetrics.paidTotal}</dd></div>
-            <div><dt>Awaiting payment · {utopiaMetrics.awaitingOrders} orders</dt><dd>{utopiaMetrics.awaitingTotal}</dd></div>
+            <div><dt>Orders</dt><dd>{utopiaMetrics.paidOrders}</dd></div>
+            <div><dt>Sales</dt><dd>{utopiaMetrics.paidTotal}</dd></div>
           </dl>
-          <p className="project-impact-note">Order total includes paid and awaiting-payment orders. Cancelled and expired orders excluded.</p>
+          <p className="project-impact-note">Past 30 days · checked {utopiaMetrics.asOf}. Confirmed payments only. {utopiaMetrics.shippingNote}</p>
         </section>
       </div>
     </article>
@@ -2859,11 +2865,11 @@ const utopiaScenes = [
     number: "01",
     label: "Collection",
     kicker: "Start with the collection",
-    title: "A room of records needed a path back to people.",
-    body: "The first version gave the collection a home, but it was still only a shell. The real product challenge was turning physical LPs into trustworthy listings without making Alexander the permanent operator.",
+    title: "From collection to catalogue.",
+    body: "I replaced the empty catalogue with record photos, grading, prices, and cart actions my father could manage himself.",
     image: "/projects/work/utopia-vinyl/catalogue-evolution.png",
     alt: "Utopia Vinyl catalogue evolving from an empty prototype into shoppable stock",
-    caption: "From empty catalogue to recognizable, shoppable inventory",
+    caption: "A simple publishing workflow, from record photography to a shoppable listing",
     tags: ["Collection structure", "Real record photography", "Clear catalogue facts"],
     background: "#e9e4da",
     accent: "#a64737",
@@ -2874,8 +2880,8 @@ const utopiaScenes = [
     number: "02",
     label: "Seller",
     kicker: "Design for the person doing the work",
-    title: "The seller workflow had to feel calm and forgiving.",
-    body: "The upload flow was shaped around Tim's eyesight, comfort, and inventory routine. Larger targets, visible photo previews, draft checks, and optional AI assistance make each listing easier to prepare and review.",
+    title: "An accessible listing workflow.",
+    body: "I designed larger controls, photo previews, and draft checks around my father’s routine, with optional AI help for preparing listings.",
     image: "/projects/work/utopia-vinyl/seller-workflow.png",
     alt: "Accessible seller workflow from the Utopia Vinyl project review",
     caption: "A practical path from record photography to a reviewed listing",
@@ -2889,12 +2895,12 @@ const utopiaScenes = [
     number: "03",
     label: "Model",
     kicker: "Choose the operating model",
-    title: "Checkout begins with an honest promise.",
-    body: "Utopia Vinyl uses one independent storefront and manual bank-transfer orders. The interface explains that choice clearly, then connects browsing, reservation, payment confirmation, and fulfilment as one understandable routine.",
+    title: "A clear commerce model.",
+    body: "I chose an independent storefront to keep costs down and shape ordering around our Taiwan workflow.",
     image: "/projects/work/utopia-vinyl/commerce-model.png",
     alt: "Utopia Vinyl commerce model connecting storefront, order, payment, and fulfilment",
-    caption: "Storefront to fulfilment, with every handoff made visible",
-    tags: ["Browse", "Reserve LPs", "Confirm transfer", "Ship order"],
+    caption: "Storefront → order → Tim confirms payment → fulfilment",
+    tags: ["Independent storefront", "Lower operating costs", "Taiwan workflow"],
     background: "#e4e9ed",
     accent: "#325d6e",
     ink: "#18252d",
@@ -2904,11 +2910,11 @@ const utopiaScenes = [
     number: "04",
     label: "Buyer",
     kicker: "Test the path",
-    title: "A buyer should not have to create an account.",
-    body: "Testing shifted the work from adding features to removing friction. Guest checkout became unmistakable, the cart survived browsing and login, and different LPs could travel together in one combined order.",
+    title: "Flexible checkout, fewer barriers.",
+    body: "I clarified guest checkout so buyers can order without an account, kept sign-in optional, and preserved one combined cart.",
     image: "/projects/work/utopia-vinyl/buyer-journey.png",
     alt: "Buyer journey improvements for guest checkout and cart persistence",
-    caption: "Real tester feedback clarified the route to one combined guest order",
+    caption: "One combined cart, with guest checkout or optional sign-in",
     tags: ["Guest checkout", "Persistent cart", "One combined order", "Visible order status"],
     background: "#eee0d8",
     accent: "#b44a35",
@@ -2919,11 +2925,11 @@ const utopiaScenes = [
     number: "05",
     label: "Results",
     kicker: "Measure, then improve",
-    title: "The store became a working selling routine.",
-    body: `The current order snapshot records ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. Cancelled and expired orders are excluded. The paid figures match Sales & Traffic's past-30-day results.`,
+    title: "Early sales results.",
+    body: `Real orders now show how the store performs. This snapshot covers the dashboard’s past 30 days, checked ${utopiaMetrics.asOf}.`,
     image: "/projects/work/utopia-vinyl/results-current.svg",
-    alt: `Utopia Vinyl orders: ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders, split into ${utopiaMetrics.paidTotal} paid and ${utopiaMetrics.awaitingTotal} awaiting payment`,
-    caption: `${utopiaMetrics.orderPeriod} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone})`,
+    alt: `Utopia Vinyl: ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.paidTotal} in sales over the past 30 days, checked ${utopiaMetrics.asOf}`,
+    caption: `${utopiaMetrics.period} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone})`,
     tags: ["Order evidence", "Careful analytics", "Search visibility", "Continuous improvement"],
     background: "#cfd8d1",
     accent: "#2f6550",
@@ -2980,15 +2986,14 @@ function UtopiaStorefrontDemo() {
 function UtopiaResultsGraphic() {
   return (
     <div className="utopia-results-graphic" aria-label="Verified sales snapshot">
-      <p className="utopia-results-eyebrow">Orders & payment status</p>
-      <p className="utopia-results-heading">Orders at a glance.</p>
-      <p className="utopia-results-period">{utopiaMetrics.orderPeriod} · checked {utopiaMetrics.asOf}<br />{utopiaMetrics.timeZone}</p>
-      <div className="utopia-results-total"><strong>{utopiaMetrics.orderTotal}</strong><span>Displayed totals across {utopiaMetrics.validOrders} valid orders</span></div>
+      <p className="utopia-results-eyebrow">Store performance</p>
+      <p className="utopia-results-heading">Sales at a glance.</p>
+      <p className="utopia-results-period">{utopiaMetrics.period} · checked {utopiaMetrics.asOf}<br />{utopiaMetrics.timeZone}</p>
       <dl className="utopia-results-grid">
-        <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Paid<br />{utopiaMetrics.paidOrders} orders</dd></div>
-        <div><dt>{utopiaMetrics.awaitingTotal}</dt><dd>Awaiting payment<br />{utopiaMetrics.awaitingOrders} orders</dd></div>
+        <div><dt>{utopiaMetrics.paidOrders}</dt><dd>Orders</dd></div>
+        <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Sales</dd></div>
       </dl>
-      <p className="utopia-results-definition">{utopiaMetrics.scopeNote} {utopiaMetrics.shippingNote}</p>
+      <p className="utopia-results-definition">{utopiaMetrics.salesScopeNote} {utopiaMetrics.shippingNote}</p>
       <p className="utopia-results-graphic-source">{utopiaMetrics.sourceNote}</p>
     </div>
   );
@@ -2996,11 +3001,20 @@ function UtopiaResultsGraphic() {
 
 function UtopiaVinylPage({ clock, navigate, project }) {
   const pageRef = useRef(null);
-  const [progress, setProgress] = useState(0);
   const [activeScene, setActiveScene] = useState(0);
 
   useEffect(() => {
     let frame = 0;
+    const headers = [...document.querySelectorAll(".global-topbar, .mobile-header, .utopia-journey-hud")];
+    const measureNavigation = () => {
+      const page = pageRef.current;
+      if (!page) return;
+      const visibleBottom = Math.max(0, ...headers.map((item) => {
+        const bounds = item.getBoundingClientRect();
+        return bounds.height > 0 ? bounds.bottom : 0;
+      }));
+      page.style.setProperty("--utopia-stage-top", `${Math.ceil(visibleBottom + 16)}px`);
+    };
     const update = () => {
       frame = 0;
       const page = pageRef.current;
@@ -3011,7 +3025,6 @@ function UtopiaVinylPage({ clock, navigate, project }) {
       const ratio = Math.min(Math.max((window.scrollY - pageTop) / available, 0), 1);
       const nextProgress = Math.round(ratio * 100);
       page.style.setProperty("--utopia-scroll", String(nextProgress));
-      setProgress((current) => current === nextProgress ? current : nextProgress);
 
       const marker = window.innerHeight * 0.56;
       let nextScene = 0;
@@ -3020,13 +3033,6 @@ function UtopiaVinylPage({ clock, navigate, project }) {
         if (!section) return;
 
         const rect = section.getBoundingClientRect();
-        const travel = Math.max(rect.height - window.innerHeight, 1);
-        const sceneProgress = Math.min(Math.max(-rect.top / travel, 0), 1);
-        section.style.setProperty("--scene-progress", sceneProgress.toFixed(3));
-        section.style.setProperty("--scene-copy-lift", `${((0.5 - sceneProgress) * 16).toFixed(2)}px`);
-        section.style.setProperty("--scene-image-lift", `${((0.5 - sceneProgress) * 34).toFixed(2)}px`);
-        section.style.setProperty("--scene-image-scale", (1.025 - sceneProgress * 0.035).toFixed(3));
-        section.style.setProperty("--scene-drift", `${((0.5 - sceneProgress) * 88).toFixed(2)}px`);
         if (rect.top <= marker) nextScene = index;
       });
       setActiveScene((current) => current === nextScene ? current : nextScene);
@@ -3036,13 +3042,18 @@ function UtopiaVinylPage({ clock, navigate, project }) {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
 
+    const resize = () => { measureNavigation(); requestUpdate(); };
+    const observer = new ResizeObserver(resize);
+    headers.forEach((header) => observer.observe(header));
+    measureNavigation();
     update();
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
+    window.addEventListener("resize", resize);
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      observer.disconnect();
       window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
@@ -3051,37 +3062,38 @@ function UtopiaVinylPage({ clock, navigate, project }) {
 
   return (
     <main className="main-content utopia-page" ref={pageRef}>
-      <header className="utopia-hero utopia-hero-with-demo" id="utopia-overview" aria-labelledby="utopia-title">
+      <header className="utopia-hero" id="utopia-overview" aria-labelledby="utopia-title">
+        <div className="utopia-hero-media">
+          <div className="utopia-storefront-preview">
+            <div className="utopia-storefront-bar"><span aria-hidden="true"><i /><i /><i /></span><span>utopiavinyl.com.tw</span></div>
+            <UtopiaStorefrontDemo />
+          </div>
+          <p className="utopia-hero-media-caption"><span>Guided storefront demo</span><span>Browse · catalogue · record details</span></p>
+        </div>
         <div className="utopia-hero-copy">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span aria-hidden="true">←</span> selected work</a>
-          <div>
-            <p><span>Ongoing</span> Product design · Independent commerce</p>
-            <h1 id="utopia-title">Utopia<br />Vinyl</h1>
-            <p className="utopia-hero-lede">Reconnecting a family collection with returning collectors and first-time buyers.</p>
-          </div>
-          <div className="utopia-hero-actions">
-            <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Begin the journey <span aria-hidden="true">↓</span></button>
-            <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
+          <div className="utopia-hero-intro">
+            <p className="utopia-hero-eyebrow"><span>Ongoing</span> Product design · Independent commerce</p>
+            <h1 id="utopia-title">Utopia Vinyl</h1>
+            <p className="utopia-hero-lede">I’m helping my father’s record collection find its next listeners.</p>
+            <div className="utopia-hero-actions">
+              <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Explore the project <span aria-hidden="true">↓</span></button>
+              <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
+            </div>
           </div>
         </div>
-        <div className="utopia-banner-demo">
-          <div className="utopia-banner-browser"><span aria-hidden="true">● ● ●</span><span>utopiavinyl.com.tw</span></div>
-          <UtopiaStorefrontDemo />
-          <p>Browse the collection · Open a record · Add to cart</p>
-        </div>
-        <div className="utopia-hero-index"><span>01</span><span>24</span></div>
       </header>
 
       <section className="utopia-origin" aria-labelledby="utopia-origin-title">
         <p>THE STARTING POINT</p>
         <div>
-          <h2 id="utopia-origin-title">This started as a family problem, not a portfolio brief.</h2>
-          <p>Alexander's father had more vinyl records than he could connect to buyers. The work grew from a catalogue experiment into a complete product system for listing, ordering, payment confirmation, fulfilment, and support.</p>
+          <h2 id="utopia-origin-title">A new home for my father’s records.</h2>
+          <p>My father had more records than he could connect with buyers. I built a storefront and a simple workflow he could run himself.</p>
         </div>
         <dl>
           <div><dt>Collection</dt><dd>Physical LPs waiting to be rediscovered</dd></div>
-          <div><dt>People</dt><dd>A seller who needed calm tools and buyers who needed confidence</dd></div>
-          <div><dt>Role</dt><dd>Product direction, interface, brand, feedback, and AI-assisted delivery</dd></div>
+          <div><dt>People</dt><dd>My father and returning or first-time collectors</dd></div>
+          <div><dt>My role</dt><dd>Product design, brand, testing, and AI-assisted delivery</dd></div>
         </dl>
       </section>
 
@@ -3103,29 +3115,26 @@ function UtopiaVinylPage({ clock, navigate, project }) {
               </div>
               <figure className="utopia-report-frame">
                 <div className="utopia-report-bar"><span>Alexander Chen / Utopia Vinyl</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
-                {scene.id === "learning" ? <UtopiaResultsGraphic /> : <img src={assetHref(scene.image)} alt={scene.alt} loading={index === 0 ? "eager" : "lazy"} />}
+                {scene.id === "learning" ? <UtopiaResultsGraphic /> : scene.id === "buyer" ? <UtopiaBuyerJourney /> : ["collection", "model"].includes(scene.id) ? <UtopiaProcessTimeline kind={scene.id} /> : <img src={assetHref(scene.image)} alt={scene.alt} loading={index === 0 ? "eager" : "lazy"} />}
                 <figcaption><span>{scene.number}</span>{scene.caption}</figcaption>
               </figure>
-              <span className="utopia-scene-word" aria-hidden="true">{scene.label}</span>
             </div>
           </section>
         ))}
       </div>
 
       <section className="utopia-outcome" id="utopia-outcome" aria-labelledby="utopia-outcome-title">
-        <div className="utopia-outcome-record" aria-hidden="true"><i /><span>UTOPIA<br />VINYL</span></div>
         <div className="utopia-outcome-copy">
           <p>VERIFIED RESULTS · {utopiaMetrics.asOf.toUpperCase()}</p>
-          <h2 id="utopia-outcome-title">A small store became a working commerce system.</h2>
-          <p>{utopiaMetrics.orderPeriod}, checked {utopiaMetrics.asOf} ({utopiaMetrics.timeZone}). {utopiaMetrics.scopeNote} {utopiaMetrics.shippingNote}</p>
+          <h2 id="utopia-outcome-title">From launch to real orders.</h2>
+          <p>A storefront my father can run, with early sales to learn from. Each dated snapshot shows the dashboard’s preceding 30 days.</p>
+          <dl className="utopia-metrics">
+            <div><dt>{utopiaMetrics.paidOrders}</dt><dd>Orders · past 30 days</dd></div>
+            <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Sales · past 30 days</dd></div>
+          </dl>
         </div>
-        <dl className="utopia-metrics">
-          <div><dt>{utopiaMetrics.orderTotal}</dt><dd>displayed totals across {utopiaMetrics.validOrders} valid orders, including orders awaiting payment</dd></div>
-          <div><dt>{utopiaMetrics.paidTotal}</dt><dd>{utopiaMetrics.salesLabel} across {utopiaMetrics.paidOrders} orders in the past 30 days</dd></div>
-          <div><dt>{utopiaMetrics.awaitingTotal}</dt><dd>awaiting payment across {utopiaMetrics.awaitingOrders} orders</dd></div>
-          <div><dt>{utopiaMetrics.lpsSold}</dt><dd>LPs in the confirmed paid orders, past 30 days</dd></div>
-        </dl>
-        <p className="utopia-results-source">{utopiaMetrics.sourceNote}. Separately, Sales & Traffic recorded {utopiaMetrics.pageViews} page views across {utopiaMetrics.visitors} visitors in the past 30 days; traffic may include staff or testing activity. Weekly Progress includes unpaid orders and is not a paid-sales total.</p>
+        <UtopiaSalesChart />
+        <p className="utopia-results-source">Latest snapshot: {utopiaMetrics.period.toLowerCase()}, checked {utopiaMetrics.asOf} ({utopiaMetrics.timeZone}). {utopiaMetrics.salesScopeNote} {utopiaMetrics.shippingNote} Source: {utopiaMetrics.sourceNote}.</p>
         <div className="utopia-outcome-actions">
           <a href={reportUrl} target="_blank" rel="noreferrer">Read the archived November 4 review (24 pages) <Arrow /></a>
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↑</span></a>

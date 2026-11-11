@@ -1,0 +1,120 @@
+.utopia-sales-chart {
+  --sales-chart-purple: #7155e8;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(22px, 2.2vw, 28px);
+  overflow: hidden;
+  border: 1px solid #dfdceb;
+  border-radius: 24px;
+  background: #f8f7fc;
+  color: #24213c;
+  font-family: var(--font-body, sans-serif);
+}
+
+.utopia-sales-chart-eyebrow {
+  margin: 0 0 8px;
+  color: #6752ba;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.utopia-sales-chart h3 {
+  max-width: 24ch;
+  margin: 0;
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(26px, 2.2vw, 32px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+
+.utopia-sales-chart figcaption > p:last-child {
+  margin: 8px 0 0;
+  color: #5f5a73;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.utopia-sales-chart-summary {
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
+}
+
+.utopia-sales-chart-summary strong {
+  color: #5239b4;
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.utopia-sales-chart-summary span {
+  color: #5f5a73;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.utopia-sales-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 190px;
+  margin: 12px 0;
+  overflow: visible;
+}
+
+.utopia-sales-chart svg text {
+  fill: #686278;
+  font-family: var(--font-body, sans-serif);
+  font-size: 18px;
+}
+
+.utopia-sales-gridline { stroke: #dcd8e8; stroke-width: 1; }
+.utopia-sales-active-guide { stroke: #c5b9ee; stroke-width: 1.5; stroke-dasharray: 5 5; }
+.utopia-sales-line { fill: none; stroke: var(--sales-chart-purple); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.utopia-sales-point-halo { fill: #e4dcfc; }
+.utopia-sales-point { fill: var(--sales-chart-purple); stroke: #f8f7fc; stroke-width: 2; }
+
+.utopia-sales-snapshot-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.utopia-sales-snapshot-controls button {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  align-content: center;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid #dfd9ed;
+  border-radius: 14px;
+  background: #fff;
+  color: #575169;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.utopia-sales-snapshot-controls button strong { color: #32264f; font-size: clamp(19px, 2vw, 26px); font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.utopia-sales-snapshot-controls button[aria-pressed="true"] { border-color: #9d87e8; background: #ebe6fa; }
+.utopia-sales-snapshot-controls button:hover { border-color: #9d87e8; }
+.utopia-sales-snapshot-controls button:focus-visible { outline: 2px solid #7155e8; outline-offset: 3px; }
+.utopia-sales-chart-note { margin: 14px 0 0; color: #615a73; font-size: 11px; line-height: 1.5; }
+
+@media (max-width: 450px) {
+  .utopia-sales-chart { padding: 22px 18px; border-radius: 20px; }
+  .utopia-sales-snapshot-controls button { padding: 11px; font-size: 10px; }
+  .utopia-sales-chart svg text { font-size: 22px; }
+}

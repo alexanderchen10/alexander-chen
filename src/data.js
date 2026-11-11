@@ -233,9 +233,10 @@ export const utopiaMetrics = {
   pageViews: "2,997",
   visitors: 609,
   salesLabel: "confirmed paid order totals",
-  shippingNote: "Uses displayed order totals; estimated month-end combined shipping is not added.",
+  shippingNote: "Sales use displayed order totals, including recorded shipping; estimated month-end combined shipping is not added.",
   scopeNote: "Cancelled and expired orders are excluded. Paid and awaiting-payment totals are reported separately.",
   sourceNote: "Orders dashboard; paid figures cross-checked with Sales & Traffic",
+  salesScopeNote: "Sales count only orders with confirmed payment. Cancelled, expired, and known test orders are excluded.",
   weekly: {
     period: "November 9–15, 2026",
     timeZone: "Taiwan time",
@@ -245,6 +246,13 @@ export const utopiaMetrics = {
     scopeNote: "Weekly order value includes unpaid orders and shipping; cancelled and expired orders are excluded.",
   },
 };
+
+// Each point is a recorded rolling 30-day total, not daily revenue.
+// November 4: archived project review, page 18. November 11: Orders and Sales & Traffic.
+export const utopiaSalesSnapshots = [
+  { date: "November 4, 2026", shortDate: "Nov 4", orders: 9, sales: 8590 },
+  { date: "November 11, 2026", shortDate: "Nov 11", orders: 12, sales: 9560 },
+];
 
 export const workProjects = [
   {
@@ -277,13 +285,12 @@ export const workProjects = [
     image: "/projects/work/utopia-vinyl/utopia-vinyl-homepage-cover.webp",
     imageAlt: "Utopia Vinyl storefront homepage with the 黑膠理想國 turntable hero",
     coverEyebrow: "Product design · Independent commerce",
-    homeMetric: `${utopiaMetrics.validOrders} orders · ${utopiaMetrics.orderTotal} displayed total · ${utopiaMetrics.paidTotal} paid / ${utopiaMetrics.awaitingTotal} awaiting payment · as of ${utopiaMetrics.asOf}`,
+    homeMetric: `${utopiaMetrics.paidOrders} orders · ${utopiaMetrics.paidTotal} in sales · past 30 days · checked ${utopiaMetrics.asOf}`,
     aspect: "16 / 9",
     sourceUrl: "/projects/work/utopia-vinyl/utopia-vinyl-portfolio.pdf",
     sourceLabel: "Open the archived November 4 project review (24 pages)",
     impact: [
-      `Recorded ${utopiaMetrics.orderTotal} in displayed totals across ${utopiaMetrics.validOrders} valid orders as of ${utopiaMetrics.asOf}: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. ${utopiaMetrics.scopeNote} ${utopiaMetrics.shippingNote}`,
-      `Confirmed paid results for the dashboard's past 30 days: ${utopiaMetrics.paidTotal} across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.lpsSold} LPs, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}).`,
+      `${utopiaMetrics.paidOrders} orders generated ${utopiaMetrics.paidTotal} in sales over the dashboard's past 30 days, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}). ${utopiaMetrics.salesScopeNote} ${utopiaMetrics.shippingNote}`,
       `Recorded ${utopiaMetrics.pageViews} page views across ${utopiaMetrics.visitors} visitors in the same 30-day dashboard window. Traffic is reported separately from paid sales.`,
       "Turned a catalogue prototype into a complete selling routine spanning accessible uploads, inventory, guest ordering, manual payment confirmation, fulfilment, and customer guidance.",
     ],
@@ -347,13 +354,13 @@ export const workProjects = [
       {
         eyebrow: "05 / Results",
         title: "Measure the operating system, then improve it.",
-        description: `The current order snapshot, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}), records ${utopiaMetrics.orderTotal} in displayed totals across ${utopiaMetrics.validOrders} valid orders: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. ${utopiaMetrics.scopeNote} ${utopiaMetrics.shippingNote} The past-30-day paid results include ${utopiaMetrics.lpsSold} LPs. Weekly progress and traffic remain separate measures.`,
+        description: `${utopiaMetrics.paidOrders} orders generated ${utopiaMetrics.paidTotal} in sales over the dashboard's past 30 days, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}). ${utopiaMetrics.salesScopeNote} ${utopiaMetrics.shippingNote}`,
         layout: "wide",
         items: [
           {
             src: "/projects/work/utopia-vinyl/results-current.svg",
-            alt: `Utopia Vinyl current orders: ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders, split into ${utopiaMetrics.paidTotal} paid and ${utopiaMetrics.awaitingTotal} awaiting payment, checked ${utopiaMetrics.asOf}`,
-            caption: `${utopiaMetrics.orderPeriod} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}) · ${utopiaMetrics.sourceNote}`,
+            alt: `Utopia Vinyl: ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.paidTotal} in sales over the past 30 days, checked ${utopiaMetrics.asOf}`,
+            caption: `${utopiaMetrics.period} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}) · ${utopiaMetrics.sourceNote}`,
             aspect: "1250 / 925",
           },
         ],
