@@ -1458,6 +1458,7 @@ export const about = {
     {
       organization: "T&T Supermarket Inc.",
       projectSlugs: ["tt-supermarket"],
+      projectLabels: { "tt-supermarket": "Instagram Content & Strategy" },
       location: "Markham, Canada",
       badge: "T&T",
       role: "Marketing Specialist, Media & Communications",
@@ -1474,6 +1475,7 @@ export const about = {
     {
       organization: "Loblaw Companies Limited",
       projectSlugs: ["loblaw-employer-brand"],
+      projectLabels: { "loblaw-employer-brand": "Employer Brand Campaigns & Systems" },
       location: "Brampton, Canada",
       badge: "LCL",
       role: "Creative Specialist, Talent Strategy & Employer Branding",
@@ -1504,6 +1506,7 @@ export const about = {
     {
       organization: "Syntax Capital",
       projectSlugs: ["aves-lair-community"],
+      projectLabels: { "aves-lair-community": "Demo Day & Community Engagement" },
       location: "Remote",
       badge: "SC",
       role: "Community Engagement Intern",

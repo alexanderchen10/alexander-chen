@@ -717,7 +717,7 @@ function ProjectColumns({ projects }) {
   );
 }
 
-function ExperienceProjectLink({ project, navigate }) {
+function ExperienceProjectLink({ project, label, navigate }) {
   const projectRoute = `project/${project.slug}`;
   const showHoverPreview = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity"].includes(project.slug);
 
@@ -727,7 +727,7 @@ function ExperienceProjectLink({ project, navigate }) {
       href={routeHref(projectRoute)}
       onClick={(event) => navigate(event, "/", projectRoute)}
     >
-      <span>{project.title}</span>
+      <span>{label || project.title}</span>
       <Arrow className="home-experience-project-arrow" />
       {showHoverPreview && (
         <span className="home-experience-project-preview" aria-hidden="true">
@@ -856,7 +856,12 @@ function HomeExperience({ navigate }) {
                       <nav className="home-experience-projects" aria-label={`Related projects at ${experience.organization}`}>
                         <p>Selected work</p>
                         {relatedProjects.map((project) => (
-                          <ExperienceProjectLink key={project.slug} project={project} navigate={navigate} />
+                          <ExperienceProjectLink
+                            key={project.slug}
+                            project={project}
+                            label={experience.projectLabels?.[project.slug]}
+                            navigate={navigate}
+                          />
                         ))}
                       </nav>
                     )}
