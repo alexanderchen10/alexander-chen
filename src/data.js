@@ -215,6 +215,37 @@ const icffSubprojects = [
 
 export const aoStudioProjectSlugs = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity", "123dentist", "veerah"];
 
+// Verified against the signed-in Sales & Traffic and Orders dashboards.
+// Current valid order totals include awaiting payment. Paid and traffic metrics
+// use the dashboard's rolling 30-day window, separate from weekly Progress.
+export const utopiaMetrics = {
+  asOf: "November 11, 2026",
+  timeZone: "Toronto time",
+  period: "Past 30 days",
+  orderPeriod: "Current valid orders",
+  orderTotal: "NT$20,704",
+  validOrders: 26,
+  awaitingTotal: "NT$11,144",
+  awaitingOrders: 14,
+  paidTotal: "NT$9,560",
+  paidOrders: 12,
+  lpsSold: 18,
+  pageViews: "2,997",
+  visitors: 609,
+  salesLabel: "confirmed paid order totals",
+  shippingNote: "Uses displayed order totals; estimated month-end combined shipping is not added.",
+  scopeNote: "Cancelled and expired orders are excluded. Paid and awaiting-payment totals are reported separately.",
+  sourceNote: "Orders dashboard; paid figures cross-checked with Sales & Traffic",
+  weekly: {
+    period: "November 9–15, 2026",
+    timeZone: "Taiwan time",
+    published: 29,
+    orders: 2,
+    orderValue: "NT$1,630",
+    scopeNote: "Weekly order value includes unpaid orders and shipping; cancelled and expired orders are excluded.",
+  },
+};
+
 export const workProjects = [
   {
     slug: "utopia-vinyl",
@@ -228,13 +259,14 @@ export const workProjects = [
     image: "/projects/work/utopia-vinyl/utopia-vinyl-homepage-cover.webp",
     imageAlt: "Utopia Vinyl storefront homepage with the 黑膠理想國 turntable hero",
     coverEyebrow: "Product design · Independent commerce",
-    homeMetric: "9 orders · 15 LPs sold · NT$8,590 confirmed",
+    homeMetric: `${utopiaMetrics.validOrders} orders · ${utopiaMetrics.orderTotal} displayed total · ${utopiaMetrics.paidTotal} paid / ${utopiaMetrics.awaitingTotal} awaiting payment · as of ${utopiaMetrics.asOf}`,
     aspect: "16 / 9",
     sourceUrl: "/projects/work/utopia-vinyl/utopia-vinyl-portfolio.pdf",
-    sourceLabel: "Open the complete 24-page project review",
+    sourceLabel: "Open the archived November 4 project review (24 pages)",
     impact: [
-      "Recorded NT$8,590 in confirmed paid order totals, including shipping, across 9 orders and 15 LPs sold as of November 4, 2026.",
-      "Reached 408 visitors and 1,774 page views while the store and its catalogue continued to evolve.",
+      `Recorded ${utopiaMetrics.orderTotal} in displayed totals across ${utopiaMetrics.validOrders} valid orders as of ${utopiaMetrics.asOf}: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. ${utopiaMetrics.scopeNote} ${utopiaMetrics.shippingNote}`,
+      `Confirmed paid results for the dashboard's past 30 days: ${utopiaMetrics.paidTotal} across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.lpsSold} LPs, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}).`,
+      `Recorded ${utopiaMetrics.pageViews} page views across ${utopiaMetrics.visitors} visitors in the same 30-day dashboard window. Traffic is reported separately from paid sales.`,
       "Turned a catalogue prototype into a complete selling routine spanning accessible uploads, inventory, guest ordering, manual payment confirmation, fulfilment, and customer guidance.",
     ],
     mediaSections: [
@@ -297,13 +329,13 @@ export const workProjects = [
       {
         eyebrow: "05 / Results",
         title: "Measure the operating system, then improve it.",
-        description: "The project pairs order evidence with careful product analytics. Its results are reported as an honest November snapshot, not as unsupported causal design uplift, while search visibility, reliability, support content, and the internal dashboard continue to improve.",
+        description: `The current order snapshot, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}), records ${utopiaMetrics.orderTotal} in displayed totals across ${utopiaMetrics.validOrders} valid orders: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. ${utopiaMetrics.scopeNote} ${utopiaMetrics.shippingNote} The past-30-day paid results include ${utopiaMetrics.lpsSold} LPs. Weekly progress and traffic remain separate measures.`,
         layout: "wide",
         items: [
           {
-            src: "/projects/work/utopia-vinyl/results.png",
-            alt: "Utopia Vinyl project outcome snapshot from November 4, 2026",
-            caption: "A measured outcome snapshot for an ongoing independent-commerce product",
+            src: "/projects/work/utopia-vinyl/results-current.svg",
+            alt: `Utopia Vinyl current orders: ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders, split into ${utopiaMetrics.paidTotal} paid and ${utopiaMetrics.awaitingTotal} awaiting payment, checked ${utopiaMetrics.asOf}`,
+            caption: `${utopiaMetrics.orderPeriod} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}) · ${utopiaMetrics.sourceNote}`,
             aspect: "1250 / 925",
           },
         ],

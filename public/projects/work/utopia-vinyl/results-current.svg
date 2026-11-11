@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 925" role="img" aria-labelledby="title desc">
+<title id="title">Utopia Vinyl order and payment snapshot</title><desc id="desc">Current valid orders, checked November 11, 2026 (Toronto time). NT$20,704 in displayed totals across 26 orders: NT$9,560 paid across 12 orders and NT$11,144 awaiting payment across 14 orders. Cancelled and expired orders are excluded. Paid and awaiting-payment totals are reported separately. Uses displayed order totals; estimated month-end combined shipping is not added.</desc>
+<rect width="1250" height="925" fill="#f2efe6"/><g font-family="Arial, sans-serif" fill="#18241f">
+<text x="70" y="75" font-size="20" letter-spacing="3" fill="#2f6550">ORDERS &amp; PAYMENT STATUS</text>
+<text x="70" y="175" font-size="74" letter-spacing="-4">Orders at a glance.</text>
+<text x="70" y="310" font-size="23" fill="#59685f">Current valid orders · checked November 11, 2026 (Toronto time)</text>
+<text x="70" y="420" font-size="92" letter-spacing="-5">NT$20,704</text><text x="70" y="462" font-size="24" fill="#4c6053">Displayed totals across 26 valid orders</text>
+<path d="M70 500H1180M70 690H1180M625 500V690" fill="none" stroke="#bdc7bf" stroke-width="2"/>
+<text x="70" y="590" font-size="74" letter-spacing="-3">NT$9,560</text><text x="660" y="590" font-size="74" letter-spacing="-3">NT$11,144</text>
+<g font-size="24" fill="#4c6053"><text x="70" y="643">Paid · 12 orders</text><text x="660" y="643">Awaiting payment · 14 orders</text></g>
+<g font-size="21" fill="#4c6053"><text x="70" y="748">Cancelled and expired orders excluded. Paid and awaiting totals are separate.</text><text x="70" y="784">Uses displayed order totals; estimated month-end combined shipping is not added.</text></g>
+<text x="70" y="857" font-size="19" fill="#627268">Orders dashboard; paid figures cross-checked with Sales &amp; Traffic</text>
+</g></svg>

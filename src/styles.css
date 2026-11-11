@@ -1443,6 +1443,28 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .utopia-report-frame img { display: block; width: 100%; aspect-ratio: 1250 / 925; object-fit: cover; transform: scale(var(--scene-image-scale, 1)); transform-origin: center; transition: transform 100ms linear; }
 .utopia-report-frame figcaption { display: flex; gap: 10px; padding: 11px 12px 13px; color: rgba(17,23,22,.62); font-size: 10px; line-height: 1.4; }
 .utopia-report-frame figcaption span { color: var(--scene-accent); font-family: var(--font-body); font-size: 8px; }
+.utopia-results-graphic { padding: clamp(24px, 3.3vw, 48px); background: #f2efe6; color: #18241f; }
+#utopia-learning .utopia-scene-sticky { height: auto; min-height: 100svh; }
+.utopia-results-eyebrow { color: #2f6550; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+.utopia-results-heading { margin: 30px 0 20px; font-size: clamp(30px, 3.6vw, 52px); font-weight: 500; letter-spacing: -.055em; line-height: 1; }
+.utopia-results-period { color: #59685f; font-size: 12px; line-height: 1.6; }
+.utopia-results-total { display: grid; gap: 12px; margin-top: 28px; }
+.utopia-results-total strong { font-size: clamp(40px, 4.5vw, 62px); font-weight: 500; letter-spacing: -.065em; line-height: 1; }
+.utopia-results-total span { color: #4c6053; font-size: 12px; line-height: 1.5; }
+.utopia-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 25px 0 24px; border-top: 1px solid #bdc7bf; border-bottom: 1px solid #bdc7bf; }
+.utopia-results-grid > div { min-width: 0; padding: 25px 12px 25px 0; }
+.utopia-results-grid > div + div { padding-left: 18px; border-left: 1px solid #bdc7bf; }
+.utopia-results-grid dt { font-size: clamp(28px, 3vw, 44px); letter-spacing: -.065em; line-height: 1.05; white-space: nowrap; }
+.utopia-results-grid dd { margin: 14px 0 0; color: #4c6053; font-size: 11px; line-height: 1.5; }
+.utopia-results-definition { color: #4c6053; font-size: 11px; line-height: 1.6; }
+.utopia-results-graphic-source { margin-top: 16px; color: #627268; font-size: 9px; line-height: 1.5; }
+.utopia-results-source { position: relative; z-index: 2; grid-column: 1 / -1; max-width: 680px; margin-top: -30px; color: rgba(242,239,230,.6); font-size: 12px; line-height: 1.6; }
+#utopia-outcome .utopia-metrics div:nth-child(-n+3) dt { font-size: clamp(24px, 3.4vw, 50px); }
+@media (max-width: 600px) {
+  .utopia-results-heading { font-size: clamp(30px, 8vw, 42px); }
+  .utopia-results-grid dt { font-size: clamp(23px, 6.3vw, 32px); }
+  #utopia-outcome .utopia-metrics div:nth-child(-n+3) dt { font-size: clamp(24px, 7.4vw, 32px); }
+}
 .utopia-scene-word { position: absolute; right: -1vw; bottom: -3vw; color: color-mix(in srgb, var(--scene-ink) 6%, transparent); font-size: clamp(90px, 18vw, 270px); font-weight: 600; letter-spacing: -.1em; line-height: .72; pointer-events: none; text-transform: uppercase; transform: translateX(var(--scene-drift, 0px)); transition: transform 100ms linear; }
 
 .utopia-outcome { position: relative; display: grid; min-height: 105svh; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-content: center; gap: 60px 80px; overflow: hidden; padding: clamp(100px, 11vw, 170px) clamp(30px, 7vw, 100px); background: var(--utopia-black); color: var(--utopia-cream); }
@@ -2848,4 +2870,12 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .mobile-header { padding-inline: 16px; }
   .mobile-header .brand { font-size: 12px; }
   .mobile-header .availability-badge { gap: 6px; margin-right: 16px; font-size: 7px; }
+}
+
+/* Continuous AC identity in the global headers. */
+.brand.brand-logo { display: inline-flex; align-items: center; width: 84px; line-height: 0; letter-spacing: normal; }
+.brand-logo picture, .brand-logo img { display: block; width: 100%; height: auto; }
+.global-topbar .brand-logo:hover, .global-topbar .brand-logo:focus-visible { transform: none; letter-spacing: normal; }
+@media (max-width: 809px) {
+  .mobile-header .brand-logo { width: 66px; flex: 0 0 66px; }
 }

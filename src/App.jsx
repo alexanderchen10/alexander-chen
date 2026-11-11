@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { about, aoStudioProjectSlugs, playgroundItems, profile, workProjects } from "./data";
+import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
@@ -320,6 +320,15 @@ function ContactLinks() {
   );
 }
 
+function BrandMark() {
+  return (
+    <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcSet={assetHref("/branding/alexander-chen-continuous.png")} />
+      <img src={assetHref("/branding/alexander-chen-continuous-beacon.gif")} width="720" height="428" alt="Alexander Chen AC monogram" />
+    </picture>
+  );
+}
+
 function AvailabilityBadge() {
   return (
     <a className="availability-badge" href={`mailto:${profile.email}`}>
@@ -346,7 +355,7 @@ function Sidebar({ page, route, navigate, clock }) {
       }}
     >
       <div className="topbar-primary">
-        <a className="brand reveal reveal-fast" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <a className="brand brand-logo reveal reveal-fast" aria-label="Alexander Chen home" href={routeHref()} onClick={(e) => navigate(e, "/")}><BrandMark /></a>
         <NavigationLinks page={page} route={route} navigate={navigate} />
         <div className="topbar-actions">
           <AvailabilityBadge />
@@ -431,7 +440,7 @@ function MobileHeader({ page, route, navigate }) {
   return (
     <>
       <header className="mobile-header">
-        <a className="brand" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <a className="brand brand-logo" aria-label="Alexander Chen home" href={routeHref()} onClick={(e) => navigate(e, "/")}><BrandMark /></a>
         <AvailabilityBadge />
         <button
           className={`menu-toggle ${open ? "is-open" : ""}`}
@@ -2691,19 +2700,36 @@ const utopiaScenes = [
   {
     id: "learning",
     number: "05",
-    label: "Learning",
+    label: "Results",
     kicker: "Measure, then improve",
     title: "The store became a working selling routine.",
-    body: "Orders, analytics, support questions, search visibility, and reliability checks now feed the next iteration. The outcome is reported as an honest snapshot of an evolving product, not as unsupported causal uplift.",
-    image: "/projects/work/utopia-vinyl/results.png",
-    alt: "Utopia Vinyl outcome snapshot from November 4, 2026",
-    caption: "A measured snapshot for an ongoing independent-commerce product",
+    body: `The current order snapshot records ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders: ${utopiaMetrics.paidTotal} paid across ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.awaitingTotal} awaiting payment across ${utopiaMetrics.awaitingOrders} orders. Cancelled and expired orders are excluded. The paid figures match Sales & Traffic's past-30-day results.`,
+    image: "/projects/work/utopia-vinyl/results-current.svg",
+    alt: `Utopia Vinyl orders: ${utopiaMetrics.orderTotal} across ${utopiaMetrics.validOrders} valid orders, split into ${utopiaMetrics.paidTotal} paid and ${utopiaMetrics.awaitingTotal} awaiting payment`,
+    caption: `${utopiaMetrics.orderPeriod} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone})`,
     tags: ["Order evidence", "Careful analytics", "Search visibility", "Continuous improvement"],
     background: "#cfd8d1",
     accent: "#2f6550",
     ink: "#18241f",
   },
 ];
+
+function UtopiaResultsGraphic() {
+  return (
+    <div className="utopia-results-graphic" aria-label="Verified sales snapshot">
+      <p className="utopia-results-eyebrow">Orders & payment status</p>
+      <p className="utopia-results-heading">Orders at a glance.</p>
+      <p className="utopia-results-period">{utopiaMetrics.orderPeriod} · checked {utopiaMetrics.asOf}<br />{utopiaMetrics.timeZone}</p>
+      <div className="utopia-results-total"><strong>{utopiaMetrics.orderTotal}</strong><span>Displayed totals across {utopiaMetrics.validOrders} valid orders</span></div>
+      <dl className="utopia-results-grid">
+        <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Paid<br />{utopiaMetrics.paidOrders} orders</dd></div>
+        <div><dt>{utopiaMetrics.awaitingTotal}</dt><dd>Awaiting payment<br />{utopiaMetrics.awaitingOrders} orders</dd></div>
+      </dl>
+      <p className="utopia-results-definition">{utopiaMetrics.scopeNote} {utopiaMetrics.shippingNote}</p>
+      <p className="utopia-results-graphic-source">{utopiaMetrics.sourceNote}</p>
+    </div>
+  );
+}
 
 function UtopiaVinylPage({ clock, navigate, project }) {
   const pageRef = useRef(null);
@@ -2791,7 +2817,7 @@ function UtopiaVinylPage({ clock, navigate, project }) {
           </div>
           <div className="utopia-hero-actions">
             <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Begin the journey <span aria-hidden="true">↓</span></button>
-            <a href={reportUrl} target="_blank" rel="noreferrer">Open full report <Arrow /></a>
+            <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
           </div>
         </div>
         <div className="utopia-hero-art" aria-hidden="true">
@@ -2837,7 +2863,7 @@ function UtopiaVinylPage({ clock, navigate, project }) {
               </div>
               <figure className="utopia-report-frame">
                 <div className="utopia-report-bar"><span>Alexander Chen / Utopia Vinyl</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
-                <img src={assetHref(scene.image)} alt={scene.alt} loading={index === 0 ? "eager" : "lazy"} />
+                {scene.id === "learning" ? <UtopiaResultsGraphic /> : <img src={assetHref(scene.image)} alt={scene.alt} loading={index === 0 ? "eager" : "lazy"} />}
                 <figcaption><span>{scene.number}</span>{scene.caption}</figcaption>
               </figure>
               <span className="utopia-scene-word" aria-hidden="true">{scene.label}</span>
@@ -2849,18 +2875,19 @@ function UtopiaVinylPage({ clock, navigate, project }) {
       <section className="utopia-outcome" id="utopia-outcome" aria-labelledby="utopia-outcome-title">
         <div className="utopia-outcome-record" aria-hidden="true"><i /><span>UTOPIA<br />VINYL</span></div>
         <div className="utopia-outcome-copy">
-          <p>OUTCOME SNAPSHOT · NOVEMBER 4, 2026</p>
+          <p>VERIFIED RESULTS · {utopiaMetrics.asOf.toUpperCase()}</p>
           <h2 id="utopia-outcome-title">A small store became a working commerce system.</h2>
-          <p>The store is still evolving. These numbers describe the recorded snapshot, while the product continues to learn from buyers, search visibility, support questions, and the realities of fulfilment.</p>
+          <p>{utopiaMetrics.orderPeriod}, checked {utopiaMetrics.asOf} ({utopiaMetrics.timeZone}). {utopiaMetrics.scopeNote} {utopiaMetrics.shippingNote}</p>
         </div>
         <dl className="utopia-metrics">
-          <div><dt>NT$8,590</dt><dd>confirmed paid order totals, including shipping</dd></div>
-          <div><dt>9</dt><dd>orders placed through the evolving store</dd></div>
-          <div><dt>15</dt><dd>LPs sold from the family collection</dd></div>
-          <div><dt>1,774</dt><dd>page views across 408 visitors</dd></div>
+          <div><dt>{utopiaMetrics.orderTotal}</dt><dd>displayed totals across {utopiaMetrics.validOrders} valid orders, including orders awaiting payment</dd></div>
+          <div><dt>{utopiaMetrics.paidTotal}</dt><dd>{utopiaMetrics.salesLabel} across {utopiaMetrics.paidOrders} orders in the past 30 days</dd></div>
+          <div><dt>{utopiaMetrics.awaitingTotal}</dt><dd>awaiting payment across {utopiaMetrics.awaitingOrders} orders</dd></div>
+          <div><dt>{utopiaMetrics.lpsSold}</dt><dd>LPs in the confirmed paid orders, past 30 days</dd></div>
         </dl>
+        <p className="utopia-results-source">{utopiaMetrics.sourceNote}. Separately, Sales & Traffic recorded {utopiaMetrics.pageViews} page views across {utopiaMetrics.visitors} visitors in the past 30 days; traffic may include staff or testing activity. Weekly Progress includes unpaid orders and is not a paid-sales total.</p>
         <div className="utopia-outcome-actions">
-          <a href={reportUrl} target="_blank" rel="noreferrer">Read the complete 24-page project review <Arrow /></a>
+          <a href={reportUrl} target="_blank" rel="noreferrer">Read the archived November 4 review (24 pages) <Arrow /></a>
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↑</span></a>
         </div>
       </section>
