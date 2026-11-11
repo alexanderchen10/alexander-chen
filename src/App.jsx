@@ -1131,6 +1131,43 @@ function HomeHero() {
   );
 }
 
+function CollaboratorCarousel({ navigate }) {
+  const railRef = useRef(null);
+  const [edges, setEdges] = useState({ start: true, end: false });
+  useEffect(() => {
+    const rail = railRef.current;
+    const update = () => setEdges({ start: rail.scrollLeft < 2, end: rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2 });
+    update();
+    rail.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(rail);
+    return () => { rail.removeEventListener("scroll", update); observer.disconnect(); };
+  }, []);
+  const move = (direction) => {
+    const rail = railRef.current;
+    rail.scrollBy({ left: direction * rail.clientWidth * 0.8, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+  return (
+    <>
+      <div ref={railRef} id="collaborator-carousel" className="home-collaborator-marquee" role="region" aria-label="Organizations Alexander Chen has worked with" tabIndex={0} onKeyDown={(event) => {
+        if (event.target !== event.currentTarget || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+        event.preventDefault(); move(event.key === "ArrowLeft" ? -1 : 1);
+      }}>
+        <div className="home-collaborator-track" role="list">
+          {profile.collaborators.map((collaborator, index) => <CollaboratorCard collaborator={collaborator} index={index} navigate={navigate} key={collaborator.name} />)}
+        </div>
+      </div>
+      <div className="collaborator-scroll-controls">
+        <span>Explore collaborators</span>
+        <div>
+          <button type="button" aria-label="Scroll collaborators left" aria-controls="collaborator-carousel" disabled={edges.start} onClick={() => move(-1)}>←</button>
+          <button type="button" aria-label="Scroll collaborators right" aria-controls="collaborator-carousel" disabled={edges.end} onClick={() => move(1)}>→</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
@@ -1144,23 +1181,7 @@ function HomePage({ clock, navigate }) {
             <p>A selection of organizations I’ve collaborated with across in-house, studio, event, and campaign work.</p>
           </div>
         </div>
-        <div className="home-collaborator-marquee" role="list" aria-label="Organizations Alexander Chen has worked with">
-          <div className="home-collaborator-track">
-            {[0, 1].map((loop) => (
-              <div className="home-collaborator-set" aria-hidden={loop === 1 || undefined} key={loop}>
-                {profile.collaborators.map((collaborator, index) => (
-                  <CollaboratorCard
-                    collaborator={collaborator}
-                    index={index}
-                    navigate={navigate}
-                    duplicate={loop === 1}
-                    key={`${loop}-${collaborator.name}`}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <CollaboratorCarousel navigate={navigate} />
       </section>
 
       <section id="work" className="portfolio-section home-work-section">
