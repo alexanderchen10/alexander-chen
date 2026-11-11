@@ -367,13 +367,15 @@ function ContactLinks() {
   );
 }
 
+const globeLogoSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><circle cx=\"16\" cy=\"16\" r=\"12\" fill=\"none\" stroke=\"#7357ff\" stroke-width=\"3\"/><path d=\"M16 4c-1 3-5 3-5 6v3H6m5 0h7l3 4-3 3h-4v7m8-19-2 4 5 2h3\" fill=\"none\" stroke=\"#7357ff\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
 function BrandMark() {
-  return (
-    <picture>
-      <source media="(prefers-reduced-motion: reduce)" srcSet={assetHref("/branding/alexander-chen-continuous.png")} />
-      <img src={assetHref("/branding/alexander-chen-continuous-beacon.gif")} width="720" height="428" alt="Alexander Chen AC monogram" />
-    </picture>
-  );
+  useEffect(() => {
+    let icon = document.querySelector('link[rel="icon"]');
+    if (!icon) { icon = document.createElement("link"); icon.rel = "icon"; document.head.appendChild(icon); }
+    icon.type = "image/svg+xml";
+    icon.href = `data:image/svg+xml,${encodeURIComponent(globeLogoSvg)}`;
+  }, []);
+  return <span role="img" aria-label="Alexander Chen globe logo" style={{ display: "block", width: 52, height: 52, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: globeLogoSvg }} />;
 }
 
 function AvailabilityBadge() {
@@ -3923,5 +3925,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
