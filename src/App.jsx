@@ -447,7 +447,7 @@ function MobileHeader({ page, route, navigate }) {
 }
 
 function ProjectVisual({ project, surface = "detail" }) {
-  const { bannerVideo, coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
+  const { bannerVideo, cardImage, coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
 
   if (surface === "card" && project.coverImage) {
     return (
@@ -455,6 +455,10 @@ function ProjectVisual({ project, surface = "detail" }) {
         <img src={assetHref(project.coverImage)} alt={project.coverImageAlt || ""} loading="lazy" />
       </div>
     );
+  }
+
+  if (surface === "card" && cardImage) {
+    return <img className="visual project-asset" src={assetHref(cardImage)} alt={imageAlt || ""} loading="lazy" />;
   }
 
   if (surface === "detail" && bannerVideo) {

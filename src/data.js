@@ -224,6 +224,7 @@ export const workProjects = [
     organization: "Independent family project",
     role: "Product Designer & Builder",
     period: "September 2026 – Present",
+    cardImage: "/projects/work/utopia-vinyl/utopia-vinyl-card-thumbnail.jpg",
     image: "/projects/work/utopia-vinyl/utopia-vinyl-homepage-cover.webp",
     imageAlt: "Utopia Vinyl storefront homepage with the 黑膠理想國 turntable hero",
     coverEyebrow: "Product design · Independent commerce",
