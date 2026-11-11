@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
@@ -33,7 +33,7 @@ const pageFromRoute = (route) => {
   if (route === "about") return "about";
   if (route === "education") return "education";
   if (route === "ao-studio") return "ao-studio";
-  if (route === "playground") return "playground";
+  if (route === "playground") return "about";
   if (route === "playground/photography") return "playground/photography";
   if (route.startsWith("playground/photography/")) return route;
   if (route === "playground/design") return "playground/design";
@@ -295,9 +295,9 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
   const [beam, setBeam] = useState({ left: 0, width: 0 });
   useEffect(() => {
     const update = () => {
-      let active = page === "home" ? "work" : page.startsWith("project/") ? "work" : page.startsWith("playground") ? "playground" : page;
+      let active = page === "home" ? "work" : page.startsWith("project/") ? "work" : page.startsWith("playground") ? "about" : page;
       if (page === "home") {
-        for (const [id, name] of [["experience", "experience"], ["home-playground", "playground"]]) {
+        for (const [id, name] of [["experience", "experience"], ["home-playground", "about"]]) {
           if (document.getElementById(id)?.getBoundingClientRect().top <= window.innerHeight * .4) active = name;
         }
       }
@@ -325,36 +325,17 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
   return (
     <nav ref={navRef} className="primary-navigation" aria-label="Primary navigation">
       <ol className="numbered-links">
-        <li>
-          <a href={routeHref("work")} className={activeRoute === "work" ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
-            <span>01.</span><span>projects</span>
+        {[
+          { route: "work", label: "projects", destination: "/", anchor: "work" },
+          { route: "experience", label: "experience", destination: "/", anchor: "experience" },
+          { route: "education", label: "education", destination: "/", anchor: "education" },
+          { route: "about", label: "about & playground", destination: "/about" },
+          { route: "ao-studio", label: "ao studio", destination: "/ao-studio" },
+        ].map((item, index) => <li key={item.route}>
+          <a href={routeHref(item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
+            <span>{String(index + 1).padStart(2, "0")}.</span><span>{item.label}</span>
           </a>
-        </li>
-        <li>
-          <a href={routeHref("experience")} className={activeRoute === "experience" ? "active" : ""} onClick={(e) => go(e, "/", "experience")}>
-            <span>02.</span><span>experience</span>
-          </a>
-        </li>
-        <li>
-          <a href={routeHref("playground")} className={activeRoute === "playground" ? "active" : ""} onClick={(e) => go(e, "/playground")}>
-            <span>03.</span><span>playground</span>
-          </a>
-        </li>
-        <li>
-          <a href={routeHref("about")} className={activeRoute === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
-            <span>04.</span><span>about</span>
-          </a>
-        </li>
-        <li>
-          <a href={routeHref("ao-studio")} className={activeRoute === "ao-studio" ? "active" : ""} onClick={(e) => go(e, "/ao-studio")}>
-            <span>05.</span><span>ao studio</span>
-          </a>
-        </li>
-        <li>
-          <a href={routeHref("education")} className={activeRoute === "education" ? "active" : ""} onClick={(e) => go(e, "/", "education")}>
-            <span>06.</span><span>education</span>
-          </a>
-        </li>
+        </li>)}
       </ol>
       <span className="navigation-beam" aria-hidden="true" style={{ left: beam.left, width: beam.width }} />
     </nav>
@@ -1550,12 +1531,7 @@ function PlaygroundNavigation({ clock, navigate }) {
   return (
     <header className="playground-nav">
       <a className="playground-nav-brand" href={routeHref()} onClick={(event) => navigate(event, "/")}>{profile.name}</a>
-      <nav aria-label="Playground navigation">
-        <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span>01.</span> work</a>
-        <a className="active" href={routeHref("playground")} onClick={(event) => navigate(event, "/playground")}><span>02.</span> playground</a>
-        <a href={routeHref("about")} onClick={(event) => navigate(event, "/about")}><span>03.</span> about</a>
-        <a href={routeHref("ao-studio")} onClick={(event) => navigate(event, "/ao-studio")}><span>04.</span> ao studio</a>
-      </nav>
+      <NavigationLinks page="playground" route="playground" navigate={navigate} />
       <div className="playground-nav-meta">
         <a href={`mailto:${profile.email}`}>email <Arrow /></a>
         <span>{clock}</span>
@@ -1565,89 +1541,52 @@ function PlaygroundNavigation({ clock, navigate }) {
 }
 
 const playgroundScenes = [
-  { id: "taipei", label: "Taiwan", chapter: "chapter 01 · origin", title: "Taipei, Taiwan", image: "/projects/playground/taipei-101-pixel-background.png" },
-  { id: "toronto", label: "Toronto", chapter: "chapter 02 · next stop", title: "Toronto, Canada", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
+  { id: "taipei", label: "Taipei", image: "/projects/playground/taipei-101-pixel-background.png" },
+  { id: "toronto", label: "Toronto", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
 ];
 
-function PlaygroundPage({ clock, navigate }) {
+function PlaygroundPage({ clock, navigate, embedded = false }) {
+  const Wrapper = embedded ? "section" : "main";
+  const Heading = embedded ? "h2" : "h1";
+  const [pixelAlexActive, setPixelAlexActive] = useState(false);
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
-  const [alexX, setAlexX] = useState(42);
-  const [alexFacing, setAlexFacing] = useState(1);
-  const [alexJumping, setAlexJumping] = useState(false);
-  const jumpTimer = useRef(null);
   const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
 
-  const moveAlex = useCallback((direction) => {
-    setAlexFacing(direction);
-    setAlexX(position => Math.max(8, Math.min(92, position + direction * 4)));
-  }, []);
-
-  const jumpAlex = useCallback(() => {
-    window.clearTimeout(jumpTimer.current);
-    setAlexJumping(false);
-    window.requestAnimationFrame(() => window.requestAnimationFrame(() => setAlexJumping(true)));
-    jumpTimer.current = window.setTimeout(() => setAlexJumping(false), 680);
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      const tagName = event.target?.tagName?.toLowerCase();
-      if (["input", "textarea", "select", "button"].includes(tagName) || event.target?.isContentEditable) return;
-      if (["ArrowLeft", "a", "A"].includes(event.key)) { event.preventDefault(); moveAlex(-1); }
-      if (["ArrowRight", "d", "D"].includes(event.key)) { event.preventDefault(); moveAlex(1); }
-      if (["ArrowUp", "w", "W", " "].includes(event.key)) { event.preventDefault(); jumpAlex(); }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [jumpAlex, moveAlex]);
-
-  useEffect(() => () => window.clearTimeout(jumpTimer.current), []);
-
-  const chooseScene = (scene) => {
-    setSceneId(scene.id);
-    setAlexX(scene.id === "taipei" ? 42 : 48);
-    setAlexFacing(1);
-  };
-
   return (
-    <main className="playground-page">
-      <PlaygroundNavigation clock={clock} navigate={navigate} />
+    <Wrapper className={embedded ? "about-playground" : "playground-page"} id={embedded ? "about-playground" : undefined}>
+      {!embedded && <PlaygroundNavigation clock={clock} navigate={navigate} />}
+      {embedded && <header className="about-section-heading"><p>playground</p><h2>Made from curiosity.</h2><p>Photography, design experiments, games, and stories beyond the brief.</p></header>}
       <section
         className="playground-stage"
         aria-labelledby="playground-title"
         style={{ "--playground-background": `url(${assetHref(activeScene.image)})` }}
       >
-        <div className="playground-world" key={activeScene.id} aria-hidden="true" />
-        <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
-        <h1 className="playground-title" id="playground-title">Alex’s Playground</h1>
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
         <div className="playground-scene-switcher" role="group" aria-label="Choose a Playground location">
           <span>location</span>
           {playgroundScenes.map(scene => (
-            <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => chooseScene(scene)}>{scene.label}</button>
+            <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => setSceneId(scene.id)}>{scene.label}</button>
           ))}
         </div>
-        <div className={`playground-center playground-pixel-hub${alexJumping ? " is-jumping" : ""}`} style={{ "--alex-x": `${alexX}%`, "--alex-facing": alexFacing }}>
+        <div className={`playground-center playground-pixel-hub${pixelAlexActive ? " is-active" : ""}`}>
           <button
             className="playground-pixel-character"
             type="button"
-            aria-label="Make Pixel Alex jump"
-            onClick={jumpAlex}
+            aria-label={pixelAlexActive ? "Let Pixel Alex rest" : "Wake up Pixel Alex"}
+            aria-pressed={pixelAlexActive}
+            onClick={() => setPixelAlexActive(active => !active)}
           >
             <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
             <img src={assetHref("/projects/playground/pixel-chibi-alex.png")} alt="Pixel-art Chibi Alex holding a laptop and cinema camera" />
             <span className="playground-pixel-shadow" aria-hidden="true" />
           </button>
+          <Heading id="playground-title">Playground</Heading>
+          <p className="playground-hub-label">{pixelAlexActive ? "camera ready · explore away" : "tap alex · drag anything"}</p>
         </div>
-        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>A / D to move · W to jump</small></div>
-        <div className="playground-game-controls" role="group" aria-label="Move Pixel Alex">
-          <button type="button" aria-label="Move Alex left" onClick={() => moveAlex(-1)}>←</button>
-          <button type="button" aria-label="Make Alex jump" onClick={jumpAlex}>↑</button>
-          <button type="button" aria-label="Move Alex right" onClick={() => moveAlex(1)}>→</button>
-        </div>
+        {playgroundItems.map((item, index) => <PlaygroundItem index={index} item={item} key={item.id} />)}
       </section>
-    </main>
+    </Wrapper>
   );
 }
 
@@ -3542,7 +3481,7 @@ function EducationPage() {
   );
 }
 
-function AboutPage({ clock }) {
+function AboutPage({ clock, navigate }) {
   const highlightTerms = [
     "clear, consistent, and human",
     "AI-enabled workflows",
@@ -3562,7 +3501,7 @@ function AboutPage({ clock }) {
   return (
     <main className="main-content about-page">
       <section className="about-section">
-        <p className="section-label reveal reveal-fast">{about.eyebrow}</p>
+        <p className="section-label reveal reveal-fast">about & playground</p>
         <div className="about-layout">
           <div className="about-portrait reveal">
             <img
@@ -3631,6 +3570,7 @@ function AboutPage({ clock }) {
           </dl>
         </div>
       </section>
+      <PlaygroundPage clock={clock} navigate={navigate} embedded />
       <MobileFooter clock={clock} />
     </main>
   );
@@ -3825,7 +3765,7 @@ export default function App() {
 
   useEffect(() => {
     if (page === "education") document.title = `${profile.name} | Education`;
-    else if (page === "about") document.title = `${profile.name} | About`;
+    else if (page === "about") document.title = `${profile.name} | About & Playground`;
     else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
     else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
     else if (page === "playground/photography") document.title = `${profile.name} | My Art`;
@@ -3848,7 +3788,7 @@ export default function App() {
       {page === "education" ? (
         <EducationPage />
       ) : page === "about" ? (
-        <AboutPage clock={clock} />
+        <AboutPage clock={clock} navigate={navigate} />
       ) : page === "ao-studio" ? (
         <AoStudioPage clock={clock} navigate={navigate} />
       ) : page === "playground/photography" ? (
