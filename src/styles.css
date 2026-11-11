@@ -267,13 +267,16 @@ p, h1, h2, h3, ol { margin: 0; }
 }
 .home-hero-portrait-stage { position: absolute; z-index: 4; top: 5%; right: 0; bottom: 0; width: 54%; container-type: size; pointer-events: none; transform: translate(calc(var(--hero-pointer-x) * -12px), calc(var(--hero-pointer-y) * -8px)); transition: transform 280ms ease-out; }
 .home-hero-avatar {
-  --camera-aim: 0;
+  --camera-flash-x: 41%;
+  --camera-flash-y: 41%;
+  --camera-flash-size: 26%;
+  --avatar-blink-clip: inset(32% 35% 60% 36%);
   position: absolute;
   z-index: 3;
-  right: clamp(1%, 3vw, 5%);
-  bottom: -4%;
-  width: min(100%, 730px, 64cqh);
-  aspect-ratio: 2 / 3;
+  right: -4%;
+  bottom: -2%;
+  width: min(112%, 850px, 110cqh);
+  aspect-ratio: 1;
   padding: 0;
   border: 0;
   border-radius: 24px;
@@ -289,42 +292,45 @@ p, h1, h2, h3, ol { margin: 0; }
   filter: drop-shadow(0 28px 34px rgba(24,26,63,.2));
   isolation: isolate;
   pointer-events: none;
-  transform-origin: 56% 90%;
+  transform-origin: 50% 90%;
   animation: home-hero-avatar-float 5.5s ease-in-out infinite;
 }
-.home-hero-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.home-hero-avatar-idle, .home-hero-avatar-camera { transition: opacity 240ms ease-in-out; }
-.home-hero-avatar-idle { opacity: calc(1 - var(--camera-aim)); }
-.home-hero-avatar-camera { opacity: var(--camera-aim); mix-blend-mode: plus-lighter; }
-.home-hero-avatar-blink { z-index: 1; opacity: 0; animation: home-hero-avatar-blink 6.2s linear infinite; }
-.home-hero-avatar[aria-pressed="true"] { --camera-aim: 1; }
-@media (hover: hover) {
-  .home-hero:not(.is-paused) .home-hero-avatar:hover { --camera-aim: 1; }
+.home-hero-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.home-hero-avatar-idle { visibility: visible; clip-path: inset(56% 0 0 0); }
+.home-hero-avatar-camera { visibility: hidden; clip-path: inset(56% 0 0 0); }
+/* Head and hair always come from the same idle pixels; the body layers cannot show through them. */
+.home-hero-avatar-shared-head { z-index: 1; clip-path: inset(0 0 44% 0); }
+.home-hero-avatar-camera-foreground {
+  z-index: 2;
+  visibility: hidden;
+  clip-path: polygon(33% 30%, 35% 31%, 36% 32%, 48% 32%, 48% 42%, 49% 42%, 50% 44%, 49% 50%, 48% 53%, 50% 56%, 100% 56%, 100% 100%, 0 100%, 0 45%, 20% 45%, 22% 38%, 23% 34%, 25% 31%, 30% 30%);
 }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .home-hero-camera-hit-area {
-    position: absolute;
-    inset: 30% 64% 45% 2%;
-    pointer-events: auto;
-  }
-  .home-hero-avatar-art::after {
-    position: absolute;
-    z-index: 2;
-    top: 44.5%;
-    left: 22.7%;
-    width: 40%;
-    aspect-ratio: 1;
-    background:
-      radial-gradient(circle, #fff 8%, rgba(252,249,255,.96) 16%, rgba(187,178,255,.55) 34%, transparent 68%),
-      radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 100% 15% no-repeat,
-      radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 15% 100% no-repeat;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.55);
-    content: "";
-  }
-  .home-hero:not(.is-paused) .home-hero-avatar-art:has(.home-hero-camera-hit-area:hover)::after {
-    animation: home-hero-camera-flash 360ms ease-out 240ms both;
-  }
+.home-hero-avatar-camera-eye { z-index: 3; visibility: hidden; clip-path: ellipse(6% 3.8% at 58.6% 35.7%); }
+.home-hero-avatar-blink {
+  z-index: 4;
+  opacity: 0;
+  clip-path: var(--avatar-blink-clip);
+  animation: home-hero-avatar-blink 6.2s step-end infinite;
+}
+.home-hero-avatar[data-camera-aimed="true"] .home-hero-avatar-idle { visibility: hidden; }
+.home-hero-avatar[data-camera-aimed="true"] .home-hero-avatar-camera,
+.home-hero-avatar[data-camera-aimed="true"] .home-hero-avatar-camera-foreground,
+.home-hero-avatar[data-camera-aimed="true"] .home-hero-avatar-camera-eye { visibility: visible; }
+.home-hero-avatar[data-camera-aimed="true"] .home-hero-avatar-blink { visibility: hidden; }
+.home-hero-camera-flash {
+  position: absolute;
+  z-index: 5;
+  top: var(--camera-flash-y);
+  left: var(--camera-flash-x);
+  width: var(--camera-flash-size);
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle, #fff 8%, rgba(252,249,255,.96) 16%, rgba(187,178,255,.55) 34%, transparent 68%),
+    radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 100% 15% no-repeat,
+    radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 15% 100% no-repeat;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.55);
+  animation: home-hero-camera-flash 360ms ease-out 160ms both;
 }
 @keyframes home-hero-camera-flash {
   0% { opacity: 0; }
@@ -344,6 +350,7 @@ p, h1, h2, h3, ol { margin: 0; }
 .home-hero-orbit span:nth-child(4) { bottom: 18%; left: 22%; animation-delay: -1.6s; }
 .home-hero.is-paused .home-hero-avatar-art, .home-hero.is-paused .home-hero-orbit span { animation-play-state: paused; }
 .home-hero.is-paused .home-hero-avatar-blink { animation-play-state: paused; visibility: hidden; }
+.home-hero.is-paused .home-hero-camera-flash { display: none; }
 .home-hero.is-paused .home-hero-avatar img { transition: none; }
 
 @keyframes home-hero-avatar-float { 0%, 100% { transform: translateY(0) rotate(-.35deg); } 50% { transform: translateY(-12px) rotate(.35deg); } }
@@ -861,6 +868,7 @@ p, h1, h2, h3, ol { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .home-hero-avatar-art, .home-hero-avatar-blink, .home-hero-orbit span { animation: none; }
+  .home-hero-camera-flash { display: none; }
   .home-hero-avatar img { transition: none; }
   .home-hero-portrait-stage, .home-hero-orbit { transform: none; transition: none; }
   .home-collaborator-marquee { overflow-x: auto; }
@@ -2154,8 +2162,8 @@ p, h1, h2, h3, ol { margin: 0; }
   .home-hero-grid { background-size: 32px 32px; mask-image: linear-gradient(180deg, rgba(0,0,0,.7), transparent 72%); }
   .home-hero-copy { width: min(100%, 540px); }
   .home-hero-motion-toggle { right: 0; min-height: 36px; padding: 7px 9px; }
-  .home-hero-portrait-stage { position: relative; inset: auto; width: 100%; height: clamp(290px, 104vw, 435px); }
-  .home-hero-avatar { inset-inline: 0; bottom: 0; width: min(100%, 66.666cqh); margin-inline: auto; }
+  .home-hero-portrait-stage { position: relative; inset: auto; width: calc(100% + 48px); height: clamp(340px, 100vw, 420px); overflow: hidden; margin-inline: -24px; }
+  .home-hero-avatar { right: auto; bottom: -2%; left: 50%; width: min(108%, 440px, 102cqh); margin: 0; transform: translateX(-50%); }
   .home-hero-orbit-ring { top: 48%; right: 50%; width: min(82vw, 340px); transform: translate(50%, -50%) rotate(-10deg); }
   .home-hero-orbit span { padding: 7px 9px; font-size: 7px; }
   .home-hero-orbit span:nth-child(1) { top: 18%; right: 3%; }

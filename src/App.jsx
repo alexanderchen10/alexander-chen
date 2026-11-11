@@ -941,7 +941,33 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
 function HomeHero() {
   const [motionPaused, setMotionPaused] = useState(false);
   const [cameraAimed, setCameraAimed] = useState(false);
+  const [cameraHovered, setCameraHovered] = useState(false);
+  const [cameraFlash, setCameraFlash] = useState(0);
   const [givenName, ...surname] = profile.name.split(" ");
+  const isCameraAimed = cameraAimed || (!motionPaused && cameraHovered);
+
+  const triggerCameraFlash = () => {
+    if (motionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setCameraFlash((value) => value + 1);
+  };
+
+  const enterCameraPose = (event) => {
+    if (motionPaused || event.pointerType === "touch") return;
+    setCameraHovered(true);
+    triggerCameraFlash();
+  };
+
+  const toggleCameraPose = () => {
+    const nextCameraAimed = !cameraAimed;
+    setCameraAimed(nextCameraAimed);
+    if (nextCameraAimed || cameraHovered) triggerCameraFlash();
+  };
+
+  const toggleMotion = () => {
+    setMotionPaused((value) => !value);
+    setCameraHovered(false);
+    setCameraFlash(0);
+  };
 
   const updateParallax = (event) => {
     if (motionPaused || event.pointerType === "touch") return;
@@ -986,7 +1012,7 @@ function HomeHero() {
           className="home-hero-motion-toggle"
           type="button"
           aria-pressed={motionPaused}
-          onClick={() => setMotionPaused((value) => !value)}
+          onClick={toggleMotion}
         >
           <span aria-hidden="true">{motionPaused ? "▶" : "Ⅱ"}</span>
           {motionPaused ? "Play motion" : "Pause motion"}
@@ -994,31 +1020,53 @@ function HomeHero() {
         <button
           className="home-hero-avatar"
           type="button"
-          aria-label="Aim the chibi’s camera"
+          aria-label="Take a photo with Alex"
           aria-pressed={cameraAimed}
-          onClick={() => setCameraAimed((value) => !value)}
+          data-camera-aimed={isCameraAimed}
+          onPointerEnter={enterCameraPose}
+          onPointerLeave={() => setCameraHovered(false)}
+          onClick={toggleCameraPose}
         >
-          <span className="home-hero-avatar-art">
+          <span className="home-hero-avatar-art" aria-hidden="true">
             <img
               className="home-hero-avatar-idle"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-chibi-hd.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-bust-idle.webp")}
               alt=""
               fetchPriority="high"
               decoding="async"
             />
             <img
               className="home-hero-avatar-camera"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-camera-hd.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
+              alt=""
+              decoding="async"
+            />
+            {/* Reuse the idle head in both poses so the hair never shifts with the camera. */}
+            <img
+              className="home-hero-avatar-shared-head"
+              src={assetHref("/projects/about/alexander-chen-hero-bust-idle.webp")}
+              alt=""
+              decoding="async"
+            />
+            <img
+              className="home-hero-avatar-camera-foreground"
+              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
+              alt=""
+              decoding="async"
+            />
+            <img
+              className="home-hero-avatar-camera-eye"
+              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
               alt=""
               decoding="async"
             />
             <img
               className="home-hero-avatar-blink"
-              src={assetHref("/projects/about/alexander-chen-hero-avatar-blink-hd.webp")}
+              src={assetHref("/projects/about/alexander-chen-hero-bust-blink.webp")}
               alt=""
               decoding="async"
             />
-            <span className="home-hero-camera-hit-area" aria-hidden="true" />
+            {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
           </span>
         </button>
         <div className="home-hero-orbit" aria-label="Creative disciplines">

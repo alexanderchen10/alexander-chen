@@ -1219,7 +1219,7 @@ export const workProjects = [
     period: "October 2026",
     coverEyebrow: "AO Studio · Corporate photography",
     backLink: { route: "ao-studio", label: "AO Studio" },
-    image: "/projects/work/123dentist/portrait-01.webp",
+    image: "/projects/work/123dentist/portrait-21.webp",
     imageAlt: "Finished professional headshot from the 123Dentist portrait series",
     aspect: "4 / 5",
     mediaSections: [
