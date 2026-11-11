@@ -249,7 +249,8 @@ export const utopiaMetrics = {
 export const workProjects = [
   {
     slug: "gta-imaging",
-    title: "GTA Imaging",
+    showInWork: false,
+    title: "Email Campaign Improvements",
     organization: "GTA Imaging Inc.",
     role: "Client Success & Email Marketing Specialist",
     period: "October 2026",
@@ -1478,6 +1479,7 @@ export const about = {
     {
       organization: "GTA Imaging Inc.",
       projectSlugs: ["gta-imaging"],
+      projectLabels: { "gta-imaging": "Email Campaign Improvements" },
       location: "Toronto, Canada",
       badge: "GTA",
       role: "Client Success & Email Marketing Specialist",
