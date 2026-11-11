@@ -630,7 +630,7 @@ export const workProjects = [
     caseStudyTitle: "Loblaw Companies Limited",
     archiveStyle: true,
     archiveEyebrow: "Project index / 2024–2026",
-    archiveTitle: "Six projects. One employer-brand system.",
+    archiveTitle: "Seven projects. One employer-brand system.",
     archiveDescription: "Campaigns attract people, digital experiences explain the opportunity, and reusable systems help internal teams deliver the brand consistently.",
     thesis: {
       label: "Operating principle",
@@ -683,7 +683,7 @@ export const workProjects = [
         id: "loblaw-campaigns",
         number: "01",
         title: "Campaigns & storytelling",
-        description: "Two talent stories with different audiences: an external franchise recruitment campaign and an internal career-growth series.",
+        description: "Three talent stories with different audiences: franchise recruitment, internal mobility, and colleague career development.",
         projects: [
           {
             number: "01",
@@ -790,6 +790,52 @@ export const workProjects = [
               { type: "image", src: "/projects/work/loblaw/career-cafe/talent-talk-session.jpg", alt: "Career Café Talent Talk speakers and audience during the session", caption: "The Talent Talk in progress", aspect: "4 / 3", hero: false },
             ],
           },
+          {
+            number: "03",
+            eyebrow: "Internal mobility · In-store campaign",
+            title: "Careers Have Momentum",
+            description: "An in-store poster campaign encouraging store colleagues to turn their existing skills and experience into momentum toward corporate, leadership, HR, category, and supply-chain opportunities.",
+            cover: "/projects/work/loblaw/career-momentum-posters/loblaw-store-colleague.jpg",
+            coverAlt: "Loblaw Careers Have Momentum in-store career poster",
+            coverFit: "contain",
+            coverBackground: "#0b0c0d",
+            heroItems: [
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/loblaw-store-colleague.jpg", alt: "Loblaw Careers Have Momentum poster featuring a store colleague", fit: "contain" },
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/no-frills.jpg", alt: "No Frills Careers Have Momentum poster featuring a store colleague", fit: "contain" },
+            ],
+            meta: [
+              { label: "Role", value: "Creative Specialist · campaign adaptation & production" },
+              { label: "Deliverable", value: "Cross-banner in-store poster system" },
+              { label: "Audience", value: "Store colleagues" },
+              { label: "Placement", value: "In-store" },
+            ],
+            contextHeading: "Career growth needed to be visible where colleagues already worked.",
+            context: "The campaign was designed for store environments, where colleagues could immediately recognize themselves in the message. It reframed frontline experience as momentum toward the next role inside Loblaw rather than a limit on where a career could go.",
+            contextDetails: [
+              { heading: "Store leadership", body: "Store leaders were introduced to category roles such as Associate Merchant and Merchant, where their operational experience could have a national impact." },
+              { heading: "Transferable experience", body: "Administrators, bookkeepers, and peer recruiters were shown pathways into Human Resources and learning-and-development support roles." },
+              { heading: "Early careers", body: "Recent graduates were encouraged to explore corporate opportunities and supply-chain analyst roles." },
+            ],
+            contribution: "I helped create and adapt the poster system across Loblaw banners, pairing colleague-led photography with a direct internal-mobility message, clear career pathways, and each banner's visual identity. The system kept the core campaign recognizable while making every execution feel relevant to the store where it appeared.",
+            workHeading: "One message, adapted across the store network.",
+            workIntro: "The campaign used a consistent headline, modular information panel, and colleague portrait. Brand colour, logo treatment, photography, and call-to-action details changed across the Loblaw, No Frills, Real Canadian Superstore, and Shoppers Drug Mart executions.",
+            mediaPresentation: "poster-system",
+            items: [
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/loblaw-store-colleague.jpg", alt: "Loblaw Careers Have Momentum poster featuring a store colleague", caption: "Loblaw Companies Limited · store colleague execution", aspect: "1836 / 2376", hero: false },
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/loblaw-colleague.jpg", alt: "Loblaw Careers Have Momentum poster featuring a colleague", caption: "Loblaw Companies Limited · colleague execution", aspect: "1837 / 2376", hero: false },
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/no-frills.jpg", alt: "No Frills Careers Have Momentum poster featuring a store colleague", caption: "No Frills · in-store execution", aspect: "1836 / 2376", hero: false },
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/real-canadian-superstore.jpg", alt: "Real Canadian Superstore Careers Have Momentum poster featuring a store colleague", caption: "Real Canadian Superstore · in-store execution", aspect: "1836 / 2376", hero: false },
+              { type: "image", src: "/projects/work/loblaw/career-momentum-posters/shoppers-drug-mart.jpg", alt: "Shoppers Drug Mart Careers Have Momentum poster featuring a colleague", caption: "Shoppers Drug Mart · in-store execution", aspect: "1837 / 2376", hero: false },
+            ],
+            impactHeading: "Internal opportunity made visible at the point of work.",
+            impact: "By placing the campaign inside stores, the work connected career mobility with the everyday experience colleagues already had. The cross-banner system made the opportunity feel both enterprise-wide and locally relevant.",
+            impactMetrics: [
+              { label: "Selected poster executions", value: "5" },
+              { label: "Loblaw banners represented", value: "4" },
+              { label: "Career pathways highlighted", value: "3" },
+            ],
+            impactSource: "Portfolio evidence: the supplied in-store campaign artwork.",
+          },
         ],
       },
       {
@@ -799,7 +845,7 @@ export const workProjects = [
         description: "A careers-site refresh focused on a more coherent candidate journey and a reusable employer-brand foundation.",
         projects: [
           {
-            number: "03",
+            number: "04",
             eyebrow: "Careers UX · Visual system",
             title: "Revamping the careers experience",
             description: "I redesigned and standardized career-site banners in Figma, building a consistent system that could flex across candidate touchpoints and future recruitment needs.",
@@ -816,7 +862,7 @@ export const workProjects = [
         description: "A centralized production system and guided learning experience designed to make high-quality employer-brand work faster, clearer, and more consistent.",
         projects: [
           {
-            number: "04",
+            number: "05",
             eyebrow: "Systems · Information architecture",
             title: "Employer-brand digital toolkit",
             description: "I used colleague feedback and UX data to restructure the global Talent Acquisition SharePoint hub, then organized templates, banners, photography, and customizable assets into an easier system for teams to navigate and produce from.",
@@ -887,7 +933,7 @@ export const workProjects = [
             items: [],
           },
           {
-            number: "05",
+            number: "06",
             eyebrow: "Social enablement · Training design",
             title: "Social Media Toolkit 2.0",
             description: "A revised learning experience that helps HR employees create clear, consistent social media assets, even when content creation is not part of their everyday role.",
@@ -923,7 +969,7 @@ export const workProjects = [
         description: "The system became more than a library: it needed a clear introduction that helped HR teams understand when, why, and how to use it.",
         projects: [
           {
-            number: "06",
+            number: "07",
             eyebrow: "Enablement · Change communication",
             title: "Introducing the toolkit across HR",
             description: "I introduced the employer-brand toolkit to the broader HR department, translating the system into practical guidance and helping teams adopt a shared approach to employer-brand work.",

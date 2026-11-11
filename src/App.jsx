@@ -2002,7 +2002,7 @@ const detailSectionsFor = (entry) => detailSections.map((section) =>
 ] : section);
 
 function ProjectDetailHeroItem({ item }) {
-  return <div className="project-detail-hero-item"><ZoomableImage src={item.src} alt={item.alt || ""} loading="eager" /></div>;
+  return <div className={`project-detail-hero-item${item.fit === "contain" ? " project-detail-hero-item-contain" : ""}`}><ZoomableImage src={item.src} alt={item.alt || ""} loading="eager" /></div>;
 }
 
 function ProjectDetailSidebar({ clock, navigate, detail, route }) {
