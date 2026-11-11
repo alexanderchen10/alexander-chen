@@ -7,7 +7,7 @@ import GtaEmailCaseStudy from "./GtaEmailCaseStudy";
 import UtopiaBuyerJourney from "./UtopiaBuyerJourney";
 import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
-import "./UtopiaJourneyToggle.css";
+import "./ProjectJourneyNavigation.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
 const Arrow = ({ className }) => <span className={className} aria-hidden="true">↗</span>;
@@ -166,16 +166,17 @@ function usePage() {
   return { page, route, navigate };
 }
 
-function useProjectProgress(sections = []) {
+function useProjectProgress(sections = [], containerId) {
   const [progress, setProgress] = useState(0);
   const [activeId, setActiveId] = useState(sections[0]?.id || "");
   const sectionKey = sections.map((section) => section.id).join("|");
 
   useEffect(() => {
     const update = () => {
-      const root = document.documentElement;
+      const root = (containerId && document.getElementById(containerId)) || document.documentElement;
+      const start = containerId ? window.scrollY + root.getBoundingClientRect().top : 0;
       const scrollable = Math.max(1, root.scrollHeight - window.innerHeight);
-      const nextProgress = Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100));
+      const nextProgress = Math.min(100, Math.max(0, ((window.scrollY - start) / scrollable) * 100));
       const marker = window.innerHeight * 0.38;
       const nextActive = sections.reduce((current, section) => {
         const element = document.getElementById(section.id);
@@ -192,14 +193,13 @@ function useProjectProgress(sections = []) {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [sectionKey]);
+  }, [sectionKey, containerId]);
 
   return { progress, activeId };
 }
 
-function ProjectProgressHUD({ sections, label = "Project journey", embedded = false }) {
-  const { progress, activeId } = useProjectProgress(sections);
-  const [barOnly, setBarOnly] = useState(false);
+function ProjectProgressHUD({ sections, label = "Project journey", embedded = false, containerId, barOnly, onBarOnlyChange }) {
+  const { progress, activeId } = useProjectProgress(sections, containerId);
   const chapterNav = useRef(null);
   const [previewIndex, setPreviewIndex] = useState(null);
   const tooltipId = `chapter-tip-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
@@ -213,8 +213,9 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
   }, [activeId, barOnly]);
   const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
   const activeSection = sections[activeIndex] || sections[0];
-  const isUtopiaJourney = label === "Utopia Vinyl project journey";
-  const chapterNavId = `utopia-journey-chapters-${embedded ? "desktop" : "mobile"}`;
+  const chapterNavId = `journey-chapters-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
+
+  useEffect(() => setPreviewIndex(null), [chapterNavId, barOnly]);
 
   if (!sections.length) return null;
 
@@ -223,7 +224,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
   const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 
   return (
-    <aside className={`project-progress-hud project-progress-compact${embedded ? " project-progress-hud-topbar" : ""}${isUtopiaJourney ? " utopia-journey-hud" : ""}${isUtopiaJourney && barOnly ? " is-bar-only" : ""}`} aria-label={label}>
+    <aside className={`project-progress-hud project-progress-compact has-progress-toggle${embedded ? " project-progress-hud-topbar" : ""}${barOnly ? " is-bar-only" : ""}`} aria-label={label}>
       <div className="project-progress-copy">
         <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
         <strong>{activeSection?.label}</strong>
@@ -232,7 +233,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
       <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
         <i style={{ width: `${progress}%` }} />
       </div>
-      <nav ref={chapterNav} id={isUtopiaJourney ? chapterNavId : undefined} hidden={isUtopiaJourney && barOnly} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
+      <nav ref={chapterNav} id={chapterNavId} hidden={barOnly} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
         {sections.map((section, index) => (
           <button
             type="button"
@@ -252,7 +253,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
           </button>
         ))}
       </nav>
-      {isUtopiaJourney && <button className="project-progress-toggle" type="button" aria-expanded={!barOnly} aria-controls={chapterNavId} onClick={() => { setBarOnly((current) => !current); setPreviewIndex(null); }}>{barOnly ? "Show sections" : "Bar only"}<span aria-hidden="true">{barOnly ? "+" : "−"}</span></button>}
+      <button className="project-progress-toggle" type="button" aria-expanded={!barOnly} aria-controls={chapterNavId} onClick={() => onBarOnlyChange(!barOnly)}>{barOnly ? "Show sections" : "Bar only"}<span aria-hidden="true">{barOnly ? "+" : "−"}</span></button>
       {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{previewSummary}</div>}
     </aside>
   );
@@ -384,7 +385,7 @@ function AvailabilityBadge() {
   );
 }
 
-function Sidebar({ page, route, navigate, clock, projectProgress }) {
+function Sidebar({ page, route, navigate, clock, projectProgress, barOnly, onBarOnlyChange }) {
   const moveTopbarGlow = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--topbar-x", `${event.clientX - bounds.left}px`);
@@ -410,7 +411,7 @@ function Sidebar({ page, route, navigate, clock, projectProgress }) {
       </div>
       <div className={`topbar-secondary${projectProgress ? " topbar-secondary-progress" : ""}`}>
         {projectProgress ? (
-          <ProjectProgressHUD sections={projectProgress.sections} label={projectProgress.label} embedded />
+          <ProjectProgressHUD {...projectProgress} barOnly={barOnly} onBarOnlyChange={onBarOnlyChange} embedded />
         ) : (
           <>
             <div className="profile-copy reveal">
@@ -943,6 +944,7 @@ function HomeExperience({ navigate }) {
             return (
               <div
                 className="home-experience-card"
+                id={`experience-role-${index}`}
                 key={`${experience.organization}-${experience.role}`}
                 style={{ "--experience-deal-direction": index % 2 === 0 ? -1 : 1 }}
               >
@@ -2338,7 +2340,7 @@ const detailSections = [
 ];
 const detailSectionsFor = (entry) => detailSections.map((section) =>
   section.id === "detail-contribution" && entry.solution ? { ...section, label: "solution" } : section
-).flatMap((section) => section.id === "detail-work" && entry.storyboardItems ? [
+).flatMap((section) => section.id === "detail-work" && entry.storyboardItems?.length ? [
   { id: "detail-storyboard", label: "storyboard" },
   { id: "detail-final-output", label: "final output" },
 ] : section);
@@ -3043,7 +3045,7 @@ function UtopiaVinylPage({ clock, navigate, project }) {
 
   useEffect(() => {
     let frame = 0;
-    const headers = [...document.querySelectorAll(".global-topbar, .mobile-header, .utopia-journey-hud")];
+    const headers = [...document.querySelectorAll(".global-topbar, .mobile-header, .mobile-project-progress .project-progress-hud")];
     const measureNavigation = () => {
       const page = pageRef.current;
       if (!page) return;
@@ -3776,6 +3778,43 @@ function projectProgressFor(project, detail) {
 export default function App() {
   const { page, route, navigate } = usePage();
   const clock = useClock();
+  const [barOnly, setBarOnly] = useState(() => {
+    try { return window.localStorage.getItem("portfolio-progress-bar-only") === "true"; }
+    catch { return false; }
+  });
+  const [experienceInView, setExperienceInView] = useState(false);
+
+  useEffect(() => {
+    try { window.localStorage.setItem("portfolio-progress-bar-only", String(barOnly)); }
+    catch { /* Navigation still works when browser storage is unavailable. */ }
+  }, [barOnly]);
+
+  useEffect(() => {
+    if (page !== "home") {
+      setExperienceInView(false);
+      return;
+    }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const bounds = document.getElementById("experience")?.getBoundingClientRect();
+      const marker = window.innerHeight * .38;
+      setExperienceInView((current) => {
+        // Keep the bar stable when its own height shifts the section boundary.
+        const visible = !!bounds && bounds.top <= marker + (current ? 80 : 0) && bounds.bottom > marker;
+        return current === visible ? current : visible;
+      });
+    };
+    const queueUpdate = () => { if (!frame) frame = window.requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+    };
+  }, [page]);
   const selectedDetail = detailFromRoute(page);
   const selectedProject = selectedDetail?.project || projectFromRoute(page);
   const selectedPhotographyAlbum = page.startsWith("playground/photography/")
@@ -3785,7 +3824,15 @@ export default function App() {
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const isUtopia = selectedProject?.slug === "utopia-vinyl";
-  const projectProgress = !isPlayground ? projectProgressFor(selectedProject, selectedDetail) : null;
+  const projectProgress = !isPlayground ? projectProgressFor(selectedProject, selectedDetail) || (page === "home" && experienceInView ? {
+    label: "Professional experience journey",
+    containerId: "experience",
+    sections: about.experience.map((experience, index) => ({
+      id: `experience-role-${index}`,
+      label: `${experience.organization} · ${experience.role}`,
+      summary: `${experience.organization} · ${experience.role}`,
+    })),
+  } : null) : null;
   const usesTopbar = !isPlayground;
 
   useEffect(() => {
@@ -3830,9 +3877,9 @@ export default function App() {
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
+      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} barOnly={barOnly} onBarOnlyChange={setBarOnly} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
-      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD sections={projectProgress.sections} label={projectProgress.label} /></div>}
+      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD {...projectProgress} barOnly={barOnly} onBarOnlyChange={setBarOnly} /></div>}
       {page === "work" ? (
         <ProjectsPage Media={ProjectVisual} />
       ) : page.startsWith("project-log") ? (
