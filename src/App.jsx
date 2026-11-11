@@ -1829,11 +1829,33 @@ function StructuredMediaItem({ item, title, index, presentation }) {
   );
 }
 
+function OverviewProjectCard({ project, chapter, entry, projectIndex }) {
+  const fallbackCover = [...(entry.items || []), ...(entry.storyboardItems || []), ...(entry.finalOutputItems || [])].find((item) => item.type === "image" || item.poster);
+  const cover = entry.cover ? { src: entry.cover, alt: entry.coverAlt || `${entry.title} project cover` } : fallbackCover;
+  return (
+    <a className="overview-project-card reveal" href={routeHref(projectDetailRoute(project, chapter, projectIndex))}>
+      <div className="overview-project-cover">
+        {cover ? <img src={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} loading="lazy" style={entry.coverFit || entry.coverBackground ? { objectFit: entry.coverFit, background: entry.coverBackground } : undefined} /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
+        <span className="overview-project-open" aria-hidden="true">↗</span>
+      </div>
+      <div className="overview-project-copy">
+        <p>{entry.eyebrow}</p>
+        <h3>{entry.title}</h3>
+        <span>{entry.description}</span>
+        <small>View project <span aria-hidden="true">→</span></small>
+      </div>
+    </a>
+  );
+}
+
 function StructuredCaseStudyPage({ clock, navigate, project }) {
   const [openGlossaryId, setOpenGlossaryId] = useState(null);
   const openGlossaryChapter = project.chapters.find((chapter) => chapter.id === openGlossaryId);
+  const projectCount = project.chapters.reduce((count, chapter) => count + chapter.projects.length, 0);
   const progressSections = useMemo(() => [
     { id: "structured-overview", label: "Overview" },
+    ...(project.thesis ? [{ id: "structured-thesis", label: project.thesis.label || "Approach" }] : []),
+    ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Proof" }] : []),
     { id: "structured-work", label: "Project index" },
     ...project.chapters.map((chapter) => ({ id: chapter.id, label: chapter.title })),
   ], [project]);
@@ -1857,6 +1879,7 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
             <dl className="structured-case-study-meta" aria-label="Project details">
               <div><dt>Role</dt><dd>{project.role}</dd></div>
               <div><dt>Timeline</dt><dd>{project.period}</dd></div>
+              {project.format && <div><dt>Format</dt><dd>{project.format}</dd></div>}
             </dl>
             <a className="project-scroll-cue" href={`#structured-work`} onClick={(event) => { event.preventDefault(); document.getElementById("structured-work")?.scrollIntoView({ behavior: "smooth" }); }}>
               Explore the project <span aria-hidden="true">↓</span>
@@ -1864,13 +1887,50 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
           </div>
         </header>
 
-        {project.impact?.length > 0 && (
+        {project.thesis && <section className="structured-thesis reveal" id="structured-thesis" aria-labelledby={`${project.slug}-thesis`}>
+          <p>{project.thesis.label || "Working principle"}</p>
+          <div>
+            <h2 id={`${project.slug}-thesis`}>{project.thesis.title}</h2>
+            <p>{project.thesis.body}</p>
+          </div>
+        </section>}
+
+        {project.proofMetrics?.length > 0 ? (
+          <section className="structured-proof-strip structured-proof-strip-metrics reveal" id="structured-proof" aria-label="Project proof">
+            {project.proofMetrics.map((metric, index) => <article key={`${metric.value}-${metric.label}`}><span>{String(index + 1).padStart(2, "0")}</span><strong>{metric.value}</strong><p>{metric.label}</p></article>)}
+          </section>
+        ) : project.impact?.length > 0 && (
           <section className="structured-proof-strip reveal" aria-label="Project proof">
             {project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}
           </section>
         )}
 
-        <section className="structured-glossary reveal" id="structured-work" aria-labelledby={`${project.slug}-glossary`}>
+        {project.archiveStyle ? <section className="structured-archive" id="structured-work" aria-labelledby={`${project.slug}-archive`}>
+          <header className="structured-archive-header reveal">
+            <p>{project.archiveEyebrow || "Project index"}</p>
+            <div>
+              <span>{String(projectCount).padStart(2, "0")} projects</span>
+              <h2 id={`${project.slug}-archive`}>{project.archiveTitle || "Explore the work."}</h2>
+              <p>{project.archiveDescription}</p>
+            </div>
+          </header>
+          {project.chapters.map((chapter) => (
+            <section className="structured-chapter overview-chapter structured-archive-group" id={chapter.id} aria-labelledby={`${chapter.id}-title`} key={chapter.id}>
+              <header className="structured-chapter-header reveal">
+                <p>{chapter.number}</p>
+                <div>
+                  <span className="structured-chapter-count">{String(chapter.projects.length).padStart(2, "0")} {chapter.projects.length === 1 ? "project" : "projects"}</span>
+                  <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
+                  <p>{chapter.description}</p>
+                </div>
+              </header>
+              <div className="overview-project-grid">
+                {chapter.projects.map((entry, projectIndex) => <OverviewProjectCard project={project} chapter={chapter} entry={entry} projectIndex={projectIndex} key={`${chapter.id}-${projectIndex}`} />)}
+              </div>
+            </section>
+          ))}
+        </section> : <>
+          <section className="structured-glossary reveal" id="structured-work" aria-labelledby={`${project.slug}-glossary`}>
           <header>
             <p>Project index</p>
             <div><h2 id={`${project.slug}-glossary`}>Explore the work.</h2><p className="structured-glossary-lede">Choose a chapter to preview its projects, then open the full story.</p></div>
@@ -1901,39 +1961,23 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
               ))}
             </div>}
           </nav>
-        </section>
-
-        {project.chapters.map((chapter) => (
-          <section className="structured-chapter overview-chapter" id={chapter.id} aria-labelledby={`${chapter.id}-title`} key={chapter.id}>
-            <header className="structured-chapter-header reveal">
-              <p>{chapter.number}</p>
-              <div>
-                <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
-                <p>{chapter.description}</p>
-              </div>
-            </header>
-
-            <div className="overview-project-grid">
-              {chapter.projects.map((entry, projectIndex) => {
-                const cover = [...(entry.items || []), ...(entry.storyboardItems || []), ...(entry.finalOutputItems || [])].find((item) => item.type === "image" || item.poster);
-                return (
-                  <a className="overview-project-card reveal" href={routeHref(projectDetailRoute(project, chapter, projectIndex))} key={`${chapter.id}-${projectIndex}`}>
-                    <div className="overview-project-cover">
-                      {cover ? <img src={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} loading="lazy" /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
-                      <span className="overview-project-open" aria-hidden="true">↗</span>
-                    </div>
-                    <div className="overview-project-copy">
-                      <p>{entry.eyebrow}</p>
-                      <h3>{entry.title}</h3>
-                      <span>{entry.description}</span>
-                      <small>View project <span aria-hidden="true">→</span></small>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
           </section>
-        ))}
+
+          {project.chapters.map((chapter) => (
+            <section className="structured-chapter overview-chapter" id={chapter.id} aria-labelledby={`${chapter.id}-title`} key={chapter.id}>
+              <header className="structured-chapter-header reveal">
+                <p>{chapter.number}</p>
+                <div>
+                  <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
+                  <p>{chapter.description}</p>
+                </div>
+              </header>
+              <div className="overview-project-grid">
+                {chapter.projects.map((entry, projectIndex) => <OverviewProjectCard project={project} chapter={chapter} entry={entry} projectIndex={projectIndex} key={`${chapter.id}-${projectIndex}`} />)}
+              </div>
+            </section>
+          ))}
+        </>}
         <nav className="immersive-project-next reveal" aria-label="Continue exploring">
           <span>Continue exploring</span>
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↗</span></a>
@@ -2148,12 +2192,18 @@ function ProjectDetailSectionHeading({ label, title }) {
   return <header className="project-detail-section-heading"><p className="project-detail-section-label">{label}</p><h2>{title}</h2></header>;
 }
 
+function ProjectDocumentLinks({ entry }) {
+  const documents = entry.documents || (entry.documentUrl ? [{ href: entry.documentUrl, label: entry.documentLabel || "Open project document" }] : []);
+  if (documents.length === 0) return null;
+  return <div className="project-detail-document-links">{documents.map((document) => <a className="project-detail-gallery-link" href={assetHref(document.href)} target="_blank" rel="noreferrer" key={document.href}>{document.label} ↗</a>)}</div>;
+}
+
 function ProjectDetailPage({ clock, navigate, detail }) {
   const { project, chapter, entry, index } = detail;
   const galleryRef = useRef(null);
   const sections = detailSectionsFor(entry);
   const projectRoute = `project/${project.slug}`;
-  const heroImages = (entry.items || []).filter((item) => item.type === "image" && item.hero !== false);
+  const heroImages = (entry.heroItems || entry.items || []).filter((item) => item.type === "image" && item.hero !== false);
   const entries = project.chapters.flatMap((section) => section.projects.map((item, itemIndex) => ({ chapter: section, entry: item, index: itemIndex })));
   const currentIndex = entries.findIndex((item) => item.chapter.id === chapter.id && item.index === index);
   const next = entries[currentIndex + 1];
@@ -2187,6 +2237,9 @@ function ProjectDetailPage({ clock, navigate, detail }) {
           <p>{entry.eyebrow} <span>·</span> {project.title}</p>
           <h1>{entry.title}</h1>
           <div>{entry.description}</div>
+          {entry.meta?.length > 0 && <dl className="project-detail-intro-meta" aria-label={`${entry.title} project details`}>
+            {entry.meta.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}
+          </dl>}
           {entry.profileUrl && <a className="project-detail-profile-button" href={entry.profileUrl} target="_blank" rel="noopener noreferrer">Explore @tt_supermarket on Instagram <span aria-hidden="true">↗</span></a>}
         </header>
         <section className="project-detail-section reveal" id="detail-context">
@@ -2232,7 +2285,7 @@ function ProjectDetailPage({ clock, navigate, detail }) {
             {entry.items?.length > 0 && <div ref={galleryRef} className={`project-detail-gallery project-detail-gallery-${entry.items.length}${entry.mediaPresentation ? ` project-detail-gallery-${entry.mediaPresentation}` : ""}`}>
               {entry.items.map((item, itemIndex) => <StructuredMediaItem item={item} title={entry.title} index={itemIndex} presentation={entry.mediaPresentation} key={item.src || item.videoId || `${item.label}-${itemIndex}`} />)}
             </div>}
-            {entry.documentUrl && <a className="project-detail-gallery-link" href={assetHref(entry.documentUrl)} target="_blank" rel="noreferrer">{entry.documentLabel || "Open project document"} ↗</a>}
+            <ProjectDocumentLinks entry={entry} />
             {entry.additionalPosts && <details className="project-detail-related-posts">
               <summary>More posts from the account <span>{String(entry.additionalPosts.length).padStart(2, "0")}</span></summary>
               <div>{entry.additionalPosts.map((post, postIndex) => <a href={post.url} target="_blank" rel="noopener noreferrer" key={post.url}>
@@ -2254,7 +2307,7 @@ function ProjectDetailPage({ clock, navigate, detail }) {
               <div className={`project-detail-gallery project-detail-gallery-${entry.storyboardItems.length}`}>
                 {entry.storyboardItems.map((item, itemIndex) => <StructuredMediaItem item={item} title={entry.title} index={itemIndex} key={item.src} />)}
               </div>
-              {entry.documentUrl && <a className="project-detail-gallery-link" href={assetHref(entry.documentUrl)} target="_blank" rel="noreferrer">{entry.documentLabel || "Open project document"} ↗</a>}
+              <ProjectDocumentLinks entry={entry} />
             </div>
           </section>
           <section className="project-detail-section project-detail-final-output reveal" id="detail-final-output">
