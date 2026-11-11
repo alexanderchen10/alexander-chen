@@ -3049,3 +3049,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .project-progress-hud nav button:focus-visible{outline:3px solid #8b6ae8;outline-offset:3px}
 @media(max-width:1100px) and (min-width:810px){.project-progress-hud.project-progress-hud-topbar{grid-template-columns:minmax(170px,.6fr) minmax(70px,1fr);gap:10px 18px}.project-progress-hud nav button{font-size:11px;padding:8px 10px}.project-progress-hud nav button .project-progress-label{font-size:11px}}
 @media(max-width:809px){.mobile-project-progress .project-progress-hud{background:#faf9fd;border-color:#d4cde4;padding:12px;box-shadow:0 4px 14px #29213b18}.mobile-project-progress .project-progress-hud nav{display:flex;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;gap:8px;margin-top:10px;padding:2px 2px 6px;scroll-padding:8px;scrollbar-width:thin;scrollbar-color:#a295bf #efecf5}.mobile-project-progress .project-progress-hud nav button{flex:0 0 auto;min-height:44px;padding:8px 12px}.mobile-project-progress .project-progress-hud nav button .project-progress-label{white-space:nowrap;font-size:12px}.mobile-project-progress .project-progress-copy{font-size:11px}}
+
+/* Visible boundaries keep each project together across screen sizes. */
+.project-card { border: 1px solid rgba(57, 48, 92, .24); border-radius: 24px; padding: clamp(14px, 1.5vw, 22px); background: rgba(255,255,255,.68); box-shadow: 0 4px 18px rgba(30,24,55,.035); }
+.project-card:is(:hover, :focus-visible, :focus-within) { border-color: rgba(115,87,255,.7); }
+@media (max-width: 760px) { .project-card { border-radius: 20px; padding: 14px; } .project-card-summary { max-width: 100%; } }
+
