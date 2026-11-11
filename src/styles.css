@@ -2330,7 +2330,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .playground-nav-meta { display: none; }
   .playground-stage { display: grid; min-height: 0; grid-template-columns: 1fr 1fr; gap: 42px 12px; padding: 28px 14px 48px; }
   .playground-kicker, .playground-note { position: static; grid-column: 1 / -1; }
-  .playground-note { max-width: 230px; margin-top: -26px; justify-self: end; text-align: right; }
+  .playground-note { display: none; }
   .playground-center { position: relative; top: auto; left: auto; grid-column: 1 / -1; min-height: 310px; align-content: center; transform: none; }
   .playground-person { transform: scale(.9); transform-origin: bottom center; }
   .plaything { position: relative; inset: auto; width: auto; min-width: 0; animation: none; }

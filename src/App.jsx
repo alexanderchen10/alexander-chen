@@ -1567,7 +1567,7 @@ function PlaygroundPage({ clock, navigate }) {
       <section
         className="playground-stage"
         aria-labelledby="playground-title"
-        style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-background-moving.webp")})` }}
+        style={{ "--playground-background": `url(${assetHref("/projects/playground/taipei-101-pixel-background.png")})` }}
       >
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
