@@ -193,6 +193,15 @@ function useProjectProgress(sections = []) {
 
 function ProjectProgressHUD({ sections, label = "Project journey", embedded = false }) {
   const { progress, activeId } = useProjectProgress(sections);
+  const chapterNav = useRef(null);
+  useEffect(() => {
+    const nav = chapterNav.current;
+    const active = nav?.querySelector('[aria-current="step"]');
+    if (active && nav.scrollWidth > nav.clientWidth) {
+      const left = active.offsetLeft - nav.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+      nav.scrollTo({ left: Math.max(0, left), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  }, [activeId]);
   const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
   const activeSection = sections[activeIndex] || sections[0];
 
@@ -210,7 +219,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
       <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
         <i style={{ width: `${progress}%` }} />
       </div>
-      <nav aria-label={`${label} chapters`}>
+      <nav ref={chapterNav} aria-label={`${label} chapters`}>
         {sections.map((section, index) => (
           <button
             type="button"
@@ -220,7 +229,8 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
             aria-current={section.id === activeId ? "step" : undefined}
             key={section.id}
           >
-            <span>{String(index + 1).padStart(2, "0")}</span>
+            <span className="project-progress-number">{String(index + 1).padStart(2, "0")}</span>
+            <span className="project-progress-label">{section.label}</span>
           </button>
         ))}
       </nav>
