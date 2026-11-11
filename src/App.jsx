@@ -194,6 +194,8 @@ function useProjectProgress(sections = []) {
 function ProjectProgressHUD({ sections, label = "Project journey", embedded = false }) {
   const { progress, activeId } = useProjectProgress(sections);
   const chapterNav = useRef(null);
+  const [previewIndex, setPreviewIndex] = useState(null);
+  const tooltipId = `chapter-tip-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
   useEffect(() => {
     const nav = chapterNav.current;
     const active = nav?.querySelector('[aria-current="step"]');
@@ -210,7 +212,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
   const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <aside className={`project-progress-hud${embedded ? " project-progress-hud-topbar" : ""}`} aria-label={label}>
+    <aside className={`project-progress-hud project-progress-compact${embedded ? " project-progress-hud-topbar" : ""}`} aria-label={label}>
       <div className="project-progress-copy">
         <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
         <strong>{activeSection?.label}</strong>
@@ -219,12 +221,17 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
       <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
         <i style={{ width: `${progress}%` }} />
       </div>
-      <nav ref={chapterNav} aria-label={`${label} chapters`}>
+      <nav ref={chapterNav} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
         {sections.map((section, index) => (
           <button
             type="button"
             className={section.id === activeId ? "active" : ""}
             onClick={() => jumpTo(section.id)}
+            onPointerEnter={(event) => { if (event.pointerType !== "touch") setPreviewIndex(index); }}
+            onPointerLeave={() => setPreviewIndex(null)}
+            onFocus={() => setPreviewIndex(index)}
+            onBlur={() => setPreviewIndex(null)}
+            aria-describedby={previewIndex === index ? tooltipId : undefined}
             aria-label={`Go to ${section.label}`}
             aria-current={section.id === activeId ? "step" : undefined}
             key={section.id}
@@ -234,6 +241,7 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
           </button>
         ))}
       </nav>
+      {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{sections[previewIndex].label}</div>}
     </aside>
   );
 }

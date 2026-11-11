@@ -3136,3 +3136,27 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .project-card:is(:hover, :focus-visible, :focus-within) { border-color: rgba(115,87,255,.7); }
 @media (max-width: 760px) { .project-card { border-radius: 20px; padding: 14px; } .project-card-summary { max-width: 100%; } }
 
+
+/* Compact chapter navigation shared by every portfolio page. */
+.project-progress-hud.project-progress-compact,
+.project-progress-hud.project-progress-hud-topbar.project-progress-compact { display: flex; align-items: center; gap: 16px; padding-block: 7px; }
+.project-progress-hud-topbar.project-progress-compact { position: relative; }
+.project-progress-compact .project-progress-copy { display: none; }
+.project-progress-hud.project-progress-compact .project-progress-line { flex: 1 1 80px; min-width: 28px; height: 3px; margin: 0; }
+.project-progress-hud.project-progress-compact nav { display: flex; flex: 0 1 auto; min-width: 0; grid-column: auto; flex-wrap: nowrap; align-items: center; gap: 5px; margin: 0; padding: 3px; overflow-x: auto; scrollbar-width: none; }
+.project-progress-compact nav::-webkit-scrollbar { display: none; }
+.project-progress-hud.project-progress-compact nav button { display: grid; place-items: center; flex: 0 0 32px; width: 32px; min-width: 32px; min-height: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; box-shadow: none; color: var(--ink-50); }
+.project-progress-hud.project-progress-compact nav button .project-progress-number { display: inline; min-width: 0; height: auto; padding: 0; background: none; border-radius: 0; color: inherit; font-size: 11px; font-weight: 500; }
+.project-progress-hud.project-progress-compact nav button .project-progress-label { display: none; }
+.project-progress-hud.project-progress-compact nav button.active { background: var(--tech-purple); color: #fff; }
+.project-progress-hud.project-progress-compact nav button:hover:not(.active) { background: var(--tech-lilac); color: var(--tech-purple); }
+.project-progress-compact .project-progress-tooltip { position: absolute; top: calc(100% + 7px); right: 0; z-index: 60; display: flex; gap: 10px; align-items: baseline; width: max-content; max-width: min(340px,100%); padding: 11px 14px; border: 1px solid var(--ink-08); border-radius: 10px; background: var(--paper); color: var(--ink-80); box-shadow: 0 8px 24px rgba(20,20,35,.12); font-size: 12px; line-height: 1.5; pointer-events: none; }
+.project-progress-tooltip > span { color: var(--tech-purple); font-variant-numeric: tabular-nums; }
+@media (max-width: 809px) {
+ .mobile-project-progress .project-progress-hud.project-progress-compact { gap: 9px; padding: 5px 9px; border-radius: 12px; }
+ .mobile-project-progress .project-progress-compact .project-progress-line { flex: 0 1 56px; }
+ .mobile-project-progress .project-progress-compact nav { flex: 1 1 auto; justify-content: flex-start; }
+}
+@media (pointer: coarse) {
+ .project-progress-hud.project-progress-compact nav button { flex-basis: 44px; width: 44px; min-width: 44px; height: 44px; }
+}
