@@ -2932,3 +2932,41 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media(max-width:700px){.gta-case{padding:30px 22px 70px}.gta-hero{padding-top:30px}.gta-screens{gap:12px}.gta-highlights{gap:12px}.gta-highlights span{font-size:11px}.gta-case section{margin-top:55px}.gta-chart{padding:22px}.gta-products{grid-template-columns:repeat(2,1fr)}.gta-learning-grid{grid-template-columns:1fr;gap:8px}.gta-product-detail{flex-direction:column;gap:10px}.gta-screens figcaption{font-size:12px}.gta-screens figcaption span{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.gta-bar{transition:none}}
 
+
+/* Education: editorial degree card and continuing study. */
+.education-page { max-width: 1320px; margin-inline: auto; padding-top: 150px; }
+.education-intro { margin-bottom: 56px; max-width: 800px; }
+.education-intro h1 { margin: 18px 0 24px; font-size: clamp(42px, 6vw, 80px); line-height: 1.02; letter-spacing: -.065em; }
+.education-intro > p:last-child { max-width: 600px; font-size: 18px; color: var(--ink-65); }
+.education-degree { position: relative; overflow: hidden; isolation: isolate; padding: clamp(24px, 4vw, 54px); color: #fff; background: linear-gradient(125deg, #10134f, #2521a5 65%, #3932c2); box-shadow: 0 24px 70px #14135418; }
+.education-degree::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 25% 0%, #ffffff20, transparent 55%); }
+.education-degree-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.education-degree-top img { width: 190px; max-width: 52%; height: 80px; object-fit: contain; filter: grayscale(1) brightness(0) invert(1); }
+.education-seal { width: 92px; height: 92px; border: 1px solid #ffffff60; border-radius: 50%; display: grid; place-content: center; text-align: center; font-size: 8px; letter-spacing: .15em; line-height: 1.6; color: #e5d0a2; transform: rotate(12deg); }
+.education-seal span { font-size: 26px; }
+.education-degree h2 { margin: 38px 0 100px; max-width: 900px; font-family: Georgia, serif; font-size: clamp(36px, 5.3vw, 72px); line-height: 1.1; letter-spacing: -.05em; }
+.education-degree h2 em { color: #e5d0a2; font-weight: 400; }
+.education-year { position: absolute; top: 47%; right: 5%; font-size: clamp(70px, 11vw, 145px); line-height: 1; letter-spacing: -.07em; color: transparent; -webkit-text-stroke: 1px #ffffff45; }
+.education-degree-bottom { position: relative; }
+.education-degree-bottom a { display: inline-flex; gap: 18px; align-items: center; font-weight: 600; text-decoration: underline; text-underline-offset: 5px; }
+.education-degree-bottom p { margin: 14px 0; color: #ffffffba; }
+.education-tags { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 0; }
+.education-tags li { padding: 9px 16px; border-radius: 30px; background: #ffffff18; font-size: 14px; }
+.education-beyond, .education-threads { margin-top: 64px; }
+.education-beyond h2, .education-threads h2 { font-size: 28px; letter-spacing: -.045em; margin-bottom: 24px; }
+.education-certificate { padding: 30px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: #eeebff; border-left: 3px solid #3932c2; }
+.education-certificate h3 { font-size: 25px; letter-spacing: -.04em; }
+.education-certificate + .education-certificate { margin-top: 16px; }
+.education-certificate p { margin-top: 8px; color: var(--ink-65); }
+.education-certificate > span { font-size: 13px; white-space: nowrap; }
+.education-threads .education-tags li { background: #eae8ef; }
+@media (max-width: 700px) {
+  .education-page { padding-top: 120px; }
+  .education-intro { margin-bottom: 36px; }
+  .education-degree h2 { margin: 30px 0 100px; }
+  .education-year { top: 48%; }
+  .education-seal { width: 70px; height: 70px; font-size: 6px; }
+  .education-certificate { align-items: flex-start; flex-direction: column; padding: 24px; }
+  .education-beyond, .education-threads { margin-top: 40px; }
+}
+

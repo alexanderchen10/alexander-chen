@@ -27,6 +27,7 @@ const detailFromRoute = (route) => {
 };
 const pageFromRoute = (route) => {
   if (route === "about") return "about";
+  if (route === "education") return "education";
   if (route === "ao-studio") return "ao-studio";
   if (route === "playground") return "playground";
   if (route === "playground/photography") return "playground/photography";
@@ -292,6 +293,11 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
         <li>
           <a href={routeHref("ao-studio")} className={page === "ao-studio" ? "active" : ""} onClick={(e) => go(e, "/ao-studio")}>
             <span>05.</span><span>ao studio</span>
+          </a>
+        </li>
+        <li>
+          <a href={routeHref("education")} className={page === "education" ? "active" : ""} onClick={(e) => go(e, "/", "education")}>
+            <span>06.</span><span>education</span>
           </a>
         </li>
       </ol>
@@ -3166,6 +3172,48 @@ function IcffGalleryPage({ clock, navigate, project }) {
   );
 }
 
+function EducationPage() {
+  return (
+    <main className="main-content education-page">
+      <header className="education-intro">
+        <p className="section-label">Education</p>
+        <h1>Learning that shapes<br />the way I work.</h1>
+        <p>Digital Enterprise Management at the University of Toronto, with a foundation in UX design and a hands-on creative practice.</p>
+      </header>
+      <section className="education-degree" aria-labelledby="education-degree-title">
+        <div className="education-degree-top">
+          <img src={assetHref("/brands/university-of-toronto.webp")} alt="University of Toronto" />
+          <span className="education-seal" aria-label="Class of 2024">U OF T<br /><span aria-hidden="true">✧</span><br />CLASS OF 2024</span>
+        </div>
+        <h2 id="education-degree-title">Honours Bachelor <em>of Arts</em></h2>
+        <span className="education-year" aria-hidden="true">2024</span>
+        <div className="education-degree-bottom">
+          <a href="https://www.utm.utoronto.ca/" target="_blank" rel="noreferrer">University of Toronto Mississauga <Arrow /></a>
+          <p>Graduated · June 2024</p>
+          <ul className="education-tags" aria-label="Program of study"><li>Digital Enterprise Management Specialist</li></ul>
+        </div>
+      </section>
+      <section className="education-beyond" aria-labelledby="education-beyond-title">
+        <h2 id="education-beyond-title">Beyond the degree</h2>
+        <article className="education-certificate">
+          <div><h3>UX Design Certificate</h3><p>Juno College of Technology · Remote, Canada</p></div>
+          <span>Completed · June 2023</span>
+        </article>
+        <article className="education-certificate">
+          <div><h3>Flight Attendant Training</h3><p>Porter Airlines · Aviation safety &amp; passenger service</p></div>
+        </article>
+        <article className="education-certificate">
+          <div><h3>Smart Serve Ontario</h3><p>Responsible alcohol service</p></div>
+        </article>
+      </section>
+      <section className="education-threads" aria-labelledby="education-threads-title">
+        <h2 id="education-threads-title">Study threads</h2>
+        <ul className="education-tags">{["Digital enterprise", "UX design", "Content strategy", "Digital marketing", "Visual storytelling", "Project management"].map((thread) => <li key={thread}>{thread}</li>)}</ul>
+      </section>
+    </main>
+  );
+}
+
 function AboutPage({ clock }) {
   const highlightTerms = [
     "clear, consistent, and human",
@@ -3362,7 +3410,8 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    if (page === "about") document.title = `${profile.name} | About`;
+    if (page === "education") document.title = `${profile.name} | Education`;
+    else if (page === "about") document.title = `${profile.name} | About`;
     else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
     else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
     else if (page === "playground/photography") document.title = `${profile.name} | My Art`;
@@ -3381,7 +3430,9 @@ export default function App() {
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
       {!isPlayground && (selectedDetail ? <ProjectDetailSidebar clock={clock} navigate={navigate} detail={selectedDetail} route={page} /> : isIcffGallery ? <IcffSidebar clock={clock} navigate={navigate} project={selectedProject} /> : isIcffHub ? <IcffHubSidebar clock={clock} navigate={navigate} project={selectedProject} /> : <Sidebar page={page} route={route} navigate={navigate} clock={clock} />)}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
-      {page === "about" ? (
+      {page === "education" ? (
+        <EducationPage />
+      ) : page === "about" ? (
         <AboutPage clock={clock} />
       ) : page === "ao-studio" ? (
         <AoStudioPage clock={clock} navigate={navigate} />
@@ -3418,3 +3469,4 @@ export default function App() {
     </div>
   );
 }
+
