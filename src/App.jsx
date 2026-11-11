@@ -1339,7 +1339,18 @@ function HomeToolkits() {
 function HomePlayground({ navigate }) {
   const items = playgroundItems.filter(item => ["photography", "projects", "porter-airlines"].includes(item.id));
   return <section id="home-playground" className="home-playground-section" aria-labelledby="home-playground-title">
-    <header><p className="section-label">Playground</p><h2 id="home-playground-title">A little room to explore.</h2><p>Photography, design experiments, and stories from life outside the brief.</p><a href={routeHref("playground")} onClick={event => navigate(event, "/playground")}>Explore the playground <Arrow /></a></header>
+    <div className="home-playground-intro">
+      <header><p className="section-label">Playground</p><h2 id="home-playground-title">A little room to explore.</h2><p>Photography, design experiments, and stories from life outside the brief.</p><a href={routeHref("playground")} onClick={event => navigate(event, "/playground")}>Explore the playground <Arrow /></a></header>
+      <a className="home-playground-pixel" href={routeHref("playground")} onClick={event => navigate(event, "/playground")} aria-label="Meet Pixel Alex and enter the playground">
+        <span className="home-playground-pixel-art" aria-hidden="true">
+          <i className="pixel-spark pixel-spark-one" />
+          <i className="pixel-spark pixel-spark-two" />
+          <i className="pixel-spark pixel-spark-three" />
+          <img src={assetHref("/projects/playground/pixel-chibi-alex.png")} alt="" />
+        </span>
+        <span className="home-playground-pixel-copy"><small>meet pixel alex</small><strong>Come in and play <Arrow /></strong></span>
+      </a>
+    </div>
     <div className="home-playground-grid">{items.map(item => <a href={routeHref(item.href.replace(/^#/, ""))} onClick={event => navigate(event, "/", item.href.replace(/^#/, ""))} key={item.id}><img src={assetHref(item.image)} alt={item.alt} loading="lazy" /><span>{item.label}<Arrow /></span></a>)}</div>
   </section>;
 }
@@ -1548,6 +1559,8 @@ function PlaygroundNavigation({ clock, navigate }) {
 }
 
 function PlaygroundPage({ clock, navigate }) {
+  const [pixelAlexActive, setPixelAlexActive] = useState(false);
+
   return (
     <main className="playground-page">
       <PlaygroundNavigation clock={clock} navigate={navigate} />
@@ -1556,9 +1569,23 @@ function PlaygroundPage({ clock, navigate }) {
         aria-labelledby="playground-title"
         style={{ "--playground-background": `url(${assetHref("/projects/playground/playground-background-moving.webp")})` }}
       >
-        <h1 className="playground-title" id="playground-title">Playground</h1>
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
+        <div className={`playground-center playground-pixel-hub${pixelAlexActive ? " is-active" : ""}`}>
+          <button
+            className="playground-pixel-character"
+            type="button"
+            aria-label={pixelAlexActive ? "Let Pixel Alex rest" : "Wake up Pixel Alex"}
+            aria-pressed={pixelAlexActive}
+            onClick={() => setPixelAlexActive(active => !active)}
+          >
+            <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
+            <img src={assetHref("/projects/playground/pixel-chibi-alex.png")} alt="Pixel-art Chibi Alex holding a laptop and cinema camera" />
+            <span className="playground-pixel-shadow" aria-hidden="true" />
+          </button>
+          <h1 id="playground-title">Playground</h1>
+          <p className="playground-hub-label">{pixelAlexActive ? "camera ready · explore away" : "tap alex · drag anything"}</p>
+        </div>
         {playgroundItems.map((item, index) => <PlaygroundItem index={index} item={item} key={item.id} />)}
       </section>
     </main>
