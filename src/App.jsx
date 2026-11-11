@@ -2413,6 +2413,7 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
   const railRef = useRef(null);
   const [showAll, setShowAll] = useState(false);
   const isPortraitGrid = section.layout === "portrait-grid";
+  const isStaticGrid = isPortraitGrid || ["editorial-grid", "editorial-triptych"].includes(section.layout);
   const visibleItems = showAll || !section.initialCount ? section.items : section.items.slice(0, section.initialCount);
   const scrollRail = (direction) => {
     const rail = railRef.current;
@@ -2433,11 +2434,25 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
       </header>
       {section.items.length > 1 && (
         <div className="immersive-gallery-controls" aria-label={`${section.title} gallery controls`}>
-          <span>{isPortraitGrid ? `${visibleItems.length} of ${section.items.length} portraits · Select to enlarge` : `${section.items.length} project assets`}</span>
-          {!isPortraitGrid && <div><button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${section.title} asset`}>←</button><button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${section.title} asset`}>→</button></div>}
+          <span>{isPortraitGrid ? `${visibleItems.length} of ${section.items.length} portraits · Select to enlarge` : isStaticGrid ? `${section.items.length} photographs · Select to enlarge` : `${section.items.length} project assets`}</span>
+          {!isStaticGrid && <div><button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${section.title} asset`}>←</button><button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${section.title} asset`}>→</button></div>}
         </div>
       )}
-      <div ref={railRef} id={`${project.slug}-gallery-${sectionIndex}`} className={`immersive-media-rail immersive-media-${section.layout || "wide"}`}>
+      {section.article ? (
+        <div className="published-editorial-feature">
+          <figure>
+            <ZoomableImage src={section.items[0].src} alt={section.items[0].alt} />
+            <figcaption>Photography by Alexander Chen</figcaption>
+          </figure>
+          <div>
+            <p className="published-editorial-meta">{section.article.publisher}<br /><time dateTime={section.article.dateTime}>{section.article.date}</time></p>
+            <h3>{section.article.title}</h3>
+            <p>{section.article.summary}</p>
+            <dl>{section.article.credits.map(([label, name]) => <div key={label}><dt>{label}</dt><dd>{name}</dd></div>)}</dl>
+            <a href={section.article.url} target="_blank" rel="noreferrer">Read the full feature <Arrow /></a>
+          </div>
+        </div>
+      ) : <div ref={railRef} id={`${project.slug}-gallery-${sectionIndex}`} className={`immersive-media-rail immersive-media-${section.layout || "wide"}`}>
         {visibleItems.map((item, itemIndex) => (
           <figure className="immersive-media-item" key={item.src || item.videoId} style={{ "--media-aspect": item.aspect || "16 / 10" }}>
             <div className="immersive-media-frame">
@@ -2471,7 +2486,7 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
             {item.caption && <figcaption><span>{String(itemIndex + 1).padStart(2, "0")}</span>{item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<Arrow /></a> : item.caption}</figcaption>}
           </figure>
         ))}
-      </div>
+      </div>}
       {visibleItems.length < section.items.length && (
         <button className="immersive-gallery-show-all" type="button" aria-controls={`${project.slug}-gallery-${sectionIndex}`} onClick={() => setShowAll(true)}>
           View all {section.items.length} portraits <span aria-hidden="true">↓</span>
@@ -2563,7 +2578,7 @@ function CaseStudyPage({ clock, navigate, project }) {
             </div>
           </nav>
         )}
-        {project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
+        {project.showProofStrip !== false && project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
         {project.mediaSections?.map((section, sectionIndex) => <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
         {project.subprojects?.length > 0 && (
           <section className="case-study-subprojects immersive-project-collection reveal" id="project-collection" aria-labelledby={`${project.slug}-projects`}>
@@ -2586,7 +2601,7 @@ function CaseStudyPage({ clock, navigate, project }) {
         </section>
         <nav className="immersive-project-next reveal" aria-label="Continue exploring projects">
           <span>{nextProject ? "Next project" : "Continue exploring"}</span>
-          <a href={routeHref(nextProject ? `project/${nextProject.slug}` : "work")} onClick={(event) => navigate(event, "/", nextProject ? `project/${nextProject.slug}` : "work")}>{nextProject ? nextProject.title : "Return to selected work"} <span aria-hidden="true">↗</span></a>
+          <a href={routeHref(nextProject ? `project/${nextProject.slug}` : backRoute)} onClick={(event) => navigate(event, "/", nextProject ? `project/${nextProject.slug}` : backRoute)}>{nextProject ? nextProject.title : `Return to ${backLabel}`} <span aria-hidden="true">↗</span></a>
         </nav>
       </article>
       <MobileFooter clock={clock} />

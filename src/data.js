@@ -21,7 +21,7 @@ export const profile = {
     { name: "Google", logo: "/brands/google.png", scale: 0.72, background: "#f5f8ff", foreground: "#2959c8" },
     { name: "SASE Company", logo: "/brands/sase.png", scale: 0.72, background: "#ffc928", foreground: "#111111" },
     { name: "123Dentist", logo: "/brands/123dentist.svg", scale: 0.84, background: "#eefaff", foreground: "#087ca6", projectSlug: "123dentist" },
-    { name: "VEERAH", logo: "/brands/veerah.png", scale: 0.82, background: "#ffffff", foreground: "#111111" },
+    { name: "VEERAH", logo: "/brands/veerah.png", scale: 0.82, background: "#ffffff", foreground: "#111111", projectSlug: "veerah" },
     { name: "Flippa", logo: "/brands/flippa.svg", scale: 0.8, background: "#edf8f2", foreground: "#146b48" },
     { name: "University of Toronto", logo: "/brands/university-of-toronto.webp", scale: 0.92, background: "#ffffff", foreground: "#163b69" },
     { name: "No Frills", logo: "/brands/no-frills.png", scale: 0.9, background: "#fff7d6", foreground: "#d9291c" },
@@ -213,7 +213,7 @@ const icffSubprojects = [
   },
 ];
 
-export const aoStudioProjectSlugs = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity", "123dentist"];
+export const aoStudioProjectSlugs = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity", "123dentist", "veerah"];
 
 export const workProjects = [
   {
@@ -1252,6 +1252,86 @@ export const workProjects = [
       },
     ],
     impact: ["Created a set of professional headshots with a consistent look across the marketing team and board of directors."],
+  },
+  {
+    slug: "veerah",
+    showInWork: false,
+    title: "VEERAH",
+    description: "Photography, co-writing, and an on-site interview with Laura Huang for VEERAH’s Warrior to Watch series.",
+    thesis: "Introduce the brand through the independent women who wear it.",
+    organization: "VEERAH · AO Studio",
+    role: "Photographer, Co-writer & Interview Collaborator",
+    period: "Published March 3, 2021",
+    coverEyebrow: "AO Studio · Editorial brand storytelling",
+    backLink: { route: "ao-studio", label: "AO Studio" },
+    image: "/projects/work/veerah/veerah-13.webp",
+    imageAlt: "Laura Huang smiling beneath a clear umbrella during the VEERAH editorial shoot",
+    aspect: "534 / 799",
+    sourceUrl: "https://www.veerah.com/blogs/women-empowerment/warrior-to-watch-laura-huang",
+    sourceLabel: "Read the published interview",
+    showProofStrip: false,
+    mediaSections: [
+      {
+        eyebrow: "The person behind the brand",
+        title: "A portrait of independence.",
+        description: "The brief was to promote VEERAH and the independent women wearing it. I photographed Laura in everyday settings, giving her personality as much space as the footwear.",
+        layout: "editorial-grid",
+        items: [
+          { src: "/projects/work/veerah/veerah-06.webp", alt: "Laura smiling while holding a book in a warmly lit library", caption: "Personality before product", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-09.webp", alt: "Laura standing beside library shelves in a black dress and ankle boots", caption: "An environmental portrait", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-01.webp", alt: "Laura laughing while seated by a window with her feet resting on a chair", caption: "A relaxed moment", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-04.webp", alt: "Laura in a teal dress, seated beside a small table in a bright lounge", caption: "A second setting and a different mood", aspect: "534 / 799" },
+        ],
+      },
+      {
+        eyebrow: "Footwear in context",
+        title: "The details tell a story, too.",
+        description: "Close details connect the portraits back to VEERAH. The shoes appear as part of what Laura wears and how she moves, alongside the wider story of the woman herself.",
+        layout: "portrait-pair",
+        items: [
+          { src: "/projects/work/veerah/veerah-02.webp", alt: "Close view of Laura’s pointed pumps as she rests her feet on a chair by a window", caption: "FRIDA pumps in a lived-in setting", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-05.webp", alt: "Pointed pumps with floral brooches, worn with Laura’s teal dress", caption: "Footwear and accessories", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-07.webp", alt: "Laura’s black ankle boots photographed beside a woven chair", caption: "HEDY boots indoors", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-10.webp", alt: "Black ankle boots with decorative details photographed outdoors", caption: "A closer look at the details", aspect: "534 / 799" },
+          { src: "/projects/work/veerah/veerah-12.webp", alt: "Laura’s ankle boots reflected on a rain-soaked wooden walkway", caption: "Movement and reflection", aspect: "534 / 799" },
+        ],
+      },
+      {
+        eyebrow: "On-site collaboration",
+        title: "A conversation in the moment.",
+        description: "Alongside photographing the feature, I collaborated on the on-site interview with VEERAH founder Stacey Chang and co-wrote the article. The conversation and images brought Laura’s perspective into the brand story.",
+        layout: "editorial-triptych",
+        items: [
+          { src: "/projects/work/veerah/veerah-03.webp", alt: "Laura crossing a rain-soaked street beneath a clear umbrella", caption: "Out into the city", aspect: "534 / 750" },
+          { src: "/projects/work/veerah/veerah-11.webp", alt: "Laura standing under an umbrella beside a geometric building facade", caption: "Portraits on location", aspect: "450 / 675" },
+          { src: "/projects/work/veerah/veerah-13.webp", alt: "A close portrait of Laura smiling under a clear umbrella", caption: "A more personal perspective", aspect: "534 / 799" },
+        ],
+      },
+      {
+        eyebrow: "The published feature",
+        title: "Warrior to Watch: Laura Huang.",
+        description: "The finished feature pairs the portrait series with a conversation about adversity, opportunity, and women’s leadership.",
+        layout: "article-feature",
+        article: {
+          publisher: "VEERAH · Warrior to Watch · Series 003",
+          date: "March 3, 2021",
+          dateTime: "2021-03-03",
+          title: "Meet Laura Huang",
+          summary: "A brand story built around the woman wearing the shoes. Explore the full interview and photography on VEERAH’s website.",
+          url: "https://www.veerah.com/blogs/women-empowerment/warrior-to-watch-laura-huang",
+          credits: [
+            ["Photography & co-writing", "Alexander Chen"],
+            ["Interview collaboration", "With Stacey Chang, VEERAH founder"],
+            ["Photography assistants", "Joanne Fan & Olivia Chen"],
+          ],
+        },
+        items: [{ src: "/projects/work/veerah/veerah-08.webp", alt: "Laura working at a laptop in a library lined with bookshelves", aspect: "800 / 534" }],
+      },
+    ],
+    impact: [
+      "A published editorial feature combining my photography and co-writing for VEERAH’s Warrior to Watch series.",
+      "A portrait and footwear story designed to promote VEERAH through the independent women who wear the brand.",
+    ],
   },
 ];
 
