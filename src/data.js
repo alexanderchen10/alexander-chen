@@ -1306,6 +1306,26 @@ export const workProjects = [
     showProofStrip: false,
     mediaSections: [
       {
+        eyebrow: "The published feature",
+        title: "Warrior to Watch: Laura Huang.",
+        description: "The finished feature pairs the portrait series with a conversation about adversity, opportunity, and women’s leadership.",
+        layout: "article-feature",
+        article: {
+          publisher: "VEERAH · Warrior to Watch · Series 003",
+          date: "March 3, 2021",
+          dateTime: "2021-03-03",
+          title: "Meet Laura Huang",
+          summary: "A brand story built around the woman wearing the shoes. Explore the full interview and photography on VEERAH’s website.",
+          url: "https://www.veerah.com/blogs/women-empowerment/warrior-to-watch-laura-huang",
+          credits: [
+            ["Photography & co-writing", "Alexander Chen"],
+            ["Interview collaboration", "With Stacey Chang, VEERAH founder"],
+            ["Photography assistants", "Joanne Fan & Olivia Chen"],
+          ],
+        },
+        items: [{ src: "/projects/work/veerah/veerah-08.webp", alt: "Laura working at a laptop in a library lined with bookshelves", aspect: "800 / 534" }],
+      },
+      {
         eyebrow: "The person behind the brand",
         title: "A portrait of independence.",
         description: "The brief was to promote VEERAH and the independent women wearing it. I photographed Laura in everyday settings, giving her personality as much space as the footwear.",
@@ -1340,26 +1360,6 @@ export const workProjects = [
           { src: "/projects/work/veerah/veerah-11.webp", alt: "Laura standing under an umbrella beside a geometric building facade", caption: "Portraits on location", aspect: "450 / 675" },
           { src: "/projects/work/veerah/veerah-13.webp", alt: "A close portrait of Laura smiling under a clear umbrella", caption: "A more personal perspective", aspect: "534 / 799" },
         ],
-      },
-      {
-        eyebrow: "The published feature",
-        title: "Warrior to Watch: Laura Huang.",
-        description: "The finished feature pairs the portrait series with a conversation about adversity, opportunity, and women’s leadership.",
-        layout: "article-feature",
-        article: {
-          publisher: "VEERAH · Warrior to Watch · Series 003",
-          date: "March 3, 2021",
-          dateTime: "2021-03-03",
-          title: "Meet Laura Huang",
-          summary: "A brand story built around the woman wearing the shoes. Explore the full interview and photography on VEERAH’s website.",
-          url: "https://www.veerah.com/blogs/women-empowerment/warrior-to-watch-laura-huang",
-          credits: [
-            ["Photography & co-writing", "Alexander Chen"],
-            ["Interview collaboration", "With Stacey Chang, VEERAH founder"],
-            ["Photography assistants", "Joanne Fan & Olivia Chen"],
-          ],
-        },
-        items: [{ src: "/projects/work/veerah/veerah-08.webp", alt: "Laura working at a laptop in a library lined with bookshelves", aspect: "800 / 534" }],
       },
     ],
     impact: [
