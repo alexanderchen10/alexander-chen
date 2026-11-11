@@ -287,6 +287,36 @@ p, h1, h2, h3, ol { margin: 0; }
 @media (hover: hover) {
   .home-hero:not(.is-paused) .home-hero-avatar:hover { --camera-aim: 1; }
 }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .home-hero-camera-hit-area {
+    position: absolute;
+    inset: 30% 64% 45% 2%;
+    pointer-events: auto;
+  }
+  .home-hero-avatar-art::after {
+    position: absolute;
+    z-index: 2;
+    top: 44.5%;
+    left: 22.7%;
+    width: 40%;
+    aspect-ratio: 1;
+    background:
+      radial-gradient(circle, #fff 8%, rgba(252,249,255,.96) 16%, rgba(187,178,255,.55) 34%, transparent 68%),
+      radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 100% 15% no-repeat,
+      radial-gradient(ellipse, rgba(234,227,255,.86), transparent 70%) center / 15% 100% no-repeat;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.55);
+    content: "";
+  }
+  .home-hero:not(.is-paused) .home-hero-avatar-art:has(.home-hero-camera-hit-area:hover)::after {
+    animation: home-hero-camera-flash 360ms ease-out 240ms both;
+  }
+}
+@keyframes home-hero-camera-flash {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15); }
+}
 .home-hero-orbit-ring { position: absolute; z-index: 1; top: 49%; right: 8%; width: min(44vw, 620px); aspect-ratio: 1; border: 1px solid rgba(50,57,145,.2); border-radius: 50%; transform: translateY(-50%) rotate(-10deg); }
 .home-hero-orbit-ring::before, .home-hero-orbit-ring::after { position: absolute; border: 1px solid rgba(115,87,255,.15); border-radius: inherit; content: ""; }
 .home-hero-orbit-ring::before { inset: 11%; }
@@ -584,10 +614,9 @@ p, h1, h2, h3, ol { margin: 0; }
   .home-experience-highlights li:hover::before { transform: scaleX(1); }
 }
 .home-experience-projects {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
   margin-top: 24px;
 }
 .home-experience-projects > p {
@@ -598,6 +627,7 @@ p, h1, h2, h3, ol { margin: 0; }
 .home-experience-project {
   position: relative;
   display: inline-flex;
+  max-width: 100%;
   min-height: 44px;
   align-items: center;
   gap: 10px;
@@ -610,7 +640,8 @@ p, h1, h2, h3, ol { margin: 0; }
   scroll-margin-block-start: var(--experience-deck-top);
   transition: border-color 260ms ease, background 260ms ease;
 }
-.home-experience-project-arrow { transition: transform 300ms var(--ease); }
+.home-experience-project > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.home-experience-project-arrow { flex-shrink: 0; transition: transform 300ms var(--ease); }
 .home-experience-project:hover, .home-experience-project:focus-visible {
   border-color: var(--experience-accent);
   background: #fff;
@@ -713,7 +744,6 @@ p, h1, h2, h3, ol { margin: 0; }
 
 @media (max-width: 560px) {
   .home-experience-highlights { grid-template-columns: 1fr; }
-  .home-experience-projects > p { flex-basis: 100%; }
 }
 
 
@@ -819,7 +849,9 @@ p, h1, h2, h3, ol { margin: 0; }
   .home-hero-avatar-art, .home-hero-avatar-blink, .home-hero-orbit span { animation: none; }
   .home-hero-avatar img { transition: none; }
   .home-hero-portrait-stage, .home-hero-orbit { transform: none; transition: none; }
+  .home-collaborator-marquee { overflow-x: auto; }
   .home-collaborator-track { animation: none; transform: translateX(0); }
+  .home-collaborator-set[aria-hidden="true"] { display: none; }
   .project-card, .project-media, .project-logo-cover img { transition-duration: 1ms; }
   .project-card:is(:hover, :focus-visible) { transform: none; }
   .global-topbar:hover, .global-topbar:focus-within, .global-topbar .numbered-links a:hover, .global-topbar .numbered-links a:focus-visible, .global-topbar .profile-copy p:hover, .global-topbar .sidebar-meta span:hover { transform: none; }
@@ -2019,6 +2051,13 @@ p, h1, h2, h3, ol { margin: 0; }
 .ao-studio-details span { color: var(--ink-40); font-size: 11px; text-transform: lowercase; }
 .ao-studio-details p { max-width: 310px; margin-top: 36px; color: var(--ink-65); font-size: 14px; line-height: 1.5; }
 .ao-studio-details a { border-bottom: 1px solid var(--ink-40); }
+.ao-studio-work { padding: clamp(48px, 7vw, 96px) clamp(8px, 3vw, 44px); }
+.ao-studio-work h2 { margin-bottom: 20px; color: var(--ink-80); font-size: clamp(24px, 3vw, 38px); font-weight: 500; letter-spacing: -.05em; }
+.ao-studio-work ul { margin: 0; padding: 0; list-style: none; }
+.ao-studio-work li { border-top: 1px solid var(--ink-08); }
+.ao-studio-work li:last-child { border-bottom: 1px solid var(--ink-08); }
+.ao-studio-work a { display: flex; min-height: 56px; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 6px; color: var(--ink-80); font-size: clamp(15px, 1.65vw, 22px); transition: color 240ms ease; }
+.ao-studio-work a:is(:hover, :focus-visible) { color: var(--tech-purple); }
 .ao-studio-signoff { display: flex; justify-content: flex-end; padding: 48px 0 0; }
 .ao-studio-signoff img { display: block; width: 72px; height: 72px; object-fit: contain; }
 
@@ -2581,6 +2620,11 @@ p, h1, h2, h3, ol { margin: 0; }
 .immersive-media-rail { display: grid; grid-auto-columns: min(84%, 1050px); grid-auto-flow: column; gap: 20px; overflow-x: auto; margin-top: 34px; padding: 0 0 18px; scroll-snap-type: x mandatory; scrollbar-color: rgba(115,87,255,.34) transparent; }
 .immersive-media-rail:has(> :only-child) { grid-auto-columns: 100%; overflow: visible; }
 .immersive-media-portrait-pair { grid-auto-columns: min(46%, 520px); }
+.immersive-project-123dentist .project-progress-hud { display: none; }
+.immersive-project-123dentist .immersive-media-portrait-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-columns: auto; grid-auto-flow: row; gap: 24px; overflow: visible; scroll-snap-type: none; }
+.immersive-project-123dentist .immersive-media-portrait-grid .immersive-media-frame { box-shadow: 0 12px 36px rgba(22,20,40,.08); }
+.immersive-gallery-show-all { display: flex; align-items: center; gap: 24px; margin: 30px auto 0; padding: 16px 24px; border: 1px solid rgba(115,87,255,.3); border-radius: 999px; background: #fff; color: var(--tech-purple); font: inherit; cursor: pointer; transition: background 200ms ease, border-color 200ms ease; }
+.immersive-gallery-show-all:hover, .immersive-gallery-show-all:focus-visible { border-color: var(--tech-purple); background: var(--tech-lilac); }
 .immersive-media-item { min-width: 0; margin: 0; scroll-snap-align: start; }
 .immersive-media-frame { position: relative; overflow: hidden; aspect-ratio: var(--media-aspect); border-radius: 18px; background: #e9eaf2; box-shadow: 0 24px 70px rgba(22,20,40,.1); transform: translateY(0); transition: box-shadow 500ms ease, transform 600ms var(--ease); }
 .immersive-media-item:hover .immersive-media-frame { box-shadow: 0 36px 90px rgba(22,20,40,.17); transform: translateY(-7px); }
@@ -2659,6 +2703,7 @@ p, h1, h2, h3, ol { margin: 0; }
   .immersive-gallery-controls { margin-top: 48px; }
   .immersive-media-rail { grid-auto-columns: 88%; gap: 13px; }
   .immersive-media-portrait-pair { grid-auto-columns: 82%; }
+  .immersive-project-123dentist .immersive-media-portrait-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .immersive-media-frame { border-radius: 13px; }
   .immersive-client-quote { grid-template-columns: 1fr; gap: 40px; padding: 34px 24px; }
   .immersive-project-collection { padding: 100px 24px; }

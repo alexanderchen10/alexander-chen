@@ -20,7 +20,7 @@ export const profile = {
     { name: "ICFF", logo: "/brands/icff.webp", scale: 0.9, background: "#ffffff", foreground: "#171713" },
     { name: "Google", logo: "/brands/google.png", scale: 0.72, background: "#f5f8ff", foreground: "#2959c8" },
     { name: "SASE Company", logo: "/brands/sase.png", scale: 0.72, background: "#ffc928", foreground: "#111111" },
-    { name: "123Dentist", logo: "/brands/123dentist.svg", scale: 0.84, background: "#eefaff", foreground: "#087ca6" },
+    { name: "123Dentist", logo: "/brands/123dentist.svg", scale: 0.84, background: "#eefaff", foreground: "#087ca6", projectSlug: "123dentist" },
     { name: "VEERAH", logo: "/brands/veerah.png", scale: 0.82, background: "#ffffff", foreground: "#111111" },
     { name: "Flippa", logo: "/brands/flippa.svg", scale: 0.8, background: "#edf8f2", foreground: "#146b48" },
     { name: "University of Toronto", logo: "/brands/university-of-toronto.webp", scale: 0.92, background: "#ffffff", foreground: "#163b69" },
@@ -212,6 +212,8 @@ const icffSubprojects = [
     sourceLabel: "View the ICFF event page",
   },
 ];
+
+export const aoStudioProjectSlugs = ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity", "123dentist"];
 
 export const workProjects = [
   {
@@ -1047,6 +1049,50 @@ export const workProjects = [
     ],
     subprojects: icffSubprojects,
   },
+  {
+    slug: "123dentist",
+    showInWork: false,
+    title: "123Dentist Portraits",
+    description: "I photographed professional headshots for 123Dentist’s marketing team and board of directors.",
+    thesis: "Create a consistent portrait series while giving each person room for a natural expression.",
+    organization: "123Dentist",
+    role: "Portrait Photographer",
+    period: "October 2026",
+    coverEyebrow: "AO Studio · Corporate photography",
+    backLink: { route: "ao-studio", label: "AO Studio" },
+    image: "/projects/work/123dentist/portrait-01.webp",
+    imageAlt: "Finished professional headshot from the 123Dentist portrait series",
+    aspect: "4 / 5",
+    mediaSections: [
+      {
+        eyebrow: "Selected portraits",
+        title: "The people behind the team",
+        description: "Professional portraits for 123Dentist’s marketing team and board of directors. Consistent lighting and a shared office backdrop connect the series, with different poses and expressions for each person.",
+        layout: "portrait-grid",
+        initialCount: 12,
+        items: Array.from({ length: 51 }, (_, index) => {
+          const number = String(index + 1).padStart(2, "0");
+          return {
+            src: `/projects/work/123dentist/portrait-${number}.webp`,
+            previewSrc: `/projects/work/123dentist/previews/portrait-${number}.webp`,
+            alt: `Portrait ${number} from the 123Dentist marketing team and board of directors session`,
+            aspect: "4 / 5",
+          };
+        }),
+      },
+      {
+        eyebrow: "Behind the scenes",
+        title: "On set at 123Dentist",
+        description: "I set up a camera and softbox beside the office windows, using the glass buildings outside as a consistent backdrop across the session.",
+        layout: "portrait-pair",
+        items: [
+          { src: "/projects/work/123dentist/lighting-setup.webp", alt: "Camera on a tripod and a softbox set up beside the office windows", caption: "Camera and lighting setup", aspect: "9 / 16" },
+          { src: "/projects/work/123dentist/portrait-session.webp", alt: "Portrait subject standing next to the softbox during the office shoot", caption: "A portrait in progress", aspect: "9 / 16" },
+        ],
+      },
+    ],
+    impact: ["Created a set of professional headshots with a consistent look across the marketing team and board of directors."],
+  },
 ];
 
 // Each slot has a CSS mock object for now. Add image, video, poster, and href
@@ -1156,7 +1202,7 @@ export const about = {
     },
     {
       organization: "AO Studio Ltd.",
-      projectSlugs: ["corcoran-oakville-grand-opening", "icff-lavazza-inclucity"],
+      projectSlugs: aoStudioProjectSlugs,
       location: "Toronto, Canada",
       badge: "AO",
       role: "Founder & Creative Marketing Consultant",

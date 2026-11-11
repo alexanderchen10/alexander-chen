@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { about, playgroundItems, profile, workProjects } from "./data";
+import { about, aoStudioProjectSlugs, playgroundItems, profile, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 
@@ -226,7 +226,7 @@ function ProjectProgressHUD({ sections, label = "Project journey" }) {
   );
 }
 
-function ZoomableImage({ src, alt = "", loading = "lazy", className = "" }) {
+function ZoomableImage({ src, previewSrc, alt = "", loading = "lazy", className = "" }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -244,7 +244,7 @@ function ZoomableImage({ src, alt = "", loading = "lazy", className = "" }) {
   return (
     <>
       <button className={`zoomable-image ${className}`} type="button" onClick={() => setOpen(true)} aria-label={`Open ${alt || "project image"} full screen`}>
-        <img src={assetHref(src)} alt={alt} loading={loading} />
+        <img src={assetHref(previewSrc || src)} alt={alt} loading={loading} decoding="async" />
         <span aria-hidden="true">↗</span>
       </button>
       {open && createPortal(
@@ -835,6 +835,14 @@ function HomeExperience({ navigate }) {
                     <h3 id={`home-experience-company-${index}`}>{experience.organization}</h3>
                     <p>{experience.period}</p>
                     {experience.location && <p>{experience.location}</p>}
+                    {relatedProjects.length > 0 && (
+                      <nav className="home-experience-projects" aria-label={`Related projects at ${experience.organization}`}>
+                        <p>Selected work</p>
+                        {relatedProjects.map((project) => (
+                          <ExperienceProjectLink key={project.slug} project={project} navigate={navigate} />
+                        ))}
+                      </nav>
+                    )}
                   </div>
                   <div className="home-experience-content">
                     <h4>{experience.role}</h4>
@@ -847,14 +855,6 @@ function HomeExperience({ navigate }) {
                         </li>
                       ))}
                     </ul>
-                    {relatedProjects.length > 0 && (
-                      <nav className="home-experience-projects" aria-label={`Related projects at ${experience.organization}`}>
-                        <p>Selected work</p>
-                        {relatedProjects.map((project) => (
-                          <ExperienceProjectLink key={project.slug} project={project} navigate={navigate} />
-                        ))}
-                      </nav>
-                    )}
                   </div>
                 </article>
               </div>
@@ -1018,6 +1018,7 @@ function HomeHero() {
               alt=""
               decoding="async"
             />
+            <span className="home-hero-camera-hit-area" aria-hidden="true" />
           </span>
         </button>
         <div className="home-hero-orbit" aria-label="Creative disciplines">
@@ -2302,6 +2303,9 @@ function ProjectDetailPage({ clock, navigate, detail }) {
 
 function CaseStudyFeatureSection({ project, section, sectionIndex }) {
   const railRef = useRef(null);
+  const [showAll, setShowAll] = useState(false);
+  const isPortraitGrid = section.layout === "portrait-grid";
+  const visibleItems = showAll || !section.initialCount ? section.items : section.items.slice(0, section.initialCount);
   const scrollRail = (direction) => {
     const rail = railRef.current;
     const item = rail?.querySelector("figure");
@@ -2321,12 +2325,12 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
       </header>
       {section.items.length > 1 && (
         <div className="immersive-gallery-controls" aria-label={`${section.title} gallery controls`}>
-          <span>{section.items.length} project assets</span>
-          <div><button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${section.title} asset`}>←</button><button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${section.title} asset`}>→</button></div>
+          <span>{isPortraitGrid ? `${visibleItems.length} of ${section.items.length} portraits · Select to enlarge` : `${section.items.length} project assets`}</span>
+          {!isPortraitGrid && <div><button type="button" onClick={() => scrollRail(-1)} aria-label={`Previous ${section.title} asset`}>←</button><button type="button" onClick={() => scrollRail(1)} aria-label={`Next ${section.title} asset`}>→</button></div>}
         </div>
       )}
-      <div ref={railRef} className={`immersive-media-rail immersive-media-${section.layout || "wide"}`}>
-        {section.items.map((item, itemIndex) => (
+      <div ref={railRef} id={`${project.slug}-gallery-${sectionIndex}`} className={`immersive-media-rail immersive-media-${section.layout || "wide"}`}>
+        {visibleItems.map((item, itemIndex) => (
           <figure className="immersive-media-item" key={item.src || item.videoId} style={{ "--media-aspect": item.aspect || "16 / 10" }}>
             <div className="immersive-media-frame">
               {item.type === "youtube" ? (
@@ -2353,13 +2357,18 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
                   Your browser does not support embedded video.
                 </video>
               ) : (
-                <ZoomableImage src={item.src} alt={item.alt || ""} />
+                <ZoomableImage src={item.src} previewSrc={item.previewSrc} alt={item.alt || ""} />
               )}
             </div>
             {item.caption && <figcaption><span>{String(itemIndex + 1).padStart(2, "0")}</span>{item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<Arrow /></a> : item.caption}</figcaption>}
           </figure>
         ))}
       </div>
+      {visibleItems.length < section.items.length && (
+        <button className="immersive-gallery-show-all" type="button" aria-controls={`${project.slug}-gallery-${sectionIndex}`} onClick={() => setShowAll(true)}>
+          View all {section.items.length} portraits <span aria-hidden="true">↓</span>
+        </button>
+      )}
       {section.quote && (
         <blockquote className="immersive-client-quote">
           <p>“{section.quote.text}”</p>
@@ -2375,8 +2384,8 @@ function CaseStudyPage({ clock, navigate, project }) {
     return <StructuredCaseStudyPage clock={clock} navigate={navigate} project={project} />;
   }
 
-  const backRoute = project.parentSlug ? `project/${project.parentSlug}` : "work";
-  const backLabel = project.parentTitle || "selected work";
+  const backRoute = project.backLink?.route || (project.parentSlug ? `project/${project.parentSlug}` : "work");
+  const backLabel = project.backLink?.label || project.parentTitle || "selected work";
   const sections = [
     { id: "project-overview", label: "Overview" },
     ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
@@ -2965,7 +2974,7 @@ function AboutPage({ clock }) {
   );
 }
 
-function AoStudioPage({ clock }) {
+function AoStudioPage({ clock, navigate }) {
   return (
     <main className="main-content ao-studio-page">
       <section className="ao-studio-hero reveal reveal-fast">
@@ -2994,6 +3003,24 @@ function AoStudioPage({ clock }) {
         <div><span>my role</span><p>Founder · Creative Director · Designer · Developer</p></div>
         <div><span>focus</span><p>Brand identity · Content · Digital experiences</p></div>
         <div><span>website</span><p><a href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">aostudioinfo.com <Arrow /></a></p></div>
+      </section>
+
+      <section className="ao-studio-work reveal" aria-labelledby="ao-studio-work-title">
+        <h2 id="ao-studio-work-title">Selected work</h2>
+        <ul>
+          {aoStudioProjectSlugs.map((slug) => {
+            const route = `project/${slug}`;
+            const project = projectFromRoute(route);
+            return (
+              <li key={slug}>
+                <a href={routeHref(route)} onClick={(event) => navigate(event, "/", route)}>
+                  <span>{project.title}</span>
+                  <Arrow />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <div className="ao-studio-signoff reveal" aria-label="AO Studio">
@@ -3071,7 +3098,7 @@ export default function App() {
       {page === "about" ? (
         <AboutPage clock={clock} />
       ) : page === "ao-studio" ? (
-        <AoStudioPage clock={clock} />
+        <AoStudioPage clock={clock} navigate={navigate} />
       ) : page === "playground/photography" ? (
         <PhotographyPage clock={clock} navigate={navigate} />
       ) : selectedPhotographyAlbum ? (
