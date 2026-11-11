@@ -251,6 +251,20 @@ p, h1, h2, h3, ol { margin: 0; }
 .home-hero-current dd { margin: 2px 0 0; color: var(--tech-navy); font-size: 15px; font-weight: 500; }
 .home-hero-current a { display: inline-flex; align-items: center; gap: 7px; }
 .home-hero-current a:hover, .home-hero-current a:focus-visible { color: #4931a7; text-decoration: underline; }
+.home-hero-live-project { display: flex; align-items: center; gap: 9px; }
+.home-hero-live-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #e23a33;
+  box-shadow: 0 0 0 0 rgba(226, 58, 51, .42);
+  animation: home-hero-live-pulse 1.35s ease-in-out infinite;
+}
+@keyframes home-hero-live-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(226, 58, 51, .42); }
+  50% { opacity: .48; box-shadow: 0 0 0 6px rgba(226, 58, 51, 0); }
+}
 .home-hero-portrait-stage { position: absolute; z-index: 4; top: 5%; right: 0; bottom: 0; width: 54%; container-type: size; pointer-events: none; transform: translate(calc(var(--hero-pointer-x) * -12px), calc(var(--hero-pointer-y) * -8px)); transition: transform 280ms ease-out; }
 .home-hero-avatar {
   --camera-aim: 0;
