@@ -2829,3 +2829,23 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media (prefers-reduced-motion: reduce) {
   .zoomable-image img, .immersive-project-hero-media > .visual, .immersive-media-frame, .project-scroll-cue span { animation: none; transform: none; }
 }
+
+/* Availability in the desktop and mobile headers. */
+.topbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 20px; }
+.availability-badge { display: inline-flex; align-items: center; gap: 9px; min-height: 32px; color: var(--ink-80); font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: .055em; line-height: 1.4; text-transform: uppercase; white-space: nowrap; }
+.availability-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--tech-purple); box-shadow: 0 0 0 5px rgba(115,87,255,.13); }
+.availability-badge:hover, .availability-badge:focus-visible { color: var(--tech-purple); }
+.availability-badge:focus-visible { outline: 2px solid var(--tech-purple); outline-offset: 5px; border-radius: 3px; }
+@media (min-width: 810px) and (max-width: 1439px) {
+  .topbar-actions { flex-direction: column; align-items: flex-end; gap: 3px; }
+  .topbar-actions .availability-badge { font-size: 8px; min-height: 24px; }
+}
+@media (max-width: 809px) {
+  .mobile-header .availability-badge { margin-left: auto; margin-right: 22px; font-size: 8px; letter-spacing: .025em; }
+  .mobile-header .availability-dot { flex-basis: 5px; width: 5px; height: 5px; box-shadow: 0 0 0 4px rgba(115,87,255,.13); }
+}
+@media (max-width: 380px) {
+  .mobile-header { padding-inline: 16px; }
+  .mobile-header .brand { font-size: 12px; }
+  .mobile-header .availability-badge { gap: 6px; margin-right: 16px; font-size: 7px; }
+}

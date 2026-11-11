@@ -320,6 +320,15 @@ function ContactLinks() {
   );
 }
 
+function AvailabilityBadge() {
+  return (
+    <a className="availability-badge" href={`mailto:${profile.email}`}>
+      <span className="availability-dot" aria-hidden="true" />
+      <span>Open to opportunities</span>
+    </a>
+  );
+}
+
 function Sidebar({ page, route, navigate, clock }) {
   const moveTopbarGlow = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -339,7 +348,10 @@ function Sidebar({ page, route, navigate, clock }) {
       <div className="topbar-primary">
         <a className="brand reveal reveal-fast" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
         <NavigationLinks page={page} route={route} navigate={navigate} />
-        <ContactLinks />
+        <div className="topbar-actions">
+          <AvailabilityBadge />
+          <ContactLinks />
+        </div>
       </div>
       <div className="topbar-secondary">
         <div className="profile-copy reveal">
@@ -420,6 +432,7 @@ function MobileHeader({ page, route, navigate }) {
     <>
       <header className="mobile-header">
         <a className="brand" href={routeHref()} onClick={(e) => navigate(e, "/")}>{profile.name}</a>
+        <AvailabilityBadge />
         <button
           className={`menu-toggle ${open ? "is-open" : ""}`}
           type="button"
