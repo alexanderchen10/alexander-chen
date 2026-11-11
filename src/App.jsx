@@ -262,45 +262,73 @@ function ZoomableImage({ src, previewSrc, alt = "", loading = "lazy", className 
 }
 
 function NavigationLinks({ page, route, navigate, closeMenu }) {
+  const navRef = useRef(null);
+  const [activeRoute, setActiveRoute] = useState(route);
+  const [beam, setBeam] = useState({ left: 0, width: 0 });
+  useEffect(() => {
+    const update = () => {
+      let active = page === "home" ? "work" : page.startsWith("project/") ? "work" : page.startsWith("playground") ? "playground" : page;
+      if (page === "home") {
+        for (const [id, name] of [["experience", "experience"], ["home-playground", "playground"]]) {
+          if (document.getElementById(id)?.getBoundingClientRect().top <= window.innerHeight * .4) active = name;
+        }
+      }
+      setActiveRoute(active);
+      const link = navRef.current?.querySelector(`a[href="${routeHref(active)}"]`);
+      if (link) {
+        const rect = link.getBoundingClientRect();
+        const parent = navRef.current.getBoundingClientRect();
+        setBeam({ left: rect.left - parent.left, width: rect.width });
+      }
+    };
+    const frame = requestAnimationFrame(update);
+    const observer = new ResizeObserver(update);
+    if (navRef.current) observer.observe(navRef.current);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    document.fonts.ready.then(update);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
+  }, [page, route]);
   const go = (event, destination, anchor) => {
     closeMenu?.();
     navigate(event, destination, anchor);
   };
 
   return (
-    <nav aria-label="Primary navigation">
+    <nav ref={navRef} className="primary-navigation" aria-label="Primary navigation">
       <ol className="numbered-links">
         <li>
-          <a href={routeHref("work")} className={route !== "experience" && (page === "home" || page.startsWith("project/")) ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
+          <a href={routeHref("work")} className={activeRoute === "work" ? "active" : ""} onClick={(e) => go(e, "/", "work")}>
             <span>01.</span><span>projects</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("experience")} className={route === "experience" ? "active" : ""} onClick={(e) => go(e, "/", "experience")}>
+          <a href={routeHref("experience")} className={activeRoute === "experience" ? "active" : ""} onClick={(e) => go(e, "/", "experience")}>
             <span>02.</span><span>experience</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("playground")} className={page.startsWith("playground") ? "active" : ""} onClick={(e) => go(e, "/playground")}>
+          <a href={routeHref("playground")} className={activeRoute === "playground" ? "active" : ""} onClick={(e) => go(e, "/playground")}>
             <span>03.</span><span>playground</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("about")} className={page === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
+          <a href={routeHref("about")} className={activeRoute === "about" ? "active" : ""} onClick={(e) => go(e, "/about")}>
             <span>04.</span><span>about</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("ao-studio")} className={page === "ao-studio" ? "active" : ""} onClick={(e) => go(e, "/ao-studio")}>
+          <a href={routeHref("ao-studio")} className={activeRoute === "ao-studio" ? "active" : ""} onClick={(e) => go(e, "/ao-studio")}>
             <span>05.</span><span>ao studio</span>
           </a>
         </li>
         <li>
-          <a href={routeHref("education")} className={page === "education" ? "active" : ""} onClick={(e) => go(e, "/", "education")}>
+          <a href={routeHref("education")} className={activeRoute === "education" ? "active" : ""} onClick={(e) => go(e, "/", "education")}>
             <span>06.</span><span>education</span>
           </a>
         </li>
       </ol>
+      <span className="navigation-beam" aria-hidden="true" style={{ left: beam.left, width: beam.width }} />
     </nav>
   );
 }
@@ -1271,6 +1299,31 @@ function CollaboratorCarousel({ navigate }) {
   );
 }
 
+function HomeToolkits() {
+  const [open, setOpen] = useState(0);
+  const kits = [
+    { title: "Design & digital experiences", description: "Turning complex journeys into clear, useful interfaces.", tools: ["UX research & user flows", "Figma", "Design systems", "Information architecture", "Website design", "Accessibility"] },
+    { title: "Marketing & content strategy", description: "Connecting the right story to the audience and measuring what happens next.", tools: ["Campaign planning", "Email marketing", "Meta campaigns", "Sprout Social", "Google Analytics", "CRM & customer journeys"] },
+    { title: "Photography & production", description: "Taking a visual story from the first idea through to the final edit.", tools: ["Photography", "Video production", "DaVinci Resolve", "Lightroom", "Social-first storytelling", "Creative direction"] },
+    { title: "Delivery & operations", description: "Keeping people, assets, and project decisions moving together.", tools: ["Stakeholder coordination", "Project timelines", "SharePoint", "Excel & reporting", "Asset governance", "Process improvement"] },
+  ];
+  return <section className="home-toolkit-section" id="toolkits" aria-labelledby="toolkit-title">
+    <header><p className="section-label">Skills & toolkits</p><h2 id="toolkit-title">What I work with.</h2><p>Four toolkits connecting strategy, design, storytelling, and delivery.</p></header>
+    <div className="home-toolkit-list">{kits.map((kit, i) => <article key={kit.title} className={open === i ? "is-open" : ""}>
+      <h3><button type="button" aria-expanded={open === i} aria-controls={`toolkit-panel-${i}`} onClick={() => setOpen(open === i ? null : i)}><span>0{i + 1}</span>{kit.title}<span aria-hidden="true">{open === i ? "−" : "+"}</span></button></h3>
+      <div id={`toolkit-panel-${i}`} hidden={open !== i}><p>{kit.description}</p><ul>{kit.tools.map(tool => <li key={tool}>{tool}</li>)}</ul><small>{kit.tools.length} skills & tools</small></div>
+    </article>)}</div>
+  </section>;
+}
+
+function HomePlayground({ navigate }) {
+  const items = playgroundItems.filter(item => ["photography", "projects", "porter-airlines"].includes(item.id));
+  return <section id="home-playground" className="home-playground-section" aria-labelledby="home-playground-title">
+    <header><p className="section-label">Playground</p><h2 id="home-playground-title">A little room to explore.</h2><p>Photography, design experiments, and stories from life outside the brief.</p><a href={routeHref("playground")} onClick={event => navigate(event, "/playground")}>Explore the playground <Arrow /></a></header>
+    <div className="home-playground-grid">{items.map(item => <a href={routeHref(item.href.replace(/^#/, ""))} onClick={event => navigate(event, "/", item.href.replace(/^#/, ""))} key={item.id}><img src={assetHref(item.image)} alt={item.alt} loading="lazy" /><span>{item.label}<Arrow /></span></a>)}</div>
+  </section>;
+}
+
 function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
@@ -1295,6 +1348,8 @@ function HomePage({ clock, navigate }) {
         <ProjectColumns projects={workProjects} />
       </section>
       <HomeExperience navigate={navigate} />
+      <HomeToolkits />
+      <HomePlayground navigate={navigate} />
       <MobileFooter clock={clock} />
     </main>
   );
@@ -3570,4 +3625,5 @@ export default function App() {
     </div>
   );
 }
+
 
