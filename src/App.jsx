@@ -198,64 +198,12 @@ function useProjectProgress(sections = [], containerId) {
   return { progress, activeId };
 }
 
-function ProjectProgressHUD({ sections, label = "Project journey", embedded = false, containerId, barOnly, onBarOnlyChange }) {
-  const { progress, activeId } = useProjectProgress(sections, containerId);
-  const chapterNav = useRef(null);
-  const [previewIndex, setPreviewIndex] = useState(null);
-  const tooltipId = `chapter-tip-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
-  useEffect(() => {
-    const nav = chapterNav.current;
-    const active = nav?.querySelector('[aria-current="step"]');
-    if (active && nav.scrollWidth > nav.clientWidth) {
-      const left = active.offsetLeft - nav.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
-      nav.scrollTo({ left: Math.max(0, left), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    }
-  }, [activeId, barOnly]);
-  const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
-  const activeSection = sections[activeIndex] || sections[0];
-  const chapterNavId = `journey-chapters-${embedded ? "desktop" : "mobile"}-${sections[0]?.id}`;
-
-  useEffect(() => setPreviewIndex(null), [chapterNavId, barOnly]);
-
-  if (!sections.length) return null;
-
-  const previewSection = previewIndex !== null ? sections[previewIndex] : null;
-  const previewSummary = previewSection ? (previewSection.summary || document.getElementById(previewSection.id)?.querySelector("h1, h2, h3")?.textContent || previewSection.label) : "";
-  const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-
+function ProjectProgressHUD({ sections, label = "Project journey", embedded = false, containerId }) {
+  const { progress } = useProjectProgress(sections, containerId);
   return (
-    <aside className={`project-progress-hud project-progress-compact has-progress-toggle${embedded ? " project-progress-hud-topbar" : ""}${barOnly ? " is-bar-only" : ""}`} aria-label={label}>
-      <div className="project-progress-copy">
-        <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
-        <strong>{activeSection?.label}</strong>
-        <small>{Math.round(progress)}%</small>
-      </div>
-      <div className="project-progress-line" role="progressbar" aria-label={`${label} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
-        <i style={{ width: `${progress}%` }} />
-      </div>
-      <nav ref={chapterNav} id={chapterNavId} hidden={barOnly} aria-label={`${label} chapters`} onKeyDown={(event) => { if (event.key === "Escape") setPreviewIndex(null); }}>
-        {sections.map((section, index) => (
-          <button
-            type="button"
-            className={section.id === activeId ? "active" : ""}
-            onClick={() => jumpTo(section.id)}
-            onPointerEnter={(event) => { if (event.pointerType !== "touch") setPreviewIndex(index); }}
-            onPointerLeave={() => setPreviewIndex(null)}
-            onFocus={() => setPreviewIndex(index)}
-            onBlur={() => setPreviewIndex(null)}
-            aria-describedby={previewIndex === index ? tooltipId : undefined}
-            aria-label={`Go to ${section.label}`}
-            aria-current={section.id === activeId ? "step" : undefined}
-            key={section.id}
-          >
-            <span className="project-progress-number">{String(index + 1).padStart(2, "0")}</span>
-            <span className="project-progress-label">{section.label}</span>
-          </button>
-        ))}
-      </nav>
-      <button className="project-progress-toggle" type="button" aria-expanded={!barOnly} aria-controls={chapterNavId} onClick={() => onBarOnlyChange(!barOnly)}>{barOnly ? "Show sections" : "Bar only"}<span aria-hidden="true">{barOnly ? "+" : "−"}</span></button>
-      {previewIndex !== null && sections[previewIndex] && <div className="project-progress-tooltip" id={tooltipId} role="tooltip"><span>{String(previewIndex + 1).padStart(2, "0")}</span>{previewSummary}</div>}
-    </aside>
+    <div className={`project-progress-hud scroll-progress-indicator${embedded ? " project-progress-hud-topbar" : ""}`} role="progressbar" aria-label={`${label} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
+      <span style={{ transform: `scaleX(${progress / 100})` }} />
+    </div>
   );
 }
 
@@ -387,7 +335,7 @@ function AvailabilityBadge() {
   );
 }
 
-function Sidebar({ page, route, navigate, clock, projectProgress, barOnly, onBarOnlyChange }) {
+function Sidebar({ page, route, navigate, clock, projectProgress }) {
   const moveTopbarGlow = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--topbar-x", `${event.clientX - bounds.left}px`);
@@ -413,7 +361,7 @@ function Sidebar({ page, route, navigate, clock, projectProgress, barOnly, onBar
       </div>
       <div className={`topbar-secondary${projectProgress ? " topbar-secondary-progress" : ""}`}>
         {projectProgress ? (
-          <ProjectProgressHUD {...projectProgress} barOnly={barOnly} onBarOnlyChange={onBarOnlyChange} embedded />
+          <ProjectProgressHUD {...projectProgress} embedded />
         ) : (
           <>
             <div className="profile-copy reveal">
@@ -3881,16 +3829,8 @@ function projectProgressFor(project, detail) {
 export default function App() {
   const { page, route, navigate } = usePage();
   const clock = useClock();
-  const [barOnly, setBarOnly] = useState(() => {
-    try { return window.localStorage.getItem("portfolio-progress-bar-only") === "true"; }
-    catch { return false; }
-  });
   const [experienceInView, setExperienceInView] = useState(false);
 
-  useEffect(() => {
-    try { window.localStorage.setItem("portfolio-progress-bar-only", String(barOnly)); }
-    catch { /* Navigation still works when browser storage is unavailable. */ }
-  }, [barOnly]);
 
   useEffect(() => {
     if (page !== "home") {
@@ -3980,9 +3920,9 @@ export default function App() {
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} barOnly={barOnly} onBarOnlyChange={setBarOnly} />}
+      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
-      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD {...projectProgress} barOnly={barOnly} onBarOnlyChange={setBarOnly} /></div>}
+      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD {...projectProgress} /></div>}
       {page === "work" ? (
         <ProjectsPage Media={ProjectVisual} />
       ) : page.startsWith("project-log") ? (
