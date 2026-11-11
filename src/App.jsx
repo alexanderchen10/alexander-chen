@@ -3414,9 +3414,9 @@ function projectProgressFor(project, detail) {
       label: `${project.title} project journey`,
       sections: [
         { id: "gta-overview", label: "Overview" },
-        { id: "gta-design", label: "Redesign" },
-        { id: "gta-results", label: "Results" },
+        { id: "gta-design", label: "The opportunity" },
         { id: "gta-changes", label: "What changed" },
+        { id: "gta-results", label: "Results" },
         { id: "gta-products", label: "Product discovery" },
         { id: "gta-next", label: "Next steps" },
       ],
