@@ -1,3 +1,4 @@
+import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
@@ -30,6 +31,7 @@ const detailFromRoute = (route) => {
   return null;
 };
 const pageFromRoute = (route) => {
+  if (route === "work" || route === "project-log" || route.startsWith("project-log/")) return route;
   if (route === "about") return "about";
   if (route === "education") return "education";
   if (route === "ao-studio") return "ao-studio";
@@ -295,7 +297,7 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
   const [beam, setBeam] = useState({ left: 0, width: 0 });
   useEffect(() => {
     const update = () => {
-      let active = page === "home" ? "work" : page.startsWith("project/") ? "work" : page.startsWith("playground") ? "about" : page;
+      let active = page === "home" ? "work" : (page.startsWith("project/") || page.startsWith("project-log")) ? "work" : page.startsWith("playground") ? "about" : page;
       if (page === "home") {
         for (const [id, name] of [["experience", "experience"], ["home-playground", "about"]]) {
           if (document.getElementById(id)?.getBoundingClientRect().top <= window.innerHeight * .4) active = name;
@@ -3808,7 +3810,9 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    if (page === "education") document.title = `${profile.name} | Education`;
+    if (page === "work") document.title = `Projects | ${profile.name}`;
+    else if (page.startsWith("project-log")) document.title = `Project & Documentation Log | ${profile.name}`;
+    else if (page === "education") document.title = `${profile.name} | Education`;
     else if (page === "about") document.title = `${profile.name} | About & Playground`;
     else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
     else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
@@ -3829,7 +3833,11 @@ export default function App() {
       {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
       {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD sections={projectProgress.sections} label={projectProgress.label} /></div>}
-      {page === "education" ? (
+      {page === "work" ? (
+        <ProjectsPage Media={ProjectVisual} />
+      ) : page.startsWith("project-log") ? (
+        <ProjectLogPage key={page} slug={page.split("/")[1]} />
+      ) : page === "education" ? (
         <EducationPage />
       ) : page === "about" ? (
         <AboutPage clock={clock} navigate={navigate} />
