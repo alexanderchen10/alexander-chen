@@ -191,7 +191,7 @@ function useProjectProgress(sections = []) {
   return { progress, activeId };
 }
 
-function ProjectProgressHUD({ sections, label = "Project journey" }) {
+function ProjectProgressHUD({ sections, label = "Project journey", embedded = false }) {
   const { progress, activeId } = useProjectProgress(sections);
   const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
   const activeSection = sections[activeIndex] || sections[0];
@@ -201,7 +201,7 @@ function ProjectProgressHUD({ sections, label = "Project journey" }) {
   const jumpTo = (sectionId) => document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <aside className="project-progress-hud" aria-label={label}>
+    <aside className={`project-progress-hud${embedded ? " project-progress-hud-topbar" : ""}`} aria-label={label}>
       <div className="project-progress-copy">
         <span>{String(activeIndex + 1).padStart(2, "0")} / {String(sections.length).padStart(2, "0")}</span>
         <strong>{activeSection?.label}</strong>
@@ -345,7 +345,7 @@ function AvailabilityBadge() {
   );
 }
 
-function Sidebar({ page, route, navigate, clock }) {
+function Sidebar({ page, route, navigate, clock, projectProgress }) {
   const moveTopbarGlow = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--topbar-x", `${event.clientX - bounds.left}px`);
@@ -369,16 +369,22 @@ function Sidebar({ page, route, navigate, clock }) {
           <ContactLinks />
         </div>
       </div>
-      <div className="topbar-secondary">
-        <div className="profile-copy reveal">
-          <p>{profile.role}</p>
-          <p>{profile.bio}</p>
-        </div>
-        <div className="sidebar-meta reveal">
-          <span>©{new Date().getFullYear()} {profile.name.toLowerCase()}</span>
-          <span>updated {profile.updated}</span>
-          <span>{clock}</span>
-        </div>
+      <div className={`topbar-secondary${projectProgress ? " topbar-secondary-progress" : ""}`}>
+        {projectProgress ? (
+          <ProjectProgressHUD sections={projectProgress.sections} label={projectProgress.label} embedded />
+        ) : (
+          <>
+            <div className="profile-copy reveal">
+              <p>{profile.role}</p>
+              <p>{profile.bio}</p>
+            </div>
+            <div className="sidebar-meta reveal">
+              <span>©{new Date().getFullYear()} {profile.name.toLowerCase()}</span>
+              <span>updated {profile.updated}</span>
+              <span>{clock}</span>
+            </div>
+          </>
+        )}
       </div>
     </aside>
   );
@@ -2049,17 +2055,10 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
   const [openGlossaryId, setOpenGlossaryId] = useState(null);
   const openGlossaryChapter = project.chapters.find((chapter) => chapter.id === openGlossaryId);
   const projectCount = project.chapters.reduce((count, chapter) => count + chapter.projects.length, 0);
-  const progressSections = useMemo(() => [
-    { id: "structured-overview", label: "Overview" },
-    ...(project.thesis ? [{ id: "structured-thesis", label: project.thesis.label || "Approach" }] : []),
-    ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Proof" }] : []),
-    { id: "structured-work", label: "Project index" },
-    ...project.chapters.map((chapter) => ({ id: chapter.id, label: chapter.title })),
-  ], [project]);
+  const progressSections = useMemo(() => structuredProgressSectionsFor(project), [project]);
 
   return (
     <main className={`main-content case-study-page structured-case-study-page immersive-project-page structured-case-study-${project.slug}`}>
-      <ProjectProgressHUD sections={progressSections} label={`${project.title} project journey`} />
       <article className="case-study structured-case-study">
         <header className="structured-case-study-hero reveal reveal-fast" id="structured-overview">
           <div className="structured-case-study-hero-media" style={{ "--hero-aspect": project.aspect || "16 / 10" }}>
@@ -2415,7 +2414,6 @@ function ProjectDetailPage({ clock, navigate, detail }) {
 
   return (
     <main className={`main-content project-detail-page structured-case-study-${project.slug}${entry.mediaPresentation === "instagram-phone" ? " project-detail-editorial" : ""}`}>
-      <ProjectProgressHUD sections={sections.map((section) => ({ id: section.id, label: section.label }))} label={`${entry.title} project journey`} />
       <article className={`project-detail${heroImages.length === 0 ? " project-detail-no-hero" : ""}`}>
         <nav className="project-detail-breadcrumb reveal reveal-fast" aria-label="Breadcrumb">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>work</a>
@@ -2653,13 +2651,7 @@ function CaseStudyPage({ clock, navigate, project }) {
 
   const backRoute = project.backLink?.route || (project.parentSlug ? `project/${project.parentSlug}` : "work");
   const backLabel = project.backLink?.label || project.parentTitle || "selected work";
-  const sections = [
-    { id: "project-overview", label: "Overview" },
-    ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
-    ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
-    ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
-    { id: "project-impact", label: "Impact" },
-  ];
+  const sections = caseStudyProgressSectionsFor(project);
   const visibleProjects = workProjects.filter((item) => item.showInWork !== false);
   const projectIndex = visibleProjects.findIndex((item) => item.slug === project.slug);
   const nextProject = projectIndex >= 0 ? visibleProjects[(projectIndex + 1) % visibleProjects.length] : null;
@@ -2667,7 +2659,6 @@ function CaseStudyPage({ clock, navigate, project }) {
 
   return (
     <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}`}>
-      <ProjectProgressHUD sections={sections} label={`${project.title} project journey`} />
       <article className="case-study immersive-case-study">
         <header className="immersive-project-hero" id="project-overview">
           <div className="immersive-project-hero-media reveal reveal-fast" style={{ "--aspect": project.aspect || "16 / 10" }}>
@@ -2912,26 +2903,7 @@ function UtopiaVinylPage({ clock, navigate, project }) {
 
   return (
     <main className="main-content utopia-page" ref={pageRef}>
-      <nav className="utopia-journey" aria-label="Utopia Vinyl project chapters">
-        <div className="utopia-journey-status">
-          <span>Journey progress</span>
-          <strong>{String(progress).padStart(2, "0")}%</strong>
-        </div>
-        <div className="utopia-progress-track" role="progressbar" aria-label="Case study progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress}>
-          <i style={{ width: `${progress}%` }} />
-        </div>
-        <ol>
-          {utopiaScenes.map((scene, index) => (
-            <li className={activeScene === index ? "active" : ""} key={scene.id}>
-              <button type="button" onClick={() => scrollToScene(scene)} aria-current={activeScene === index ? "step" : undefined}>
-                <span>{scene.number}</span>{scene.label}
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
-
-      <header className="utopia-hero" aria-labelledby="utopia-title">
+      <header className="utopia-hero" id="utopia-overview" aria-labelledby="utopia-title">
         <div className="utopia-hero-copy">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span aria-hidden="true">←</span> selected work</a>
           <div>
@@ -3374,6 +3346,77 @@ function MobileFooter({ clock }) {
   );
 }
 
+function structuredProgressSectionsFor(project) {
+  return [
+    { id: "structured-overview", label: "Overview" },
+    ...(project.thesis ? [{ id: "structured-thesis", label: project.thesis.label || "Approach" }] : []),
+    ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Proof" }] : []),
+    { id: "structured-work", label: "Project index" },
+    ...(project.chapters || []).map((chapter) => ({ id: chapter.id, label: chapter.title })),
+  ];
+}
+
+function caseStudyProgressSectionsFor(project) {
+  return [
+    { id: "project-overview", label: "Overview" },
+    ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
+    ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
+    ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
+    { id: "project-impact", label: "Impact" },
+  ];
+}
+
+function projectProgressFor(project, detail) {
+  if (detail) {
+    return {
+      label: `${detail.entry.title} project journey`,
+      sections: detailSectionsFor(detail.entry).map((section) => ({ id: section.id, label: section.label })),
+    };
+  }
+
+  if (!project) return null;
+
+  if (project.slug === "utopia-vinyl") {
+    return {
+      label: `${project.title} project journey`,
+      sections: [
+        { id: "utopia-overview", label: "Overview" },
+        ...utopiaScenes.map((scene) => ({ id: `utopia-${scene.id}`, label: scene.label })),
+        { id: "utopia-outcome", label: "Outcome" },
+      ],
+    };
+  }
+
+  if (project.slug === "icff-distillery-opening-night-2025") {
+    return {
+      label: `${project.title} project journey`,
+      sections: [
+        { id: "icff-context", label: "Context" },
+        { id: "icff-photoshoot", label: "Photoshoot" },
+      ],
+    };
+  }
+
+  if (project.slug === "icff-lavazza-inclucity" && project.caseStudyVariant !== "structured") {
+    return {
+      label: `${project.title} project journey`,
+      sections: [
+        { id: "icff-role", label: "Role" },
+        { id: "icff-organization", label: "Organization" },
+        { id: "icff-timeline", label: "Timeline" },
+        { id: "icff-featured-projects", label: "Featured projects" },
+      ],
+    };
+  }
+
+  return {
+    label: `${project.title} project journey`,
+    sections: project.caseStudyVariant === "structured"
+      ? structuredProgressSectionsFor(project)
+      : caseStudyProgressSectionsFor(project),
+  };
+}
+
 export default function App() {
   const { page, route, navigate } = usePage();
   const clock = useClock();
@@ -3386,7 +3429,8 @@ export default function App() {
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const isUtopia = selectedProject?.slug === "utopia-vinyl";
-  const usesTopbar = !isPlayground && !selectedDetail && !isIcffGallery && !isIcffHub;
+  const projectProgress = !isPlayground ? projectProgressFor(selectedProject, selectedDetail) : null;
+  const usesTopbar = !isPlayground;
 
   useEffect(() => {
     document.documentElement.classList.add("js");
@@ -3428,8 +3472,9 @@ export default function App() {
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}`}>
       {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && (selectedDetail ? <ProjectDetailSidebar clock={clock} navigate={navigate} detail={selectedDetail} route={page} /> : isIcffGallery ? <IcffSidebar clock={clock} navigate={navigate} project={selectedProject} /> : isIcffHub ? <IcffHubSidebar clock={clock} navigate={navigate} project={selectedProject} /> : <Sidebar page={page} route={route} navigate={navigate} clock={clock} />)}
+      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
+      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD sections={projectProgress.sections} label={projectProgress.label} /></div>}
       {page === "education" ? (
         <EducationPage />
       ) : page === "about" ? (
