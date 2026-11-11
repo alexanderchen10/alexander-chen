@@ -468,6 +468,18 @@ function MobileHeader({ page, route, navigate }) {
   );
 }
 
+function ProjectCardVideo({ project }) {
+  const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduceMotion(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  if (reduceMotion) return <img className="visual project-asset" src={assetHref(project.cardImage)} alt={project.imageAlt || ""} loading="lazy" />;
+  return <video className="visual project-asset" src={assetHref(project.cardVideo)} poster={assetHref(project.cardImage)} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture aria-label="Utopia Vinyl walkthrough: browsing new arrivals and opening a record" />;
+}
+
 function ProjectVisual({ project, surface = "detail" }) {
   const { bannerVideo, cardImage, coverEyebrow, coverMetric, coverTitle, image, imageAlt, poster, video, visual: type } = project;
 
@@ -478,6 +490,8 @@ function ProjectVisual({ project, surface = "detail" }) {
       </div>
     );
   }
+
+  if (surface === "card" && project.cardVideo) return <ProjectCardVideo project={project} />;
 
   if (surface === "card" && cardImage) {
     return <img className="visual project-asset" src={assetHref(cardImage)} alt={imageAlt || ""} loading="lazy" />;
