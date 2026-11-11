@@ -2829,6 +2829,52 @@ const utopiaScenes = [
   },
 ];
 
+function UtopiaStorefrontDemo() {
+  const videoRef = useRef(null);
+  const userPaused = useRef(false);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    const syncPlayback = () => {
+      if (!visible || document.hidden || motion.matches || userPaused.current) video.pause();
+      else video.play().catch(() => setPlaying(false));
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      syncPlayback();
+    }, { threshold: 0.15 });
+    observer.observe(video);
+    document.addEventListener("visibilitychange", syncPlayback);
+    motion.addEventListener("change", syncPlayback);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", syncPlayback);
+      motion.removeEventListener("change", syncPlayback);
+      video.pause();
+    };
+  }, []);
+
+  const togglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    userPaused.current = !video.paused;
+    if (video.paused) video.play().catch(() => setPlaying(false));
+    else video.pause();
+  };
+
+  return (
+    <div className="utopia-storefront-demo">
+      <video ref={videoRef} src={assetHref("/projects/work/utopia-vinyl/utopia-vinyl-seamless-walkthrough.mp4")} poster={assetHref("/projects/work/utopia-vinyl/utopia-vinyl-seamless-poster.webp")} width="960" height="540" muted loop playsInline preload="metadata" aria-label="Utopia Vinyl walkthrough: browse records, view an album, and add it to the cart" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+      <button type="button" className="utopia-demo-toggle" onClick={togglePlayback} aria-label={`${playing ? "Pause" : "Play"} storefront demo`}><span aria-hidden="true">{playing ? "Ⅱ" : "▶"}</span>{playing ? "Pause demo" : "Play demo"}</button>
+    </div>
+  );
+}
+
+
 function UtopiaResultsGraphic() {
   return (
     <div className="utopia-results-graphic" aria-label="Verified sales snapshot">
@@ -2903,7 +2949,7 @@ function UtopiaVinylPage({ clock, navigate, project }) {
 
   return (
     <main className="main-content utopia-page" ref={pageRef}>
-      <header className="utopia-hero" id="utopia-overview" aria-labelledby="utopia-title">
+      <header className="utopia-hero utopia-hero-with-demo" id="utopia-overview" aria-labelledby="utopia-title">
         <div className="utopia-hero-copy">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span aria-hidden="true">←</span> selected work</a>
           <div>
@@ -2916,14 +2962,10 @@ function UtopiaVinylPage({ clock, navigate, project }) {
             <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
           </div>
         </div>
-        <div className="utopia-hero-art" aria-hidden="true">
-          <div className="utopia-record">
-            <div className="utopia-record-label"><span>UTOPIA</span><strong>VINYL</strong><small>TAIPEI · 2026</small></div>
-          </div>
-          <figure className="utopia-cover-sheet">
-            <img src={assetHref(project.image)} alt="" />
-          </figure>
-          <span className="utopia-sound-wave"><i /><i /><i /><i /><i /><i /><i /><i /></span>
+        <div className="utopia-banner-demo">
+          <div className="utopia-banner-browser"><span aria-hidden="true">● ● ●</span><span>utopiavinyl.com.tw</span></div>
+          <UtopiaStorefrontDemo />
+          <p>Browse the collection · Open a record · Add to cart</p>
         </div>
         <div className="utopia-hero-index"><span>01</span><span>24</span></div>
       </header>

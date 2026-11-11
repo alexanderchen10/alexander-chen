@@ -273,7 +273,7 @@ export const workProjects = [
     role: "Product Designer & Builder",
     period: "September 2026 – Present",
     cardImage: "/projects/work/utopia-vinyl/utopia-vinyl-card-thumbnail.jpg",
-    cardVideo: "/projects/work/utopia-vinyl/utopia-vinyl-walkthrough.mp4",
+    cardVideo: "/projects/work/utopia-vinyl/utopia-vinyl-seamless-walkthrough.mp4",
     image: "/projects/work/utopia-vinyl/utopia-vinyl-homepage-cover.webp",
     imageAlt: "Utopia Vinyl storefront homepage with the 黑膠理想國 turntable hero",
     coverEyebrow: "Product design · Independent commerce",
