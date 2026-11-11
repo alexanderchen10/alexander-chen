@@ -2493,7 +2493,6 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
             <figcaption>Photography by Alexander Chen</figcaption>
           </figure>
           <div>
-            <p className="published-editorial-meta">{section.article.publisher}<br /><time dateTime={section.article.dateTime}>{section.article.date}</time></p>
             <h3>{section.article.title}</h3>
             <p>{section.article.summary}</p>
             <dl>{section.article.credits.map(([label, name]) => <div key={label}><dt>{label}</dt><dd>{name}</dd></div>)}</dl>
@@ -2567,6 +2566,7 @@ function CaseStudyPage({ clock, navigate, project }) {
   const visibleProjects = workProjects.filter((item) => item.showInWork !== false);
   const projectIndex = visibleProjects.findIndex((item) => item.slug === project.slug);
   const nextProject = projectIndex >= 0 ? visibleProjects[(projectIndex + 1) % visibleProjects.length] : null;
+  const publishedArticle = project.mediaSections?.find((section) => section.article)?.article;
 
   return (
     <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}`}>
@@ -2575,6 +2575,12 @@ function CaseStudyPage({ clock, navigate, project }) {
         <header className="immersive-project-hero" id="project-overview">
           <div className="immersive-project-hero-media reveal reveal-fast" style={{ "--aspect": project.aspect || "16 / 10" }}>
             <ProjectVisual project={project} />
+            {publishedArticle && (
+              <p className="immersive-project-publication-meta">
+                <span>{publishedArticle.publisher}</span>
+                <time dateTime={publishedArticle.dateTime}>{publishedArticle.date}</time>
+              </p>
+            )}
             <span className="immersive-project-counter">01 / {String(sections.length).padStart(2, "0")}</span>
           </div>
           <div className="immersive-project-hero-copy reveal">
