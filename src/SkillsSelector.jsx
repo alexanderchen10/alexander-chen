@@ -83,7 +83,7 @@ export default function SkillsSelector() {
   useEffect(() => {
     const section = sectionRef.current;
     const stage = section.querySelector(".skills-selector-stage");
-    const desktop = window.matchMedia("(min-width: 1101px) and (min-height: 640px), (min-height: 800px)");
+    const desktop = window.matchMedia("(min-width: 1101px) and (min-height: 640px), (min-height: 600px)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     let settleTimer;
