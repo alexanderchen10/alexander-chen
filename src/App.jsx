@@ -323,7 +323,7 @@ function BrandMark() {
     icon.type = "image/svg+xml";
     icon.href = selectedLogoImage;
   }, []);
-  return <img src={selectedLogoImage} alt="Alexander Chen globe logo" width="44" height="44" style={{display:"block",width:44,height:44,objectFit:"contain"}} />;
+  return <img src={assetHref("/branding/alexander-chen-continuous-beacon.gif")} alt="Alexander Chen animated logo" width="720" height="428" style={{display:"block",width:"100%",height:"auto",objectFit:"contain"}} />;
 }
 
 function AvailabilityBadge() {
