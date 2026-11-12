@@ -919,7 +919,6 @@ function HomeExperience({ navigate }) {
       <header className="home-experience-heading">
         <p className="home-experience-kicker">02 / experience</p>
         <h2 id="home-experience-title"><span>Professional</span>{" "}<span>experience</span></h2>
-        <p className="home-experience-note">Six roles spanning client success, marketing, brand systems, community, and creative production.</p>
       </header>
       <ExperienceSkillsCarousel />
       <div className="home-experience-list">
@@ -1319,7 +1318,6 @@ function HomePage({ clock, navigate }) {
           <p>Who I’ve worked with</p>
           <div>
             <h2 id="home-collaborators-title">Trusted across retail, talent, technology, and culture.</h2>
-            <p>A selection of organizations I’ve collaborated with across in-house, studio, event, and campaign work.</p>
           </div>
         </div>
         <CollaboratorCarousel navigate={navigate} />
