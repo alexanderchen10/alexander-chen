@@ -1261,7 +1261,6 @@ function HomeToolkits() {
 }
 
 function HomePlayground({ navigate }) {
-  const items = playgroundItems.filter(item => ["photography", "porter-airlines"].includes(item.id));
   return <section id="home-playground" className="home-playground-section" aria-labelledby="home-playground-title">
     <div className="home-playground-intro">
       <header><p className="section-label">Playground</p><h2 id="home-playground-title">A little room to explore.</h2><p>Photography, design experiments, and stories from life outside the brief.</p><a href={routeHref("playground")} onClick={event => navigate(event, "/playground")}>Explore the playground <Arrow /></a></header>
@@ -1275,7 +1274,6 @@ function HomePlayground({ navigate }) {
         <span className="home-playground-pixel-copy"><small>meet pixel alex</small><strong>Come in and play <Arrow /></strong></span>
       </a>
     </div>
-    <div className="home-playground-grid">{items.map(item => <a href={routeHref(item.href.replace(/^#/, ""))} onClick={event => navigate(event, "/", item.href.replace(/^#/, ""))} key={item.id}><img src={assetHref(item.image)} alt={item.alt} loading="lazy" /><span>{item.label}<Arrow /></span></a>)}</div>
   </section>;
 }
 
