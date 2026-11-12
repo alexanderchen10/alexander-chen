@@ -1559,6 +1559,8 @@ export const about = {
       location: "Brampton, Canada",
       badge: "LCL",
       role: "Employer Branding Intern",
+      projectSlugs: ["sharepoint-digital-toolkit"],
+      projectLabels: { "sharepoint-digital-toolkit": "SharePoint Social Media Toolkit" },
       period: "Jan–Apr 2024",
       summary: "Converted employee research into a candidate-facing attraction story while building a large-scale global knowledge and creative-asset system.",
       metrics: ["52 employee survey responses", "1,000+ candidate submissions in 30 days", "640+ templates · 32 banners · thousands of photos"],
