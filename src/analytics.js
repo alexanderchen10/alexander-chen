@@ -14,7 +14,7 @@ export function isNewVisit(previous, next) { return !previous || previous.page_p
 function enabled() { return isProductionHost(window.location.hostname) && window.navigator.doNotTrack !== '1' && window['ga-disable-' + MEASUREMENT_ID] !== true; }
 function send(name, parameters = {}) {
   if (!enabled() || typeof window.gtag !== 'function') return;
-  const context = current ? { page_title: current.page_title, page_location: canonicalLocation(current), page_path: current.page_path, page_name: current.page_name, page_type: current.page_type, ...(current.project_id ? { project_id: current.project_id, project_name: current.project_name } : {}) } : {};
+  const context = current ? { page_title: current.page_title, page_location: canonicalLocation(current), page_path: current.page_path, page_name: current.page_name, page_type: current.page_type, ...(current.project_id ? { project_id: current.project_id, project_name: current.project_name } : {}), ...(current.album_id ? { album_id: current.album_id } : {}) } : {};
   const payload = { ...context, ...parameters, send_to: MEASUREMENT_IDS.filter(id => window['ga-disable-' + id] !== true), ...(debug ? { debug_mode: true, traffic_type: 'developer' } : {}) };
   window.gtag('event', name, payload);
   if (debug) {
@@ -89,13 +89,13 @@ function observeVisit(page, visit) {
   let frame = 0;
   const clear = el => { clearTimeout(timers.get(el)); timers.delete(el); };
   const check = el => {
-    if (seen.has(el) || visit !== serial) return;
+    if (seen.has(sections.get(el)?.[0]) || visit !== serial) return;
     if (visibleFraction(el) < .5) { clear(el); return; }
     if (!timers.has(el)) timers.set(el, setTimeout(() => {
       timers.delete(el);
-      if (visit !== serial || visibleFraction(el) < .5 || seen.has(el)) return;
-      seen.add(el);
+      if (visit !== serial || visibleFraction(el) < .5 || seen.has(sections.get(el)?.[0])) return;
       const [section_id, section_name] = sections.get(el);
+      seen.add(section_id);
       send('section_view', { section_id, section_name, visible_percent: 50, visibility_ms: 1000 });
     }, 1000));
   };
@@ -158,6 +158,7 @@ function handleClick(event) {
   }
   const dialog = button.closest('[role="dialog"]');
   if (dialog && modalType(dialog)) send('modal_interaction', { modal_type: modalType(dialog), action: /close/i.test(button.getAttribute('aria-label') || button.textContent) ? 'close' : 'navigate' });
+  if (button.matches('.skills-selector [role="tab"]')) send('toolkit_select', { toolkit_id: button.id.replace(/^skills-tab-/, ''), toolkit_name: button.textContent.trim().slice(0, 80) });
   if (button.closest('.home-toolkit-list')) send('toolkit_expand', { toolkit_name: button.textContent.replace(/[+−]/g, '').trim().slice(0, 80), expanded: button.getAttribute('aria-expanded') !== 'true' });
   if (button.matches('.home-hero-avatar')) send('hero_interaction', { action: 'camera_pose' });
 }
