@@ -3512,3 +3512,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media(prefers-reduced-motion:reduce) { .home-hero.is-entering::after { display:none; } .home-hero.is-entering h1,.home-hero.is-entering .home-hero-surname,.home-hero.is-entering .hero-name-mask em,.home-hero.is-entering .home-hero-eyebrow,.home-hero.is-entering .home-hero-actions,.home-hero.is-entering .home-hero-details,.home-hero.is-entering .home-hero-portrait-stage,.home-hero.is-entering .home-hero-motion-toggle { animation:none; } }
 
 html { scrollbar-gutter:stable; }
+
+.mobile-header .mobile-brand-lockup { display:inline-flex; align-items:center; gap:10px; flex:0 0 auto; line-height:1.2; letter-spacing:0; }
+.mobile-header .mobile-brand-lockup .brand-logo { display:block; width:60px; flex:0 0 60px; line-height:0; }
+.mobile-brand-copy { display:grid; gap:4px; text-align:left; white-space:nowrap; }
+.mobile-brand-copy strong { font-size:12px; font-weight:650; color:var(--tech-navy); }
+.mobile-brand-copy small { font-size:9px; font-weight:400; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-50); }
+@media(max-width:430px) { .mobile-header .mobile-brand-lockup { gap:7px; } .mobile-header .mobile-brand-lockup .brand-logo { width:46px; flex-basis:46px; } .mobile-brand-copy strong { font-size:10px; } .mobile-brand-copy small { font-size:8px; } .mobile-header .availability-badge { margin-right:12px; font-size:6px; gap:5px; } }

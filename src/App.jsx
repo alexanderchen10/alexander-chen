@@ -451,7 +451,7 @@ function MobileHeader({ page, route, navigate }) {
   return (
     <>
       <header className="mobile-header">
-        <a className="brand brand-logo" aria-label="Alexander Chen home" href={routeHref()} onClick={(e) => navigate(e, "/")}><BrandMark /></a>
+        <a className="brand mobile-brand-lockup" aria-label="Alexander Chen portfolio home" href={routeHref()} onClick={(e) => navigate(e, "/")}><span className="brand-logo"><BrandMark /></span><span className="mobile-brand-copy"><strong>Alexander Chen</strong><small>Portfolio</small></span></a>
         <AvailabilityBadge />
         <button
           className={`menu-toggle ${open ? "is-open" : ""}`}
