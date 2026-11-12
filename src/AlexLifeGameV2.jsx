@@ -1,3 +1,4 @@
+import { trackPlayground } from "./analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const WIDTH = 960;
@@ -320,6 +321,7 @@ export default function AlexLifeGameV2({ navigate }) {
         { x: 1170, y: 220, collected: false },
       ],
     };
+    trackPlayground("advance_scene", nextScene.id);
     setSceneIndex(nextIndex);
   };
 
@@ -495,3 +497,4 @@ export default function AlexLifeGameV2({ navigate }) {
     </main>
   );
 }
+

@@ -1,3 +1,5 @@
+import { commitPage, trackPlayground } from "./analytics";
+import { normalizeRoute } from "./analyticsRoutes";
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import SkillsSelector from "./SkillsSelector";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -129,7 +131,7 @@ function useIcffHubActiveSection() {
 }
 
 function usePage() {
-  const readRoute = () => window.location.hash.replace(/^#\/?/, "");
+  const readRoute = () => normalizeRoute(window.location.hash);
   const readPage = () => pageFromRoute(readRoute());
   const [route, setRoute] = useState(readRoute);
   const [page, setPage] = useState(readPage);
@@ -1516,6 +1518,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   }, []);
 
   const beginMove = useCallback((token, name, horizontal, vertical) => {
+    trackPlayground("move");
     clearRoute();
     heldMoves.current.set(token, { name, horizontal, vertical });
     if (vertical) {
@@ -1536,6 +1539,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   }, [syncPressedDirections]);
 
   const jumpAlex = useCallback(() => {
+    trackPlayground("jump");
     jumpRef.current = { active: true, elapsed: 0 };
     setAlexJumpHeight(0);
     setAlexJumping(true);
@@ -1716,6 +1720,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   }, []);
 
   const chooseScene = (scene) => {
+    trackPlayground("scene_change", scene.id);
     stopMoving();
     setSceneId(scene.id);
     updateAlexPosition({ ...scene.spawn });
@@ -1740,6 +1745,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     setPressedDirections(new Set());
     const route = findPlaygroundRoute(activeScene, alexPositionRef.current, target);
     if (route) {
+      trackPlayground("move_to_destination", activeScene.id);
       routeRef.current = route.points;
       setRouteDestination(route.destination);
     } else {
@@ -4046,22 +4052,8 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    if (page === "work") document.title = `Projects | ${profile.name}`;
-    else if (page.startsWith("project-log")) document.title = `Project & Documentation Log | ${profile.name}`;
-    else if (page === "education") document.title = `${profile.name} | Education`;
-    else if (page === "about") document.title = `${profile.name} | About`;
-    else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
-    else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
-    else if (page === "playground/photography") document.title = `${profile.name} | My Art`;
-    else if (page === "playground/design") document.title = `${profile.name} | My Design`;
-    else if (page === "playground/fa-adventure") document.title = `${profile.name} | My FA Adventure`;
-    else if (page === "playground/alexs-life") document.title = `Alex's Life | ${profile.name}`;
-    else if (page === "playground/alexs-life-hifi") document.title = `Alex's Life High Fidelity | ${profile.name}`;
-    else if (page === "playground") document.title = `${profile.name} | Playground`;
-    else if (selectedDetail) document.title = `${selectedDetail.entry.title} | ${profile.name}`;
-    else if (selectedProject) document.title = `${selectedProject.title} | ${profile.name}`;
-    else document.title = `${profile.name} | Digital Designer & Content Strategist`;
-  }, [page, selectedProject, selectedDetail, selectedPhotographyAlbum]);
+    commitPage(route);
+  }, [page, route]);
 
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
@@ -4112,6 +4104,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
