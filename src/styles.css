@@ -3423,3 +3423,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media (max-width: 680px) { .experience-skills-heading { padding-inline: 12px; } .experience-skills-heading p { max-width: 19ch; font-size: 10px; } .experience-skills-group, .experience-skills-group li { gap: 24px; } .experience-skills-group { padding-right: 24px; } }
 @media (prefers-reduced-motion: reduce) { .experience-skills-track { animation: none; } .experience-skills-window { overflow-x: auto; mask-image: none; } .experience-skills-group[aria-hidden="true"], .experience-skills-heading button { display: none; } }
 
+
+.home-hero-live-project { flex-wrap:wrap; gap:12px 24px; }
+.home-hero-live-project a { white-space:nowrap; }
+.home-hero-live-project a:nth-child(2) .home-hero-live-dot { background:var(--tech-purple); }

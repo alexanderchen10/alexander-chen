@@ -1149,8 +1149,8 @@ function HomeHero() {
           <div>
             <dt className="home-hero-detail-label">Now building</dt>
             <dd className="home-hero-live-project">
-              <span className="home-hero-live-dot" aria-hidden="true" />
-              <a href={routeHref("project/utopia-vinyl")}>Utopia Vinyl <Arrow /></a>
+              <a href={routeHref("project/utopia-vinyl")}><span className="home-hero-live-dot" aria-hidden="true" />Utopia Vinyl <Arrow /></a>
+              <a href={routeHref("ao-studio")}><span className="home-hero-live-dot" aria-hidden="true" />AO Studio <Arrow /></a>
             </dd>
           </div>
         </dl>
