@@ -140,8 +140,8 @@ function usePage() {
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
-        if (nextPage === "home" && ["work", "experience"].includes(currentRoute)) {
-          document.getElementById(currentRoute)?.scrollIntoView();
+        if (nextPage === "home" && ["projects", "experience"].includes(currentRoute)) {
+          document.getElementById(currentRoute === "projects" ? "work" : currentRoute)?.scrollIntoView({ block: "start" });
         } else {
           window.scrollTo({ top: 0 });
         }
@@ -167,7 +167,7 @@ function usePage() {
     setRoute(route);
     setPage(nextPage);
     window.setTimeout(() => {
-      if (nextPage === "home" && anchor) document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
+      if (nextPage === "home" && anchor) document.getElementById(anchor === "projects" ? "work" : anchor)?.scrollIntoView({ behavior: anchor === "projects" ? "instant" : "smooth", block: "start" });
       else window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
@@ -288,13 +288,13 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
     <nav ref={navRef} className="primary-navigation" aria-label="Primary navigation">
       <ol className="numbered-links">
         {[
-          { route: "work", label: "projects", destination: "/", anchor: "work" },
+          { route: "work", label: "projects", destination: "/", anchor: "projects" },
           { route: "experience", label: "experience", destination: "/", anchor: "experience" },
           { route: "education", label: "education", destination: "/", anchor: "education" },
           { route: "about", label: "about & playground", destination: "/about" },
           { route: "ao-studio", label: "ao studio", destination: "/ao-studio" },
         ].map((item, index) => <li key={item.route}>
-          <a href={routeHref(item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
+          <a href={routeHref(item.anchor || item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
             <span>{String(index + 1).padStart(2, "0")}.</span><span>{item.label}</span>
           </a>
         </li>)}
@@ -1305,7 +1305,7 @@ function HomeProjects({ navigate }) {
         <div className="home-ao-copy"><div className="home-ao-heading"><h3>AO Studio</h3><span className="project-status">Ongoing</span></div><p className="home-ao-role">Founder · Creative Director · Designer · Developer</p><p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p><div className="project-card-actions"><a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a><a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a></div><h4>Clients &amp; collaborations</h4><ul>{aoStudioProjectSlugs.map(slug => { const project=workProjects.find(p=>p.slug===slug); return project && <li key={slug}><a href={routeHref(`project/${slug}`)}><span>{project.organization || project.title}</span><Arrow /></a></li>; })}</ul></div>
       </article>
     </div>
-    <div className="home-all-projects" id="home-project-collection"><header><h3>More work</h3><a href={routeHref("work")}>Browse all projects <Arrow /></a></header></div>
+    <div className="home-all-projects" id="home-project-collection"><header><h3>More work</h3><a className="project-live-button" href={routeHref("work")} style={{ padding: "14px 24px", borderRadius: "999px", background: "var(--tech-navy)", color: "#fff", display: "inline-flex", alignItems: "center", gap: "12px", minHeight: "48px" }}>Projects catalogue <Arrow /></a></header></div>
   </section>;
 }
 
@@ -4135,6 +4135,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
