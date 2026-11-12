@@ -3645,7 +3645,7 @@ function EducationPage({ embedded = false }) {
   ];
   const studyThreads = [
     ["Digital enterprise", "Connects business goals, digital systems, and delivery."],
-    ["UX design", "Turns user needs into clearer flows and interfaces."],
+    ["UX design", "Turns needs into clearer flows and interfaces."],
     ["Content strategy", "Shapes information so people can understand and act."],
     ["Digital marketing", "Connects creative decisions to audience and performance."],
     ["Visual storytelling", "Builds narratives through image, motion, and sequence."],
