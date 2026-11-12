@@ -1018,10 +1018,11 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
   );
 }
 
+const homepageIntroEligible = !window.location.hash && performance.getEntriesByType("navigation")[0]?.type !== "back_forward";
 let homepageIntroSeen = false;
 function HomeHero() {
   const [intro, setIntro] = useState(() => {
-    if (homepageIntroSeen || window.scrollY > 0 || window.location.hash || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    if (!homepageIntroEligible || homepageIntroSeen || window.scrollY > 0 || window.location.hash || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
     try { if (sessionStorage.getItem("ac-home-intro")) return false; } catch {}
     return true;
   });
