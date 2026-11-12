@@ -13,6 +13,7 @@ import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
 import "./HeroNaturalAvatar.css";
 import "./TtCaseStudy.css";
+import { ExperienceCardLink, InteractiveStats, LoopingPreview } from "./ExperienceInteractions";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 import {
   PLAYGROUND_SCENE_HEIGHT,
@@ -929,6 +930,7 @@ function HomeExperience({ navigate }) {
       <div className="home-experience-list">
         <div className="home-experience-stack" ref={cardStack}>
           {about.experience.map((experience, index) => {
+            const experienceRoute = experience.organization.startsWith("AO Studio") ? "ao-studio" : `project/${experience.projectSlugs?.[0] || "aves-lair-community"}`;
             const relatedProjects = (experience.projectSlugs || [])
               .map((slug) => projectFromRoute(`project/${slug}`))
               .filter(Boolean);
@@ -940,7 +942,11 @@ function HomeExperience({ navigate }) {
                 key={`${experience.organization}-${experience.role}`}
                 style={{ "--experience-deal-direction": index % 2 === 0 ? -1 : 1 }}
               >
-                <article className="home-experience-item" aria-labelledby={`home-experience-company-${index}`}>
+                <article className="home-experience-item" aria-labelledby={`home-experience-company-${index}`} onClick={(event) => {
+                  if (event.target.closest("a, button, input, select, textarea") || window.getSelection()?.toString()) return;
+                  event.currentTarget.querySelector(".experience-card-open")?.click();
+                }}>
+                  <ExperienceCardLink href={routeHref(experienceRoute)} route={experienceRoute} label={`${experience.organization} — ${experience.role}`} navigate={navigate} />
                   <div className="home-experience-side">
                     <span className="home-experience-sequence" aria-hidden="true">{String(index + 1).padStart(2, "0")} / {String(about.experience.length).padStart(2, "0")}</span>
                     <h3 id={`home-experience-company-${index}`}>{experience.organization}</h3>
@@ -2439,11 +2445,12 @@ function StructuredMediaItem({ item, title, index, presentation }) {
 
 function OverviewProjectCard({ project, chapter, entry, projectIndex }) {
   const fallbackCover = [...(entry.items || []), ...(entry.storyboardItems || []), ...(entry.finalOutputItems || [])].find((item) => item.type === "image" || item.poster);
+  const loopVideo = [...(entry.items || []), ...(entry.finalOutputItems || [])].find(item => item.type === "video");
   const cover = entry.cover ? { src: entry.cover, alt: entry.coverAlt || `${entry.title} project cover` } : fallbackCover;
   return (
     <a className="overview-project-card reveal" href={routeHref(projectDetailRoute(project, chapter, projectIndex))}>
       <div className="overview-project-cover">
-        {cover ? <img src={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} loading="lazy" style={entry.coverFit || entry.coverBackground ? { objectFit: entry.coverFit, background: entry.coverBackground } : undefined} /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
+        {cover ? <LoopingPreview src={loopVideo ? assetHref(loopVideo.src) : undefined} poster={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} fit={entry.coverFit} background={entry.coverBackground} /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
         <span className="overview-project-open" aria-hidden="true">↗</span>
       </div>
       <div className="overview-project-copy">
@@ -2497,9 +2504,7 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
         </section>}
 
         {project.proofMetrics?.length > 0 ? (
-          <section className="structured-proof-strip structured-proof-strip-metrics reveal" id="structured-proof" aria-label="Project proof">
-            {project.proofMetrics.map((metric, index) => <article key={`${metric.value}-${metric.label}`}><span>{String(index + 1).padStart(2, "0")}</span><strong>{metric.value}</strong><p>{metric.label}</p></article>)}
-          </section>
+          <InteractiveStats key={project.slug} metrics={project.proofMetrics} />
         ) : project.impact?.length > 0 && (
           <section className="structured-proof-strip reveal" aria-label="Project proof">
             {project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}
@@ -3111,7 +3116,7 @@ function CaseStudyPage({ clock, navigate, project }) {
                   document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
                 }}>
                   <figure>
-                    <img src={assetHref(item.image)} alt={item.imageAlt || ""} loading="lazy" />
+                    <LoopingPreview src={project.mediaSections?.[Number(item.target?.split("-").pop())]?.items?.find(media => media.type === "video")?.src ? assetHref(project.mediaSections[Number(item.target.split("-").pop())].items.find(media => media.type === "video").src) : undefined} poster={assetHref(item.image)} alt={item.imageAlt || ""} />
                   </figure>
                   <span>{item.number}</span>
                   <div>
@@ -3126,6 +3131,7 @@ function CaseStudyPage({ clock, navigate, project }) {
           </nav>
         )}
         {project.showProofStrip !== false && project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
+        {project.proofMetrics?.length > 0 && <InteractiveStats key={project.slug} metrics={project.proofMetrics} />}
         {project.mediaSections?.map((section, sectionIndex) => <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
         {project.subprojects?.length > 0 && (
           <section className="case-study-subprojects immersive-project-collection reveal" id="project-collection" aria-labelledby={`${project.slug}-projects`}>
@@ -3922,6 +3928,7 @@ function caseStudyProgressSectionsFor(project) {
   return [
     { id: "project-overview", label: "Overview" },
     ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
+    ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Results" }] : []),
     ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
     ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
     { id: "project-impact", label: "Impact" },
@@ -4105,6 +4112,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
