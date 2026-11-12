@@ -3400,3 +3400,19 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
  .global-topbar .numbered-links { gap: 9px; font-size: 9px; }
  .global-topbar .topbar-actions { max-width: 230px; }
 }
+
+/* Discoverable objects share the city's pixel grid and remain keyboard accessible. */
+.playground-world-link { position:absolute; display:block; cursor:pointer; text-decoration:none; }
+.playground-world-link img { width:100%; display:block; image-rendering:pixelated; }
+.playground-world-link span { position:absolute; bottom:calc(100% + 12px); left:50%; transform:translate(-50%,4px); white-space:nowrap; padding:8px 12px; background:#252334; color:#fff7e8; font-size:13px; border:2px solid #c8b6e9; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; }
+.playground-world-link:hover span,.playground-world-link:focus-visible span { opacity:1; transform:translate(-50%,0); }
+.playground-world-link:focus-visible { outline:3px solid #aa8aff; outline-offset:8px; }
+.playground-world-plane { width:19%; left:56%; top:22%; z-index:2; animation:playground-plane-cruise 100s ease-in-out infinite alternate; }
+.playground-world-plane:hover,.playground-world-plane:focus-visible { animation-play-state:paused; }
+.playground-world-camera { width:5%; left:59%; top:83%; z-index:960; }
+.playground-world-camera:after { content:""; position:absolute; width:90%; height:12%; background:#25233440; bottom:-4%; left:5%; z-index:-1; border-radius:50%; }
+@keyframes playground-plane-cruise { from { translate:0 0; } to { translate:-200% -8%; } }
+.home-playground-grid a:has(img[src$="pixel-camera.svg"]) img { object-fit:contain; padding:36px; image-rendering:pixelated; }
+.home-playground-grid a:has(img[src$="pixel-porter.svg"]) img { object-fit:contain; padding:26px; image-rendering:pixelated; animation:home-plane-idle 30s ease-in-out infinite alternate; }
+@keyframes home-plane-idle { to { transform:translateX(-12px); } }
+@media(prefers-reduced-motion:reduce) { .playground-world-plane,.home-playground-grid a:has(img[src$="pixel-porter.svg"]) img { animation:none; } }

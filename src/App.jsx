@@ -1832,6 +1832,12 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
         <div className="playground-scene-plane" key={activeScene.id} ref={scenePlane} style={planeStyle}>
           <div className="playground-world" aria-hidden="true" />
           <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
+          <a className="playground-world-link playground-world-plane" href={routeHref("playground/fa-adventure")} aria-label="my FA adventure" onPointerDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); navigate(event, "/", "playground/fa-adventure"); }}>
+            <img src={assetHref("/projects/playground/pixel-porter.svg")} alt="Pixel-art Porter airplane" /><span>my FA adventure ↗</span>
+          </a>
+          <a className="playground-world-link playground-world-camera" href={routeHref("playground/photography")} aria-label="My Art" onPointerDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); navigate(event, "/", "playground/photography"); }}>
+            <img src={assetHref("/projects/playground/pixel-camera.svg")} alt="Pixel-art camera resting on the pavement" /><span>My Art ↗</span>
+          </a>
           {activeScene.foregrounds.map(item => (
             <div
               className="playground-foreground-object"
