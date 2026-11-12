@@ -1,6 +1,7 @@
 import { HOME_SECTIONS, ORIGIN, resolvePage, canonicalLocation, safeReferrer } from './analyticsRoutes.js';
 
 export const MEASUREMENT_ID = 'G-6FCH1QPWBP';
+export const MEASUREMENT_IDS = [MEASUREMENT_ID, 'G-FWV4F4RMGN'];
 let current = null;
 let disposeVisit = () => {};
 let initialized = false;
@@ -14,7 +15,7 @@ function enabled() { return isProductionHost(window.location.hostname) && window
 function send(name, parameters = {}) {
   if (!enabled() || typeof window.gtag !== 'function') return;
   const context = current ? { page_title: current.page_title, page_location: canonicalLocation(current), page_path: current.page_path, page_name: current.page_name, page_type: current.page_type, ...(current.project_id ? { project_id: current.project_id, project_name: current.project_name } : {}) } : {};
-  const payload = { ...context, ...parameters, send_to: MEASUREMENT_ID, ...(debug ? { debug_mode: true, traffic_type: 'developer' } : {}) };
+  const payload = { ...context, ...parameters, send_to: MEASUREMENT_IDS.filter(id => window['ga-disable-' + id] !== true), ...(debug ? { debug_mode: true, traffic_type: 'developer' } : {}) };
   window.gtag('event', name, payload);
   if (debug) {
     let trace = document.getElementById('portfolio-ga4-debug');
@@ -40,8 +41,11 @@ export function initAnalytics() {
   debug = new URLSearchParams(window.location.search).get('analytics_debug') === '1';
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+  // The existing Google tag has two connected destinations. Suppress auto views
+  // globally as well as per destination, including server-managed tag initialization.
+  window.gtag('set', { send_page_view: false, ...(debug ? { debug_mode: true } : {}) });
   window.gtag('js', new Date());
-  window.gtag('config', MEASUREMENT_ID, { send_page_view: false, ...(debug ? { debug_mode: true } : {}) });
+  MEASUREMENT_IDS.forEach(id => window.gtag('config', id, { send_page_view: false, ...(debug ? { debug_mode: true } : {}) }));
   if (!document.querySelector('script[data-portfolio-ga4]')) {
     const script = document.createElement('script');
     script.async = true;
