@@ -1509,6 +1509,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const [alexFacing, setAlexFacing] = useState(1);
   const [alexWalking, setAlexWalking] = useState(false);
   const [alexJumping, setAlexJumping] = useState(false);
+  const [pressedDirections, setPressedDirections] = useState(() => new Set());
   const heldMoves = useRef(new Map());
   const alexVelocity = useRef({ x: 0, y: 0 });
   const jumpTimer = useRef(null);
@@ -1533,16 +1534,26 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     pulseWalking();
   }, [pulseWalking]);
 
-  const beginMove = useCallback((token, horizontal, vertical) => {
-    heldMoves.current.set(token, { horizontal, vertical });
-    if (horizontal) setAlexFacing(horizontal);
+  const syncPressedDirections = useCallback(() => {
+    setPressedDirections(new Set([...heldMoves.current.values()].map(direction => direction.name).filter(Boolean)));
+  }, []);
+
+  const beginMove = useCallback((token, name, horizontal, vertical) => {
+    heldMoves.current.set(token, { name, horizontal, vertical });
+    if (horizontal) {
+      const facing = Math.sign(horizontal);
+      setAlexFacing(facing);
+      alexActor.current?.style.setProperty("--alex-facing", facing);
+    }
+    syncPressedDirections();
     window.clearTimeout(walkingPulseTimer.current);
     setAlexWalking(true);
-  }, []);
+  }, [syncPressedDirections]);
 
   const endMove = useCallback((token) => {
     heldMoves.current.delete(token);
-  }, []);
+    syncPressedDirections();
+  }, [syncPressedDirections]);
 
   const jumpAlex = useCallback(() => {
     window.clearTimeout(jumpTimer.current);
@@ -1608,29 +1619,28 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       const tagName = event.target?.tagName?.toLowerCase();
       const gameControl = event.target?.closest?.(".playground-pixel-character, .playground-game-controls");
       if (["input", "textarea", "select"].includes(tagName) || (tagName === "button" && !gameControl) || event.target?.isContentEditable) return;
-      const key = event.key.toLowerCase();
       const direction = {
-        arrowleft: [-1, 0], a: [-1, 0],
-        arrowright: [1, 0], d: [1, 0],
-        arrowup: [0, -1], w: [0, -1],
-        arrowdown: [0, 1], s: [0, 1],
-      }[key];
+        ArrowLeft: ["left", -1, 0], KeyA: ["left", -1, 0],
+        ArrowRight: ["right", 1, 0], KeyD: ["right", 1, 0],
+        ArrowUp: ["up", 0, -1], KeyW: ["up", 0, -1],
+        ArrowDown: ["down", 0, 1], KeyS: ["down", 0, 1],
+      }[event.code];
       if (direction) {
         event.preventDefault();
-        if (!event.repeat) beginMove(`key:${key}`, direction[0], direction[1]);
-      } else if (event.key === " ") {
+        if (!event.repeat) beginMove(`keyboard:${event.code}`, direction[0], direction[1], direction[2]);
+      } else if (event.code === "Space") {
         event.preventDefault();
         jumpAlex();
       }
     };
     const handleKeyUp = (event) => {
-      const key = event.key.toLowerCase();
-      if (["arrowleft", "a", "arrowright", "d", "arrowup", "w", "arrowdown", "s"].includes(key)) {
-        endMove(`key:${key}`);
+      if (["ArrowLeft", "KeyA", "ArrowRight", "KeyD", "ArrowUp", "KeyW", "ArrowDown", "KeyS"].includes(event.code)) {
+        endMove(`keyboard:${event.code}`);
       }
     };
     const stopMoving = () => {
       heldMoves.current.clear();
+      setPressedDirections(new Set());
       alexVelocity.current = { x: 0, y: 0 };
       setAlexWalking(false);
     };
@@ -1654,18 +1664,31 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     setAlexPosition(scene.id === "taipei" ? { x: 42, y: 82 } : { x: 48, y: 82 });
     setAlexFacing(1);
     heldMoves.current.clear();
+    setPressedDirections(new Set());
     alexVelocity.current = { x: 0, y: 0 };
     setAlexWalking(false);
   };
 
   const alexScale = .76 + ((alexPosition.y - 54) / 34) * .24;
-  const movementButtonProps = (name, horizontal, vertical) => ({
-    onPointerDown: (event) => beginMove(`pointer:${name}:${event.pointerId}`, horizontal, vertical),
-    onPointerUp: (event) => endMove(`pointer:${name}:${event.pointerId}`),
-    onPointerCancel: (event) => endMove(`pointer:${name}:${event.pointerId}`),
-    onPointerLeave: (event) => endMove(`pointer:${name}:${event.pointerId}`),
-    onClick: () => nudgeAlex(horizontal, vertical),
-  });
+  const movementButtonProps = (name, horizontal, vertical) => {
+    const releasePointer = (event) => {
+      endMove(`pointer:${name}:${event.pointerId}`);
+      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    };
+    return {
+      "aria-pressed": pressedDirections.has(name),
+      onPointerDown: (event) => {
+        event.preventDefault();
+        event.currentTarget.setPointerCapture?.(event.pointerId);
+        beginMove(`pointer:${name}:${event.pointerId}`, name, horizontal, vertical);
+      },
+      onPointerUp: releasePointer,
+      onPointerCancel: releasePointer,
+      onClick: (event) => {
+        if (event.detail === 0) nudgeAlex(horizontal, vertical);
+      },
+    };
+  };
 
   return (
     <Wrapper className={embedded ? "about-playground" : "playground-page"} id={embedded ? "about-playground" : undefined}>
@@ -1691,6 +1714,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
         <div
           ref={alexActor}
           className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
+          data-facing={alexFacing < 0 ? "left" : "right"}
           style={{ "--alex-x": `${alexPosition.x}%`, "--alex-y": `${alexPosition.y}%`, "--alex-facing": alexFacing, "--alex-scale": alexScale.toFixed(3) }}
         >
           <button
@@ -1702,14 +1726,14 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
             <span
               className="playground-character-sprite"
-              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-walk-cycle.png")})` }}
+              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-walk-cycle-v2.png")})` }}
               aria-hidden="true"
             />
             <span className="playground-step-dust" aria-hidden="true"><i /><i /><i /></span>
             <span className="playground-pixel-shadow" aria-hidden="true" />
           </button>
         </div>
-        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>WASD / arrows to move · Space to jump</small></div>
+        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>Hold WASD / arrows or two buttons to move · Space to jump</small></div>
         <div className="playground-game-controls" role="group" aria-label="Move Pixel Alex">
           <button type="button" className="control-up" aria-label="Move Alex up" {...movementButtonProps("up", 0, -1)}>↑</button>
           <button type="button" className="control-left" aria-label="Move Alex left" {...movementButtonProps("left", -1, 0)}>←</button>
