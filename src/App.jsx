@@ -1297,7 +1297,7 @@ function HomeEducation() {
 function HomeProjects({ navigate }) {
   const utopia = workProjects.find(project => project.slug === "utopia-vinyl");
   return <section id="work" className="portfolio-section home-work-section" aria-labelledby="home-projects-title">
-    <div className="home-work-heading"><h2 id="home-projects-title">Projects<span aria-hidden="true">.</span></h2><p>Independent products, ongoing studio collaborations, and selected client work.</p></div>
+    <div className="home-work-heading"><h2 id="home-projects-title">Projects<span aria-hidden="true">.</span></h2><a id="home-project-collection" className="project-live-button" href={routeHref("work")} style={{ padding: "14px 24px", borderRadius: "999px", background: "var(--tech-navy)", color: "#fff", display: "inline-flex", alignItems: "center", gap: "12px", minHeight: "48px" }}>Projects catalogue <Arrow /></a></div>
     <div className="home-project-features">
       <ProjectCard project={utopia} index={0} logoPreview />
       <article className="home-ao-feature" id="home-ao-studio">
@@ -1305,7 +1305,7 @@ function HomeProjects({ navigate }) {
         <div className="home-ao-copy"><div className="home-ao-heading"><h3>AO Studio</h3><span className="project-status">Ongoing</span></div><p className="home-ao-role">Founder · Creative Director · Designer · Developer</p><p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p><div className="project-card-actions"><a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a><a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a></div><h4>Clients &amp; collaborations</h4><ul>{aoStudioProjectSlugs.map(slug => { const project=workProjects.find(p=>p.slug===slug); return project && <li key={slug}><a href={routeHref(`project/${slug}`)}><span>{project.organization || project.title}</span><Arrow /></a></li>; })}</ul></div>
       </article>
     </div>
-    <div className="home-all-projects" id="home-project-collection"><header><h3>More work</h3><a className="project-live-button" href={routeHref("work")} style={{ padding: "14px 24px", borderRadius: "999px", background: "var(--tech-navy)", color: "#fff", display: "inline-flex", alignItems: "center", gap: "12px", minHeight: "48px" }}>Projects catalogue <Arrow /></a></header></div>
+
   </section>;
 }
 
