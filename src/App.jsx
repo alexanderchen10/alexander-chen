@@ -1586,15 +1586,14 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       const targetY = inputY * maxSpeedY;
       const velocity = alexVelocity.current;
       if (hasInput) {
-        const blend = 1 - Math.exp(-16 * elapsed);
-        velocity.x += (targetX - velocity.x) * blend;
-        velocity.y += (targetY - velocity.y) * blend;
+        velocity.x = targetX;
+        velocity.y = targetY;
       } else {
         velocity.x = 0;
         velocity.y = 0;
       }
       const speedRatio = Math.min(1, Math.hypot(velocity.x / maxSpeedX, velocity.y / maxSpeedY));
-      const isMoving = hasInput && speedRatio > .025;
+      const isMoving = hasInput;
       setAlexWalking(isMoving);
       if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
       if (alexActor.current) {
