@@ -3716,9 +3716,7 @@ function EducationPage({ embedded = false }) {
   return (
     <Container className={embedded ? "education-page education-home-section" : "main-content education-page"} id={embedded ? "home-education" : undefined} ref={pageRef}>
       <header className="education-intro">
-        <p className="section-label">Education</p>
-        <IntroHeading>Learning that shapes<br />the way I work.</IntroHeading>
-        <p>Digital Enterprise Management at the University of Toronto, with a foundation in UX design and a hands-on creative practice.</p>
+        <IntroHeading>Education</IntroHeading>
         <a className="education-resume-link" href={assetHref("/resume.pdf")} target="_blank" rel="noreferrer">Open full résumé <Arrow /></a>
       </header>
       <div className="education-degree-stage">
@@ -3796,7 +3794,7 @@ function EducationPage({ embedded = false }) {
               onFocus={() => setActiveThread(index)}
               key={thread}
             >
-              {thread}<span aria-hidden="true"> / </span>
+              <span className="education-thread-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><strong>{thread}</strong><span aria-hidden="true">↗</span>
             </button>
           ))}
         </div>

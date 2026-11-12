@@ -3454,3 +3454,12 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .hover-logo-video.is-playing > video { opacity:1; }
 .home-ao-cover:has(.hover-logo-video) { display:block; padding:0; }
 .home-ao-cover .hover-logo-video { background:#191735; }
+
+.education-thread-words { display:grid; grid-template-columns:1fr; max-width:none; font-size:clamp(24px,3.2vw,44px); line-height:1.2; letter-spacing:-.04em; }
+.education-thread-button { display:grid; grid-template-columns:32px minmax(0,1fr) 24px; align-items:center; gap:18px; width:100%; padding:20px 0; border-bottom:1px solid var(--ink-08); color:var(--ink-65); }
+.education-thread-button:first-child { border-top:1px solid var(--ink-08); }
+.education-thread-button strong { font-weight:500; }
+.education-thread-button .education-thread-number { font-size:12px; letter-spacing:0; }
+.education-thread-button > span:last-child { font-size:22px; }
+.education-thread-button:focus-visible { outline:2px solid var(--tech-purple); outline-offset:4px; }
+@media(max-width:809px) { .education-thread-words { font-size:clamp(23px,4.5vw,32px); } .education-thread-button { gap:12px; padding:18px 0; grid-template-columns:24px minmax(0,1fr) 20px; } }
