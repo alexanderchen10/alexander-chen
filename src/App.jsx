@@ -1553,6 +1553,10 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const endMove = useCallback((token) => {
     heldMoves.current.delete(token);
     syncPressedDirections();
+    if (!heldMoves.current.size) {
+      alexVelocity.current = { x: 0, y: 0 };
+      setAlexWalking(false);
+    }
   }, [syncPressedDirections]);
 
   const jumpAlex = useCallback(() => {
@@ -1580,15 +1584,17 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       const maxSpeedY = 15;
       const targetX = inputX * maxSpeedX;
       const targetY = inputY * maxSpeedY;
-      const response = hasInput ? 13 : 8.5;
-      const blend = 1 - Math.exp(-response * elapsed);
       const velocity = alexVelocity.current;
-      velocity.x += (targetX - velocity.x) * blend;
-      velocity.y += (targetY - velocity.y) * blend;
-      if (!hasInput && Math.abs(velocity.x) < .04) velocity.x = 0;
-      if (!hasInput && Math.abs(velocity.y) < .04) velocity.y = 0;
+      if (hasInput) {
+        const blend = 1 - Math.exp(-16 * elapsed);
+        velocity.x += (targetX - velocity.x) * blend;
+        velocity.y += (targetY - velocity.y) * blend;
+      } else {
+        velocity.x = 0;
+        velocity.y = 0;
+      }
       const speedRatio = Math.min(1, Math.hypot(velocity.x / maxSpeedX, velocity.y / maxSpeedY));
-      const isMoving = speedRatio > .025;
+      const isMoving = hasInput && speedRatio > .025;
       setAlexWalking(isMoving);
       if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
       if (alexActor.current) {
@@ -1684,6 +1690,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       },
       onPointerUp: releasePointer,
       onPointerCancel: releasePointer,
+      onLostPointerCapture: releasePointer,
       onClick: (event) => {
         if (event.detail === 0) nudgeAlex(horizontal, vertical);
       },
@@ -1726,7 +1733,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
             <span
               className="playground-character-sprite"
-              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-walk-cycle-v2.png")})` }}
+              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-directional-walk-cycle.png")})` }}
               aria-hidden="true"
             />
             <span className="playground-step-dust" aria-hidden="true"><i /><i /><i /></span>

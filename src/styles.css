@@ -1038,7 +1038,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .playground-game-hud strong { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .01em; }
 .playground-game-hud small { color: rgba(255,250,243,.58); }
 .playground-game-controls { position: absolute; z-index: 8; right: 28px; bottom: 22px; display: grid; grid-template: repeat(3, 30px) / repeat(3, 30px); gap: 2px; padding: 6px; border: 1px solid rgba(255,255,255,.22); border-radius: 18px; background: rgba(26,21,34,.72); box-shadow: 0 10px 26px rgba(20,16,24,.17); backdrop-filter: blur(10px); touch-action: none; }
-.playground-game-controls button { display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #fffaf3; font-family: var(--font-body); font-size: 13px; cursor: pointer; user-select: none; transition: background 150ms ease, transform 150ms steps(2, end); }
+.playground-game-controls button { display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #fffaf3; font-family: var(--font-body); font-size: 13px; cursor: pointer; touch-action: none; user-select: none; transition: background 150ms ease, transform 150ms steps(2, end); }
 .playground-game-controls .control-up { grid-area: 1 / 2; }
 .playground-game-controls .control-left { grid-area: 2 / 1; }
 .playground-game-controls .control-jump { grid-area: 2 / 2; color: #c4b4ff; font-size: 10px; }
