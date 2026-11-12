@@ -292,7 +292,6 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
           { route: "experience", label: "experience", destination: "/", anchor: "experience" },
           { route: "education", label: "education", destination: "/", anchor: "education" },
           { route: "about", label: "about & playground", destination: "/about" },
-          { route: "ao-studio", label: "ao studio", destination: "/ao-studio" },
         ].map((item, index) => <li key={item.route}>
           <a href={routeHref(item.anchor || item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
             <span>{String(index + 1).padStart(2, "0")}.</span><span>{item.label}</span>
@@ -4135,6 +4134,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
