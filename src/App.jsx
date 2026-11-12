@@ -12,7 +12,6 @@ import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
 import "./HeroNaturalAvatar.css";
-import "./IcffClientProjects.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 import {
   PLAYGROUND_SCENE_HEIGHT,
@@ -1004,31 +1003,9 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
     "--logo-bg": collaborator.background || "#ffffff",
     "--logo-fg": collaborator.foreground || "#171713",
   };
-  if (collaborator.name === "ICFF") {
-    const albums = [
-      ["icff-lavazza-inclucity", "ICFF Lavazza IncluCity Festival"],
-      ["icff-isabella-rossellini", "A Night with Isabella Rossellini"],
-      ["icff-susan-sarandon", "A Night with Susan Sarandon"],
-      ["icff-giancarlo-esposito", "Giancarlo Esposito"],
-    ];
-    return (
-      <article className="home-collaborator-item" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined}>
-        <div className="home-collaborator icff-client-card" style={style}>
-          <a className="home-collaborator-mark" href={routeHref("project/icff-lavazza-inclucity")} onClick={event => navigate(event, "/", "project/icff-lavazza-inclucity")} aria-label="View ICFF portfolio collection" tabIndex={duplicate ? -1 : undefined}>
-            <img src={assetHref(collaborator.logo)} alt="ICFF logo" loading="lazy" decoding="async" />
-          </a>
-          <div className="home-collaborator-meta"><span>4 projects</span><h3>ICFF</h3></div>
-          <nav className="icff-client-projects" aria-label="ICFF selected projects">
-            {albums.map(([id, title]) => <a href={routeHref(`playground/photography/${id}`)} onClick={event => navigate(event, "/", `playground/photography/${id}`)} key={id} tabIndex={duplicate ? -1 : undefined}><span>{title}</span><Arrow /></a>)}
-          </nav>
-        </div>
-      </article>
-    );
-  }
+  if (!collaborator.projectSlug && collaborator.name !== "ICFF") return <article className="home-collaborator" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined} style={style}>{content}</article>;
 
-  if (!collaborator.projectSlug) return <article className="home-collaborator" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined} style={style}>{content}</article>;
-
-  const projectRoute = `project/${collaborator.projectSlug}`;
+  const projectRoute = `project/${collaborator.name === "ICFF" ? "icff-lavazza-inclucity" : collaborator.projectSlug}`;
   return (
     <article className="home-collaborator-item" role={duplicate ? "presentation" : "listitem"} aria-hidden={duplicate || undefined}>
       <a
@@ -4127,6 +4104,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
