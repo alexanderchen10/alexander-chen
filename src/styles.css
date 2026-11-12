@@ -3428,3 +3428,5 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .home-contact nav span { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; color:var(--tech-purple); font-size:12px; }
 .home-contact nav strong { font-weight:500; font-size:clamp(13px,1.2vw,18px); overflow-wrap:anywhere; }
 @media(max-width:809px) { .home-contact header { display:block; } .home-contact h2 { margin-top:12px; } .home-contact nav { grid-template-columns:1fr; gap:8px; } .home-contact nav a { padding:16px 18px; } .home-contact nav span { margin-bottom:8px; } .home-contact nav strong { font-size:16px; } }
+
+.home-resume-details-grid:has(> .home-resume-education:only-child) { grid-template-columns:1fr; }
