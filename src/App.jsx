@@ -1280,7 +1280,7 @@ function HomeToolkits() {
 }
 
 function HomePlayground({ navigate }) {
-  const items = playgroundItems.filter(item => ["photography", "projects", "porter-airlines"].includes(item.id));
+  const items = playgroundItems.filter(item => ["photography", "porter-airlines"].includes(item.id));
   return <section id="home-playground" className="home-playground-section" aria-labelledby="home-playground-title">
     <div className="home-playground-intro">
       <header><p className="section-label">Playground</p><h2 id="home-playground-title">A little room to explore.</h2><p>Photography, design experiments, and stories from life outside the brief.</p><a href={routeHref("playground")} onClick={event => navigate(event, "/playground")}>Explore the playground <Arrow /></a></header>
