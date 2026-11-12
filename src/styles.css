@@ -3447,3 +3447,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .home-hero-live-project { flex-wrap:wrap; gap:12px 24px; }
 .home-hero-live-project a { white-space:nowrap; }
 .home-hero-live-project a:nth-child(2) .home-hero-live-dot { background:var(--tech-purple); }
+
+.hover-logo-video { position:relative; width:100%; height:100%; aspect-ratio:16/9; overflow:hidden; background:#f4efe5; }
+.hover-logo-video > img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:clamp(28px,5vw,72px); }
+.hover-logo-video > video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .45s ease; }
+.hover-logo-video.is-playing > video { opacity:1; }
+.home-ao-cover:has(.hover-logo-video) { display:block; padding:0; }
+.home-ao-cover .hover-logo-video { background:#191735; }

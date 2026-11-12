@@ -475,6 +475,23 @@ function MobileHeader({ page, route, navigate }) {
   );
 }
 
+function HoverLogoVideo({ logo, video, label }) {
+  const player = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const start = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const clip = player.current;
+    if (!clip) return;
+    setPlaying(true);
+    clip.play().catch(() => setPlaying(false));
+  };
+  const stop = () => { setPlaying(false); player.current?.pause(); };
+  return <div className={`hover-logo-video${playing ? " is-playing" : ""}`} onPointerEnter={start} onPointerLeave={stop} onFocusCapture={start} onBlurCapture={stop}>
+    <img src={assetHref(logo)} alt={`${label} logo`} />
+    <video ref={player} src={assetHref(video)} muted loop playsInline preload="metadata" aria-label={`${label} video preview`} />
+  </div>;
+}
+
 function ProjectCardVideo({ project }) {
   const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   useEffect(() => {
@@ -699,12 +716,12 @@ function ProjectVisual({ project, surface = "detail" }) {
   );
 }
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, logoPreview = false }) {
   const href = project.href || routeHref(`project/${project.slug}`);
   const external = /^https?:\/\//.test(href);
   if (project.slug === "utopia-vinyl") return (
     <article className="project-card project-card-utopia reveal" style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}>
-      <a href={href} aria-label="Read the Utopia Vinyl case study"><div className="project-media"><ProjectVisual project={project} surface="card" /></div></a>
+      <a href={href} aria-label="Read the Utopia Vinyl case study"><div className="project-media">{logoPreview ? <HoverLogoVideo logo="/brands/utopia-vinyl-logo.png" video={project.cardVideo} label="Utopia Vinyl" /> : <ProjectVisual project={project} surface="card" />}</div></a>
       <div className="project-copy">
         <div className="project-copy-heading">
           <h3><a href={href}>{project.title}</a></h3>
@@ -1283,9 +1300,9 @@ function HomeProjects({ navigate }) {
   return <section id="work" className="portfolio-section home-work-section" aria-labelledby="home-projects-title">
     <div className="home-work-heading"><h2 id="home-projects-title">Projects<span aria-hidden="true">.</span></h2><p>Independent products, ongoing studio collaborations, and selected client work.</p></div>
     <div className="home-project-features">
-      <ProjectCard project={utopia} index={0} />
+      <ProjectCard project={utopia} index={0} logoPreview />
       <article className="home-ao-feature" id="home-ao-studio">
-        <a className="home-ao-cover" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}><img src={assetHref("/projects/ao-studio/ao-studio-wordmark-dark.png")} alt="AO Studio" /></a>
+        <a className="home-ao-cover" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}><HoverLogoVideo logo="/projects/ao-studio/ao-studio-wordmark-dark.png" video="/projects/work/corcoran/oakville-banner.m4v" label="AO Studio" /></a>
         <div className="home-ao-copy"><div className="home-ao-heading"><h3>AO Studio</h3><span className="project-status">Ongoing</span></div><p className="home-ao-role">Founder · Creative Director · Designer · Developer</p><p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p><div className="project-card-actions"><a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a><a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a></div><h4>Clients &amp; collaborations</h4><ul>{aoStudioProjectSlugs.map(slug => { const project=workProjects.find(p=>p.slug===slug); return project && <li key={slug}><a href={routeHref(`project/${slug}`)}><span>{project.organization || project.title}</span><Arrow /></a></li>; })}</ul></div>
       </article>
     </div>
@@ -3889,7 +3906,7 @@ function AoStudioPage({ clock, navigate }) {
     <main className="main-content ao-studio-page">
       <section className="ao-studio-hero reveal reveal-fast">
         <div className="ao-studio-hero-brand">
-          <img src={assetHref("/projects/ao-studio/ao-studio-wordmark-dark.png")} alt="AO Studio" />
+          <HoverLogoVideo logo="/projects/ao-studio/ao-studio-wordmark-dark.png" video="/projects/work/corcoran/oakville-banner.m4v" label="AO Studio" />
         </div>
         <div className="ao-studio-hero-copy">
           <p>independent creative production agency</p>
