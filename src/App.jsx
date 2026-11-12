@@ -361,7 +361,7 @@ function Sidebar({ page, route, navigate, clock, projectProgress }) {
       }}
     >
       <div className="topbar-primary">
-        <a className="brand brand-logo reveal reveal-fast" aria-label="Alexander Chen home" href={routeHref()} onClick={(e) => navigate(e, "/")}><BrandMark /></a>
+        <a className="brand desktop-brand-lockup reveal reveal-fast" aria-label="Alexander Chen portfolio home" href={routeHref()} onClick={(e) => navigate(e, "/")}><span className="brand-logo"><BrandMark /></span><span className="desktop-brand-copy"><strong>Alexander Chen</strong><small>Portfolio</small></span></a>
         <NavigationLinks page={page} route={route} navigate={navigate} />
         <div className="topbar-actions">
           <AvailabilityBadge />
