@@ -1,5 +1,5 @@
 /* Versioned natural avatar assets share one fixed canvas in every pose. */
-.home-hero-avatar-natural {
+.home-hero-avatar.home-hero-avatar-natural {
   --camera-flash-x: 48.7%;
   --camera-flash-y: 31.7%;
   --camera-flash-size: 14%;
