@@ -44,7 +44,7 @@ const pageFromRoute = (route) => {
   if (route === "about") return "about";
   if (route === "education") return "education";
   if (route === "ao-studio") return "ao-studio";
-  if (route === "playground") return "about";
+  if (route === "playground") return "playground";
   if (route === "playground/photography") return "playground/photography";
   if (route.startsWith("playground/photography/")) return route;
   if (route === "playground/design") return "playground/design";
@@ -257,14 +257,14 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
   const [beam, setBeam] = useState({ left: 0, width: 0 });
   useEffect(() => {
     const update = () => {
-      let active = page === "home" ? "work" : (page.startsWith("project/") || page.startsWith("project-log")) ? "work" : page.startsWith("playground") ? "about" : page;
+      let active = page === "home" ? "work" : (page.startsWith("project/") || page.startsWith("project-log")) ? "work" : page.startsWith("playground") ? "playground" : page;
       if (page === "home") {
-        for (const [id, name] of [["work", "work"], ["experience", "experience"], ["home-education", "education"], ["home-playground", "about"]]) {
+        for (const [id, name] of [["work", "work"], ["experience", "experience"], ["home-education", "education"], ["home-playground", "playground"]]) {
           if (document.getElementById(id)?.getBoundingClientRect().top <= window.innerHeight * .4) active = name;
         }
       }
       setActiveRoute(active);
-      const link = navRef.current?.querySelector(`a[href="${routeHref(active)}"]`);
+      const link = navRef.current?.querySelector(`a[href="${routeHref(active === "work" ? "projects" : active)}"]`);
       if (link) {
         const rect = link.getBoundingClientRect();
         const parent = navRef.current.getBoundingClientRect();
@@ -291,7 +291,8 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
           { route: "work", label: "projects", destination: "/", anchor: "projects" },
           { route: "experience", label: "experience", destination: "/", anchor: "experience" },
           { route: "education", label: "education", destination: "/", anchor: "education" },
-          { route: "about", label: "about & playground", destination: "/about" },
+          { route: "about", label: "about", destination: "/about" },
+          { route: "playground", label: "playground", destination: "/playground" },
         ].map((item, index) => <li key={item.route}>
           <a href={routeHref(item.anchor || item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
             <span>{String(index + 1).padStart(2, "0")}.</span><span>{item.label}</span>
@@ -951,6 +952,11 @@ function HomeExperience({ navigate }) {
                             navigate={navigate}
                           />
                         ))}
+                        {relatedProjects.some(project => project.slug === "tt-supermarket") && (
+                          <a className="home-experience-project" href={routeHref("project/tt-supermarket/tt-campaigns/1")} onClick={event => navigate(event, "/", "project/tt-supermarket/tt-campaigns/1")}>
+                            <span>San Jose Store Opening — Meta Ads Campaign</span><Arrow className="home-experience-project-arrow" />
+                          </a>
+                        )}
                       </nav>
                     )}
                   </div>
@@ -3782,7 +3788,7 @@ function AboutPage({ clock, navigate }) {
   return (
     <main className="main-content about-page">
       <section className="about-section">
-        <p className="section-label reveal reveal-fast">about & playground</p>
+        <p className="section-label reveal reveal-fast">about</p>
         <div className="about-layout">
           <div className="about-portrait reveal">
             <img
@@ -3851,7 +3857,6 @@ function AboutPage({ clock, navigate }) {
           </dl>
         </div>
       </section>
-      <PlaygroundPage clock={clock} navigate={navigate} embedded />
       <MobileFooter clock={clock} />
     </main>
   );
@@ -4071,7 +4076,7 @@ export default function App() {
     if (page === "work") document.title = `Projects | ${profile.name}`;
     else if (page.startsWith("project-log")) document.title = `Project & Documentation Log | ${profile.name}`;
     else if (page === "education") document.title = `${profile.name} | Education`;
-    else if (page === "about") document.title = `${profile.name} | About & Playground`;
+    else if (page === "about") document.title = `${profile.name} | About`;
     else if (page === "ao-studio") document.title = `AO Studio | ${profile.name}`;
     else if (selectedPhotographyAlbum) document.title = `${selectedPhotographyAlbum.title} Album | ${profile.name}`;
     else if (page === "playground/photography") document.title = `${profile.name} | My Art`;
@@ -4134,6 +4139,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
