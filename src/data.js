@@ -500,8 +500,18 @@ export const workProjects = [
   {
     slug: "tt-supermarket",
     showInWork: false,
+    archiveStyle: true,
+    archiveEyebrow: "Selected work / April–August 2026",
+    archiveTitle: "From the food shelf to the social feed.",
+    archiveDescription: "Store launches, everyday content, seasonal campaigns, and colleague stories — organized around the audience each project needed to reach.",
+    format: "Campaign strategy · social content · film · recruitment design",
+    proofMetrics: [
+      { value: "5,978", label: "net new Instagram followers · May 1–July 21, 2026" },
+      { value: "19.6M", label: "Instagram profile impressions · same reporting period" },
+      { value: "174", label: "published Instagram posts · account-wide totals" },
+    ],
     title: "T&T Supermarket",
-    description: "A localized, social-first Instagram and paid-media strategy that added 5,500+ followers and generated 5.22M impressions for a California launch.",
+    description: "Marketing across store openings, seasonal food stories, Instagram strategy, and employer branding. I created campaign videos, social content, and recruitment visuals for T&T’s Canadian and US audiences.",
     organization: "T&T Supermarket Inc.",
     role: "Marketing Specialist, Media & Communications",
     period: "April 2026 – August 2026",
@@ -520,8 +530,8 @@ export const workProjects = [
       {
         id: "tt-campaigns",
         number: "01",
-        title: "Campaigns",
-        description: "Launch and awareness campaigns shaped around a specific audience, market, and business goal.",
+        title: "Store launches",
+        description: "Launch creative for San Jose and Sherway Gardens.",
       },
       {
         id: "tt-instagram-management",
@@ -529,21 +539,45 @@ export const workProjects = [
         title: "Instagram Content & Strategy",
         description: "Ongoing channel strategy, content planning, publishing, and performance-informed iteration.",
       },
+      {
+        "id": "tt-seasonal",
+        "number": "03",
+        "title": "Seasonal campaigns",
+        "description": "Food storytelling and practical customer communications tied to seasonal moments."
+      },
+      {
+        "id": "tt-employer-branding",
+        "number": "04",
+        "title": "Employer branding & recruitment",
+        "description": "Colleague storytelling and hiring creative that bring the workplace into view."
+      },
     ],
     chapters: [
       {
         id: "tt-campaigns",
         number: "01",
-        title: "Campaigns",
-        description: "A growing collection of paid and organic campaigns created for launches, seasonal moments, and audience growth.",
+        title: "Store launches",
+        description: "Paid-media assets and teaser creative that introduce a store through its food, space, and brand personality.",
         projects: [
           {
             number: "01",
-            eyebrow: "Launch campaign · Meta",
+            eyebrow: "Launch campaign · Meta & Reddit",
             title: "San Jose store opening",
             description: "Paid-social video creative developed to support T&T Supermarket's San Jose store opening across portrait and square placements.",
+            contextHeading: "Introduce a new store through more than an address.",
+            context: "The San Jose opening needed creative that could introduce T&T’s store environment and food offer across paid-social placements.",
+            contribution: "I created launch-video variations for Meta and Reddit, including store-led and food-led cuts. The selected outputs show how the same opening can be framed for different placements.",
+            workHeading: "A launch told through food and place.",
+            workIntro: "A food-led Reddit variation alongside portrait and square Meta assets. Results below describe the wider launch campaign, not an isolated creative test.",
             impact: "The California launch generated 5.22M impressions and helped build anticipation for a San Jose grand opening that drew 500+ customers before doors opened.",
             items: [
+              {
+                "type": "video",
+                "src": "/projects/work/tt-supermarket/san-jose-reddit.mp4",
+                "poster": "/projects/work/tt-supermarket/san-jose-reddit-poster.jpg",
+                "caption": "San Jose · food-led Reddit creative",
+                "aspect": "1 / 1"
+              },
               {
                 type: "video",
                 src: "/projects/work/tt-supermarket/san-jose-meta-ad-01.mp4",
@@ -559,6 +593,27 @@ export const workProjects = [
                 aspect: "1 / 1",
               },
             ],
+          },
+          {
+            "number": "02",
+            "eyebrow": "Store launch · teaser concept",
+            "title": "Sherway Gardens teaser",
+            "description": "A short-form store teaser that brings T&T’s mascot into the retail space.",
+            "contextHeading": "Make a new location feel familiar.",
+            "context": "A store announcement needs to establish place while carrying the personality people recognize from T&T.",
+            "contribution": "I created the Sherway Gardens teaser, using the mascot and store environment to introduce the location through a short social-first reveal.",
+            "workHeading": "A character-led introduction.",
+            "workIntro": "The archive contains this draft export. It is presented as a creative exploration, rather than a final published campaign.",
+            "impact": "Developed a character-led portrait teaser for the Sherway Gardens store project.",
+            "items": [
+              {
+                "type": "video",
+                "src": "/projects/work/tt-supermarket/sherway-teaser-draft.mp4",
+                "poster": "/projects/work/tt-supermarket/sherway-teaser-draft-poster.jpg",
+                "caption": "Sherway Gardens · teaser draft",
+                "aspect": "9 / 16"
+              }
+            ]
           },
         ],
       },
@@ -677,6 +732,117 @@ export const workProjects = [
             ],
           },
         ],
+      },
+      {
+        "id": "tt-seasonal",
+        "number": "03",
+        "title": "Seasonal campaigns",
+        "description": "Food storytelling and practical customer communications tied to seasonal moments.",
+        "projects": [
+          {
+            "number": "01",
+            "eyebrow": "Moon Festival · product storytelling",
+            "title": "Afternoon tea",
+            "description": "A Chinese-language food film built around an afternoon-tea occasion.",
+            "contextHeading": "Give the product an occasion.",
+            "context": "The Moon Festival archive includes a private-label afternoon-tea film. The creative connects food with a recognizable pause in the day.",
+            "contribution": "I created the afternoon-tea video, bringing together product imagery, pacing, and Chinese-language captions. The deliverables include a Chinese final and a clean version.",
+            "workHeading": "From product to everyday ritual.",
+            "workIntro": "The Chinese final export is shown below; the clean master supports alternate text treatments.",
+            "impact": "Delivered a finished Chinese-language film and a clean master for alternate caption treatments.",
+            "items": [
+              {
+                "type": "video",
+                "src": "/projects/work/tt-supermarket/afternoon-tea.mp4",
+                "poster": "/projects/work/tt-supermarket/afternoon-tea-poster.jpg",
+                "caption": "Afternoon tea · Chinese final",
+                "aspect": "9 / 16"
+              }
+            ]
+          },
+          {
+            "number": "02",
+            "eyebrow": "Canada Day · Independence Day",
+            "title": "Holiday store hours",
+            "description": "A coordinated visual system for holiday opening-hours announcements in Canada and the US.",
+            "contextHeading": "Make the useful information unmistakable.",
+            "context": "Holiday posts need to answer a practical shopping question quickly: is the store open? The design also needs to feel timely and recognizable in a social feed.",
+            "contribution": "I designed Canada Day and Independence Day store-hours creative, with Instagram and RedNote variants in the production archive.",
+            "workHeading": "One message, localized for two holidays.",
+            "workIntro": "The Instagram versions keep the holiday identity, opening message, and T&T branding together.",
+            "impact": "Delivered a coordinated set of holiday-hours visuals for Canada and the US, adapted for Instagram and RedNote.",
+            "coverFit": "contain",
+            "coverBackground": "#eef5ee",
+            "items": [
+              {
+                "type": "image",
+                "src": "/projects/work/tt-supermarket/canada-day.webp",
+                "alt": "Canada Day · Instagram store-hours announcement",
+                "caption": "Canada Day · Instagram store-hours announcement",
+                "aspect": "4 / 5"
+              },
+              {
+                "type": "image",
+                "src": "/projects/work/tt-supermarket/independence-day.webp",
+                "alt": "Independence Day · Instagram store-hours announcement",
+                "caption": "Independence Day · Instagram store-hours announcement",
+                "aspect": "4 / 5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "tt-employer-branding",
+        "number": "04",
+        "title": "Employer branding & recruitment",
+        "description": "Colleague storytelling and hiring creative that bring the workplace into view.",
+        "projects": [
+          {
+            "number": "01",
+            "eyebrow": "Employer brand · colleague story",
+            "title": "Peisi’s T&T story",
+            "description": "An interview-led employer-brand film, adapted for English and Chinese audiences and multiple formats.",
+            "contextHeading": "Let a colleague tell the story.",
+            "context": "Recruitment content can show the workplace through the people who know it. This project centers a colleague’s experience rather than relying only on a hiring message.",
+            "contribution": "I created the Peisi film, combining the interview, workplace B-roll, branded question slides, music, and language-specific edits. The archive includes final English landscape and portrait exports alongside Chinese versions.",
+            "workHeading": "An interview shaped for multiple placements.",
+            "workIntro": "The final English landscape film is shown below. The wider production set includes portrait edits and Chinese-language versions.",
+            "impact": "Delivered final English versions in two orientations and developed Chinese-language edits, creating a flexible colleague-story package.",
+            "items": [
+              {
+                "type": "video",
+                "src": "/projects/work/tt-supermarket/hr-peisi.mp4",
+                "poster": "/projects/work/tt-supermarket/hr-peisi-poster.jpg",
+                "caption": "Peisi · final English employer-brand film",
+                "aspect": "16 / 9"
+              }
+            ]
+          },
+          {
+            "number": "02",
+            "eyebrow": "US recruitment · hiring design",
+            "title": "San Francisco hiring creative",
+            "description": "Recruitment visuals developed for the US hiring campaign archive.",
+            "contextHeading": "Connect the hiring message to the people.",
+            "context": "The hiring materials needed a recognizable T&T identity and a direct recruitment message that could be understood quickly.",
+            "contribution": "I designed recruitment creative with a clear “We’re hiring” headline, colleague imagery, and T&T branding. The folder contains teaser visual variations and a San Francisco hiring postcard.",
+            "workHeading": "A direct invitation to join the team.",
+            "workIntro": "Selected hiring poster from the San Francisco campaign folder, with a shared message spanning multiple US locations.",
+            "impact": "Created a family of recruitment visuals, including teaser-poster variations and a hiring postcard.",
+            "coverFit": "contain",
+            "coverBackground": "#eef5ee",
+            "items": [
+              {
+                "type": "image",
+                "src": "/projects/work/tt-supermarket/sf-hiring.webp",
+                "alt": "US hiring creative · selected recruitment poster",
+                "caption": "US hiring creative · selected recruitment poster",
+                "aspect": "4 / 5"
+              }
+            ]
+          }
+        ]
       },
     ],
   },
