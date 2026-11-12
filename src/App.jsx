@@ -3614,9 +3614,7 @@ function EducationPage({ embedded = false }) {
   const IntroHeading = embedded ? "h2" : "h1";
   const pageRef = useRef(null);
   const degreeRef = useRef(null);
-  const threadsRef = useRef(null);
   const [activeCredential, setActiveCredential] = useState(0);
-  const [activeThread, setActiveThread] = useState(0);
   const yearDigits = "2024".split("");
   const credentials = [
     {
@@ -3641,14 +3639,6 @@ function EducationPage({ embedded = false }) {
       type: "Hospitality",
     },
   ];
-  const studyThreads = [
-    ["Digital enterprise", "Connects business goals, digital systems, and delivery."],
-    ["UX design", "Turns needs into clearer flows and interfaces."],
-    ["Content strategy", "Shapes information so people can understand and act."],
-    ["Digital marketing", "Connects creative decisions to audience and performance."],
-    ["Visual storytelling", "Builds narratives through image, motion, and sequence."],
-    ["Project management", "Keeps collaborators, timelines, and deliverables aligned."],
-  ];
 
   useEffect(() => {
     let frame = 0;
@@ -3657,7 +3647,6 @@ function EducationPage({ embedded = false }) {
       const viewportHeight = window.innerHeight || 1;
       const page = pageRef.current;
       const degree = degreeRef.current;
-      const threads = threadsRef.current;
 
       if (page) {
         const rect = page.getBoundingClientRect();
@@ -3671,14 +3660,7 @@ function EducationPage({ embedded = false }) {
         degree.style.setProperty("--education-unfold", unfold.toFixed(3));
       }
 
-      if (threads) {
-        const rect = threads.getBoundingClientRect();
-        const progress = Math.min(Math.max((viewportHeight * .82 - rect.top) / Math.max(rect.height * .72, 1), 0), 1);
-        threads.querySelectorAll(".education-thread-button").forEach((thread, index) => {
-          const lit = Math.min(Math.max(progress * studyThreads.length - index, 0), 1);
-          thread.style.setProperty("--thread-lit", lit.toFixed(3));
-        });
-      }
+
     };
     const requestUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
@@ -3692,7 +3674,7 @@ function EducationPage({ embedded = false }) {
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
     };
-  }, [studyThreads.length]);
+  }, []);
 
   const moveDegree = (event) => {
     if (event.pointerType && event.pointerType !== "mouse") return;
@@ -3776,28 +3758,7 @@ function EducationPage({ embedded = false }) {
           <p>{credentials[activeCredential].detail}</p>
         </div>
       </section>
-      <section className="education-threads" aria-labelledby="education-threads-title" ref={threadsRef}>
-        <div className="education-section-heading">
-          <h2 id="education-threads-title">Study threads</h2>
-          <p>These themes light up as the work moves from strategy to delivery.</p>
-        </div>
-        <div className="education-thread-words">
-          {studyThreads.map(([thread], index) => (
-            <button
-              className={`education-thread-button${activeThread === index ? " is-active" : ""}`}
-              type="button"
-              aria-pressed={activeThread === index}
-              onClick={() => setActiveThread(index)}
-              onPointerEnter={() => setActiveThread(index)}
-              onFocus={() => setActiveThread(index)}
-              key={thread}
-            >
-              <span className="education-thread-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><strong>{thread}</strong><span aria-hidden="true">↗</span>
-            </button>
-          ))}
-        </div>
-        <p className="education-thread-detail" aria-live="polite"><span>{String(activeThread + 1).padStart(2, "0")}</span>{studyThreads[activeThread][1]}</p>
-      </section>
+
     </Container>
   );
 }
