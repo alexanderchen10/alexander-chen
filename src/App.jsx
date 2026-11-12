@@ -937,29 +937,7 @@ function HomeExperience({ navigate }) {
             );
           })}
         </div>
-        <footer className="home-experience-resume reveal" aria-label="Resume education">
-          <header>
-            <div>
-              <p>Resume / credentials</p>
-              <h3>Education behind the work.</h3>
-            </div>
-            <a href={assetHref("/resume.pdf")} target="_blank" rel="noreferrer">Open full résumé <Arrow /></a>
-          </header>
-          <div className="home-resume-details-grid">
-            <section className="home-resume-education" aria-labelledby="home-resume-education-title">
-              <h4 id="home-resume-education-title">Education</h4>
-              {about.education.map((item) => (
-                <article key={item.program}>
-                  <p>{item.program}</p>
-                  <span>{item.school}</span>
-                  <time>{item.period}</time>
-                </article>
-              ))}
-            </section>
 
-          </div>
-
-        </footer>
       </div>
     </section>
   );
@@ -3620,7 +3598,7 @@ function EducationPage({ embedded = false }) {
       title: "UX Design Certificate",
       organization: "Juno College of Technology · Remote, Canada",
       detail: "A remote certificate grounded in UX foundations and practical interface work.",
-      status: "Completed · June 2023",
+      status: "Apr–Jun 2023",
       type: "Design",
     },
     {
@@ -3714,6 +3692,7 @@ function EducationPage({ embedded = false }) {
         <p className="section-label">Education</p>
         <IntroHeading>Learning that shapes<br />the way I work.</IntroHeading>
         <p>Digital Enterprise Management at the University of Toronto, with a foundation in UX design and a hands-on creative practice.</p>
+        <a className="education-resume-link" href={assetHref("/resume.pdf")} target="_blank" rel="noreferrer">Open full résumé <Arrow /></a>
       </header>
       <div className="education-degree-stage">
         <section
@@ -3742,7 +3721,7 @@ function EducationPage({ embedded = false }) {
           </div>
           <div className="education-degree-bottom">
             <a href="https://www.utm.utoronto.ca/" target="_blank" rel="noreferrer">University of Toronto Mississauga <Arrow /></a>
-            <p>Graduated · June 2024</p>
+            <p>Sep 2021–Jun 2024</p>
             <ul className="education-tags" aria-label="Program of study"><li>Digital Enterprise Management Specialist</li></ul>
           </div>
           <p className="education-card-hint" aria-hidden="true">move across the card</p>

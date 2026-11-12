@@ -3430,3 +3430,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 @media(max-width:809px) { .home-contact header { display:block; } .home-contact h2 { margin-top:12px; } .home-contact nav { grid-template-columns:1fr; gap:8px; } .home-contact nav a { padding:16px 18px; } .home-contact nav span { margin-bottom:8px; } .home-contact nav strong { font-size:16px; } }
 
 .home-resume-details-grid:has(> .home-resume-education:only-child) { grid-template-columns:1fr; }
+
+.education-resume-link { display:inline-flex; align-items:center; gap:12px; width:fit-content; padding:10px 0; border-bottom:1px solid currentColor; color:var(--tech-purple); font-size:14px; }
+.education-resume-link:hover { color:var(--tech-navy); }
