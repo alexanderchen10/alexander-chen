@@ -937,7 +937,7 @@ function HomeExperience({ navigate }) {
             );
           })}
         </div>
-        <footer className="home-experience-resume reveal" aria-label="Resume education, capabilities, and contact details">
+        <footer className="home-experience-resume reveal" aria-label="Resume education and capabilities">
           <header>
             <div>
               <p>Resume / credentials</p>
@@ -968,11 +968,7 @@ function HomeExperience({ navigate }) {
               </dl>
             </section>
           </div>
-          <nav className="home-resume-contact" aria-label="Resume contact information">
-            <a href={`tel:${profile.phone.replace(/[^+\d]/g, "")}`}><span>Phone</span>{profile.phone}</a>
-            <a href={`mailto:${profile.email}`}><span>Email</span>{profile.email}</a>
-            <a href={profile.socials[0].href} target="_blank" rel="noreferrer"><span>LinkedIn</span>in/alexanderchen-</a>
-          </nav>
+
         </footer>
       </div>
     </section>
@@ -1315,6 +1311,14 @@ function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
       <HomeHero />
+      <section className="home-contact" aria-labelledby="home-contact-title">
+        <header><p className="section-label">Get in touch</p><h2 id="home-contact-title">Let’s make something happen.</h2></header>
+        <nav aria-label="Contact Alexander">
+          <a href={`mailto:${profile.email}`}><span>Email <Arrow /></span><strong>{profile.email}</strong></a>
+          <a href={`tel:${profile.phone.replace(/[^+\d]/g, "")}`}><span>Phone <Arrow /></span><strong>{profile.phone}</strong></a>
+          <a href={profile.socials[0].href} target="_blank" rel="noreferrer"><span>LinkedIn <Arrow /></span><strong>in/alexanderchen-</strong></a>
+        </nav>
+      </section>
 
       <section className="home-collaborators" aria-labelledby="home-collaborators-title">
         <div className="home-collaborators-heading">
