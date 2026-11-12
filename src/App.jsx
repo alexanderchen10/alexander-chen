@@ -942,7 +942,7 @@ function HomeExperience({ navigate }) {
                   <div className="home-experience-content">
                     <h4>{experience.role}</h4>
                     <p className="home-experience-summary">{experience.summary}</p>
-                    <ul className="home-experience-highlights">
+                    <ul className="home-experience-highlights" style={{ "--experience-highlight-columns": experience.highlights.length === 3 || experience.highlights.length >= 5 ? 3 : 2 }}>
                       {experience.highlights.map((highlight) => (
                         <li key={highlight.value}>
                           <strong>{highlight.value}</strong>
