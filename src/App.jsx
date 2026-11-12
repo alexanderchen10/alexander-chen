@@ -1296,6 +1296,24 @@ function HomePlayground({ navigate }) {
   </section>;
 }
 
+function HomeEducation({ navigate }) {
+  return (
+    <section className="home-education-section" id="home-education" aria-labelledby="home-education-title">
+      <header className="home-education-heading">
+        <div><p className="section-label">Education</p><h2 id="home-education-title">Digital business.<br />Human-centred design.</h2></div>
+        <a href={routeHref("education")} onClick={(event) => navigate(event, "/", "education")}>Explore my education <Arrow /></a>
+      </header>
+      <div className="home-education-credentials">
+        {about.education.map((item, index) => <article key={item.school}>
+          <span className="home-education-number">{String(index + 1).padStart(2, "0")}</span>
+          <div><p className="home-education-school">{item.school}</p><h3>{item.program}</h3></div>
+          <p className="home-education-period">{item.period}</p>
+        </article>)}
+      </div>
+    </section>
+  );
+}
+
 function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
@@ -1320,6 +1338,7 @@ function HomePage({ clock, navigate }) {
         <ProjectColumns projects={workProjects} />
       </section>
       <HomeExperience navigate={navigate} />
+      <HomeEducation navigate={navigate} />
       <HomeToolkits />
       <HomePlayground navigate={navigate} />
       <MobileFooter clock={clock} />
