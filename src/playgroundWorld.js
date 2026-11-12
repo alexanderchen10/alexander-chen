@@ -3,8 +3,10 @@ export const PLAYGROUND_SCENE_HEIGHT = 941;
 export const PLAYGROUND_COLLIDER = { rx: 14, ry: 7 };
 
 const taipeiGround = [
-  [0, 820], [74, 790], [128, 758], [230, 735], [360, 720], [520, 706], [680, 698], [836, 693],
-  [1020, 698], [1180, 706], [1350, 720], [1510, 742], [1615, 770], [1672, 800], [1672, 941], [0, 941],
+  // Keep Pixel Alex on the rainbow crossing in the foreground. The slight
+  // slope follows the painted band instead of using a rectangular screen box.
+  [0, 806], [420, 807], [836, 808], [1250, 809], [1672, 812],
+  [1672, 910], [1250, 908], [836, 907], [420, 905], [0, 904],
 ];
 
 const torontoPlaza = [

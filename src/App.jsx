@@ -1519,7 +1519,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
   const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
   const [alexPosition, setAlexPosition] = useState(() => ({ ...playgroundScenes[0].spawn }));
-  const [alexFacing, setAlexFacing] = useState(1);
+  const [alexDirection, setAlexDirection] = useState("right");
   const [alexWalking, setAlexWalking] = useState(false);
   const [alexJumping, setAlexJumping] = useState(false);
   const [alexJumpHeight, setAlexJumpHeight] = useState(0);
@@ -1550,10 +1550,11 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
   const beginMove = useCallback((token, name, horizontal, vertical) => {
     clearRoute();
     heldMoves.current.set(token, { name, horizontal, vertical });
-    if (horizontal) {
+    if (vertical) {
+      setAlexDirection(vertical > 0 ? "front" : "back");
+    } else if (horizontal) {
       const facing = Math.sign(horizontal);
-      setAlexFacing(facing);
-      alexActor.current?.style.setProperty("--alex-facing", facing);
+      setAlexDirection(facing < 0 ? "left" : "right");
     }
     syncPressedDirections();
     window.clearTimeout(walkingPulseTimer.current);
@@ -1581,7 +1582,12 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
 
   const nudgeAlex = useCallback((horizontal, vertical) => {
     clearRoute();
-    if (horizontal) setAlexFacing(Math.sign(horizontal));
+    if (vertical) {
+      setAlexDirection(vertical > 0 ? "front" : "back");
+    } else if (horizontal) {
+      const facing = Math.sign(horizontal);
+      setAlexDirection(facing < 0 ? "left" : "right");
+    }
     const next = movePlaygroundPosition(activeScene, alexPositionRef.current, { x: horizontal * 28, y: vertical * 28 });
     updateAlexPosition(next);
     window.clearTimeout(walkingPulseTimer.current);
@@ -1661,7 +1667,12 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
         if (movedDistance > .01) {
           current = next;
           updateAlexPosition(next);
-          if (Math.abs(desiredX) > .08) setAlexFacing(Math.sign(desiredX));
+          if (Math.abs(desiredY) >= Math.abs(desiredX)) {
+            setAlexDirection(desiredY > 0 ? "front" : "back");
+          } else {
+            const facing = Math.sign(desiredX);
+            setAlexDirection(facing < 0 ? "left" : "right");
+          }
         } else if (routeRef.current.length) {
           routeRef.current.shift();
           if (!routeRef.current.length) setRouteDestination(null);
@@ -1740,7 +1751,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     stopMoving();
     setSceneId(scene.id);
     updateAlexPosition({ ...scene.spawn });
-    setAlexFacing(1);
+    setAlexDirection("right");
     jumpRef.current = { active: false, elapsed: 0 };
     setAlexJumpHeight(0);
     setAlexJumping(false);
@@ -1839,12 +1850,12 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
           <div
             ref={alexActor}
             className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
-            data-facing={alexFacing < 0 ? "left" : "right"}
+            data-facing={alexDirection}
             style={{
               left: `${alexPosition.x / PLAYGROUND_SCENE_WIDTH * 100}%`,
               top: `${alexPosition.y / PLAYGROUND_SCENE_HEIGHT * 100}%`,
               zIndex: 100 + Math.round(alexPosition.y),
-              "--alex-facing": alexFacing,
+              "--alex-facing": alexDirection === "left" ? -1 : 1,
               "--alex-scale": alexScale.toFixed(3),
               "--alex-jump": `${(-alexJumpHeight / 230 * 100).toFixed(2)}%`,
             }}
@@ -1860,7 +1871,10 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
                 <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
                 <span
                   className="playground-character-sprite"
-                  style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-directional-walk-cycle.png")})` }}
+                  style={{
+                    "--alex-side-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-directional-walk-cycle.png")})`,
+                    "--alex-vertical-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-front-back-walk-cycle.png")})`,
+                  }}
                   aria-hidden="true"
                 />
               </span>
