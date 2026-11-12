@@ -3,61 +3,72 @@ import "./SkillsSelector.css";
 
 const categories = [
   {
-    id: "ai",
-    title: "AI systems & agents",
-    introduction: "Designing where AI helps, where rules decide, and where a person signs off.",
-    skills: [
-      "Claude Code Skills & agent teams",
-      "Agent instructions & structured outputs",
-      "Human-in-the-loop review",
-      "Evaluation (DeepEval)",
-      "Multi-model testing",
-      "RAG fundamentals",
-      "Local models (Ollama)",
-      "Python · SQL",
-    ],
-  },
-  {
-    id: "product",
-    title: "Product & build",
-    introduction: "Taking a fuzzy idea to a prototype people can click.",
-    skills: [
-      "Problem framing & PRDs",
-      "User flows & edge states",
-      "React · TypeScript",
+    "id": "design",
+    "title": "Design & digital experiences",
+    "introduction": "Turning complex journeys into clear, useful interfaces.",
+    "skills": [
+      "UX research & user flows",
       "Figma",
-      "Accessibility review",
-      "Git · Docker",
-    ],
+      "Design systems",
+      "Information architecture",
+      "Website design",
+      "Accessibility"
+    ]
   },
   {
-    id: "games",
-    title: "Games & 3D",
-    introduction: "Where I stress-test AI-directed production end to end.",
-    skills: [
-      "Godot · GDScript",
-      "React Three Fiber · three.js",
-      "Blender Python pipelines",
-      "Procedural audio",
-      "Test-driven game QA",
-      "Playwright visual QA",
-    ],
+    "id": "marketing",
+    "title": "Marketing & content strategy",
+    "introduction": "Connecting audience insights, creative thinking, and commercial goals through measurable campaigns.",
+    "skills": [
+      "Campaign planning & retail launches",
+      "Consumer & audience insights",
+      "Brand strategy & positioning",
+      "Analytical & creative thinking",
+      "Commercial & strategic thinking",
+      "Campaign performance analysis",
+      "Email marketing",
+      "Meta campaigns",
+      "Sprout Social",
+      "Google Analytics",
+      "CRM & customer journeys",
+      "Vendor & agency coordination"
+    ]
   },
   {
-    id: "finance",
-    title: "Finance operations",
-    introduction: "The domain my AI work is grounded in.",
-    skills: [
-      "Reconciliation & exceptions",
-      "Month-end close controls",
-      "Journal entry preparation",
-      "Driver-based forecasts & variance analysis",
-      "Internal controls & audit trail",
-      "Structured data contracts & validation",
-      "Excel · Power BI · SQL · Python",
-      "English · Mandarin",
-    ],
+    "id": "photography",
+    "title": "Photography & production",
+    "introduction": "Taking a visual story from the first idea through to the final edit.",
+    "skills": [
+      "Photography",
+      "Video production",
+      "DaVinci Resolve",
+      "Lightroom",
+      "Social-first storytelling",
+      "Persuasive presentations & storytelling",
+      "Creative direction"
+    ]
   },
+  {
+    "id": "delivery",
+    "title": "Delivery & operations",
+    "introduction": "Taking projects from design to completion, aligning stakeholders, and turning plans into measurable results.",
+    "skills": [
+      "Stakeholder coordination & influence",
+      "Cross-functional collaboration",
+      "End-to-end project management",
+      "Independent execution & prioritization",
+      "Product development & enterprise support",
+      "Critical paths, milestones & risk escalation",
+      "Meeting facilitation & action items",
+      "Portfolio reviews & process improvement",
+      "SharePoint & asset governance",
+      "Excel: macros, pivot tables & reporting",
+      "Tableau & intermediate SQL",
+      "PowerPoint & Word",
+      "CRM platforms & Google Cloud Console",
+      "Data storytelling"
+    ]
+  }
 ];
 
 export default function SkillsSelector() {

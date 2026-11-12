@@ -275,3 +275,6 @@
     animation: none;
   }
 }
+
+/* Keep Alexander’s longer category names within the established two-column layout. */
+@media(min-width:1101px) { .skills-selector-tab { font-size:clamp(30px,3vw,50px); line-height:1.08; } }
