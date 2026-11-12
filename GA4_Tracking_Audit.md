@@ -2,7 +2,7 @@
 
 Implementation date: November 12, 2026.
 
-Existing Google tag: G-6FCH1QPWBP. Connected destinations: Alexander Chen Works (G-6FCH1QPWBP) and Alexander Chen Portfolio (G-FWV4F4RMGN). Both retained.
+Existing Google tag: G-6FCH1QPWBP. Connected destinations: Alexander Chen Works (G-6FCH1QPWBP) and Alexander Chen Portfolio (G-FWV4F4RMGN). Both retained. No property was replaced.
 
 ## Real page inventory
 
@@ -92,13 +92,13 @@ Requires 50% of the complete element visible continuously for 1,000 ms in a visi
 |---|---|---|
 | Generic project image lightbox | modal_view | project_image |
 | Photo album lightbox | modal_view | photo_album |
-| ICFF full-screen gallery | modal_view | icff_photo |
+| ICFF full-screen gallery component, when populated | modal_view | icff_photo |
 | Email preview dialog, if rendered | modal_view | email_preview |
 | Home section anchors, catalogue filters, toolkits, photo slides, game scenes | Interaction events | No page_view |
 
 ## Event schema
 
-Every custom event uses page_path, page_title, page_location, page_name, page_type; project_id and project_name are included when relevant. No screen_view or invented screen_class values.
+Every custom event uses page_path, page_title, page_location, page_name, page_type; project_id and project_name are included when relevant; photo albums include album_id. No screen_view or invented screen_class values.
 
 | Event | Additional parameters | Trigger |
 |---|---|---|
@@ -113,13 +113,14 @@ Every custom event uses page_path, page_title, page_location, page_name, page_ty
 | section_navigation | navigation_type=anchor | Anchor on same canonical page |
 | modal_view | modal_type, view_type=modal | Open lightbox; never a page visit |
 | modal_interaction | modal_type, action=close/navigate | Modal controls |
+| toolkit_select | toolkit_id, toolkit_name | Current homepage skills category tab |
 | toolkit_expand | toolkit_name, expanded | Toolkit toggle |
 | hero_interaction | action=camera_pose | Hero camera interaction |
 | playground_interaction | action=move/jump/scene_change/move_to_destination/advance_scene, scene_id | Intentional playground actions, throttled to one per action/scene per two seconds |
 
 ## GA4 administration
 
-Automatic history page views, outbound clicks, and file downloads disabled in the existing Alexander Chen Works Google tag's automatic event detection; both destinations preserved. Automatic scroll/video/form settings left unchanged. send_page_view=false in the application config. No additional tag or property created.
+Automatic history page views, outbound clicks, and file downloads disabled in the existing Alexander Chen Works Google tag's automatic event detection; both destinations preserved. Automatic scroll/video/form settings left unchanged. send_page_view=false is set globally before tag initialization and on both destination configs. Manual events explicitly target both existing destination IDs once; separate properties receiving one copy each are not duplicate visits within a property. No additional tag or property created.
 
 Recommended event-scoped custom dimensions: Page name (page_name), Page type (page_type), Section ID (section_id), Section name (section_name), Project ID (project_id), Project name (project_name), Detail name (detail_name), View type (view_type), Modal type (modal_type), Interaction action (action), Scene ID (scene_id), Filter value (filter_value), Contact method (contact_method), Link placement (link_placement). Use built-in Page path and screen class, Page title and screen name, Page location, Page referrer, Event name, Link domain where available. Do not register page_path merely to populate app dimensions.
 
@@ -135,4 +136,45 @@ No consent grants added or changed; existing Consent Mode commands are retained.
 
 ## Source verification
 
-59 unique routes/titles validated. Tests cover canonicalization, privacy-safe referrers, initial load, duplicate React effects, anchor navigation, real-route revisits, threshold boundaries, and production-host guards. JSX and JS syntax validated with esbuild. Live browser and DebugView results appended after deployment.
+59 unique routes/titles validated. Tests cover canonicalization, privacy-safe referrers, initial load, duplicate React effects, anchor navigation, real-route revisits, threshold boundaries, and production-host guards. JSX and JS syntax validated with esbuild. Nine automated checks passed, including startup suppression for both destinations and contact/outbound parameter privacy. The production GitHub Actions builds succeeded; a full local build is blocked by the installed native Rollup signature/Team ID mismatch, not a source compilation error.
+
+## Live verification — November 12, 2026
+
+| Check | Result | Scope/limit |
+|---|---|---|
+| Direct load of every inventoried route | Passed: 59/59 | Browser document titles and local debug command trace each matched one canonical page_view; not a separate network capture for every route |
+| Startup network collection | Passed | Both retained IDs returned HTTP 204; one page_view per destination, no automatic startup duplicates after correction |
+| Homepage anchor | Passed | section_navigation, no additional page_view |
+| Home → catalogue → Utopia → Back → Forward | Passed | Five total page views with correct canonical paths and preceding page_referrer values |
+| Direct case-study refresh | Passed | One new page_view for Utopia Vinyl on refresh |
+| Catalogue status filter | Passed | portfolio_filter with status/Ongoing; no page visit |
+| Homepage sections | Passed | Hero and individual experience-role section_view events observed; repeat anchor visits did not duplicate section IDs. Threshold implementation requires literal 50% of the complete element for one second, including tab visibility checks |
+| Project image lightbox | Passed | 123Dentist modal_view + project_open/view_type=modal; no extra page_view; close emits modal_interaction |
+| Photography album lightbox | Passed | Isabella Rossellini photo_album modal_view, no extra page_view |
+| Resume link | Passed | resume_download emitted with PDF metadata and header placement; transfer completion is outside the event meaning |
+| Contact/outbound | Passed | LinkedIn click emitted contact_click and outbound_click with domain-only URL. Email sanitization verified by automated click-handler test; did not launch an email/phone app |
+| Playground | Passed | Jump and Toronto scene change; V1 and V2 Start journey actions emitted advance_scene/hospital |
+| Skills tabs | Passed | Product & build emitted toolkit_select/product with no extra page_view |
+| GA4 DebugView | Passed | Alexander Chen Portfolio showed the Apple debug device and page_view, project_open, section_view, and section_navigation events |
+| ICFF-specific gallery and legacy email dialog | Not live-verified | Source classifiers retained; the inspected current pages did not render these dialog variants |
+| All interaction variants and final standard-report aggregation | Not exhaustively verified | Did not exercise every photo, outbound destination, filter state, keyboard/game path, or consent configuration. Standard-report aggregation and custom definitions remain subject to GA4 processing |
+
+The application trace checks event commands, not server receipt. Network HTTP 204 and DebugView supply separate delivery evidence. No emails, phone calls, messages, purchases, or consent grants were sent as part of QA.
+
+## Remaining GA4 report setup
+
+The code and duplicate-prevention settings are published. The recommended custom dimensions, key-event markings, explorations, and developer-traffic filter above are a setup checklist, not changes claimed to have been made in the property UI. Register the event-scoped dimensions before expecting them in explorations. The existing property and both connected destinations were preserved.
+
+For debugging only, load a working public URL with ?analytics_debug=1 before its hash, for example https://alexanderchenworks.com/?analytics_debug=1#project/utopia-vinyl. The flag lasts for that loaded document; the existing router can remove the query from the address bar during navigation. It never appears in reported canonical page paths. Ordinary visitors do not get the DOM debug trace.
+
+
+### Final sanitized network capture
+
+A final browser HAR was parsed after the last code deployment. Only event metadata is recorded here; client identifiers and raw request URLs are omitted.
+
+| Destination | page_view count | Page title | page_location | page_path | section_view | HTTP status |
+|---|---:|---|---|---|---|---|
+| G-6FCH1QPWBP | 1 | Home &#124; Alexander Chen | https://alexanderchenworks.com/ | / | toolkits | 204 |
+| G-FWV4F4RMGN | 1 | Home &#124; Alexander Chen | https://alexanderchenworks.com/ | / | toolkits | 204 |
+
+The retained enhanced-measurement scroll event was also present; it did not generate an additional page_view.
