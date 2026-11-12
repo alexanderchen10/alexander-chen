@@ -1,0 +1,12 @@
+.home-collaborator.icff-client-card { grid-template-rows: 92px auto 1fr; min-height: 320px; }
+.icff-client-card .home-collaborator-mark { padding: 18px 30px; }
+.icff-client-card .home-collaborator-mark img { height: 58px; width: 80%; }
+.icff-client-card .home-collaborator-meta { min-height: 42px; padding: 12px 18px; }
+.icff-client-projects { padding: 0 18px 14px; }
+.icff-client-projects a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 42px; padding: 9px 0; border-bottom: 1px solid rgba(20,21,47,.1); color: var(--tech-navy); font-size: 11px; line-height: 1.35; }
+.icff-client-projects a:last-child { border-bottom: 0; }
+.icff-client-projects a:hover { color: var(--tech-purple); }
+.icff-client-card a:focus-visible { outline: 2px solid var(--tech-purple); outline-offset: 2px; }
+.icff-client-projects a > span:first-child { min-width: 0; }
+.icff-client-projects a > span:last-child { flex-shrink: 0; }
+
