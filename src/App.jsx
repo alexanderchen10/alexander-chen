@@ -1,4 +1,5 @@
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
+import SkillsSelector from "./SkillsSelector";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
@@ -1247,21 +1248,7 @@ function CollaboratorCarousel({ navigate }) {
 }
 
 function HomeToolkits() {
-  const [open, setOpen] = useState(0);
-  const kits = [
-    { title: "Design & digital experiences", description: "Turning complex journeys into clear, useful interfaces.", tools: ["UX research & user flows", "Figma", "Design systems", "Information architecture", "Website design", "Accessibility"] },
-    { title: "Marketing & content strategy", description: "Combining consumer understanding, creative thinking, and commercial awareness to build campaigns and measure results.", tools: ["Campaign planning", "Retail marketing", "Retail launches", "Vendor & agency coordination", "Consumer & audience insights", "Brand strategy & positioning", "Analytical & creative thinking", "Commercial & strategic thinking", "Campaign performance analysis", "Email marketing", "Meta campaigns", "Sprout Social", "Google Analytics", "CRM & customer journeys"] },
-    { title: "Photography & production", description: "Taking a visual story from the first idea through to the final edit.", tools: ["Photography", "Video production", "DaVinci Resolve", "Lightroom", "Social-first storytelling", "Persuasive presentations & storytelling", "Creative direction"] },
-    { title: "Delivery & operations", description: "Taking projects from design to completion, aligning stakeholders, and independently turning plans into measurable results.", tools: ["Stakeholder coordination & influence", "Cross-functional collaboration", "End-to-end project management", "Independent execution", "Results-driven delivery", "Project timelines & prioritization", "Product development support", "Enterprise initiatives", "Critical path management", "Milestone tracking", "Risk escalation", "Meeting facilitation & action items", "Portfolio reviews", "SharePoint", "Asset governance", "Process improvement"] },
-    { title: "Data, reporting & business tools", description: "Turning data into clear reports, presentations, and informed decisions.", tools: ["Excel: data manipulation, macros, charts & pivot tables", "Tableau", "Intermediate SQL", "Data storytelling", "PowerPoint", "Word", "CRM platforms", "Google Cloud Console"] },
-  ];
-  return <section className="home-toolkit-section" id="toolkits" aria-labelledby="toolkit-title">
-    <header><p className="section-label">Skills & toolkits</p><h2 id="toolkit-title">What I work with.</h2><p>Strategy, design, storytelling, delivery, and data — together in one toolkit.</p></header>
-    <div className="home-toolkit-list">{kits.map((kit, i) => <article key={kit.title} className={open === i ? "is-open" : ""}>
-      <h3><button type="button" aria-expanded={open === i} aria-controls={`toolkit-panel-${i}`} onClick={() => setOpen(open === i ? null : i)}><span>0{i + 1}</span>{kit.title}<span aria-hidden="true">{open === i ? "−" : "+"}</span></button></h3>
-      <div id={`toolkit-panel-${i}`} hidden={open !== i}><p>{kit.description}</p><ul>{kit.tools.map(tool => <li key={tool}>{tool}</li>)}</ul><small>{kit.tools.length} skills & tools</small></div>
-    </article>)}</div>
-  </section>;
+  return <SkillsSelector />;
 }
 
 function HomePlayground({ navigate }) {
