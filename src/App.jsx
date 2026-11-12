@@ -184,7 +184,9 @@ function useProjectProgress(sections = [], containerId) {
     const update = () => {
       const root = (containerId && document.getElementById(containerId)) || document.documentElement;
       const start = containerId ? window.scrollY + root.getBoundingClientRect().top : 0;
-      const scrollable = Math.max(1, root.scrollHeight - window.innerHeight);
+      const endElement = root.dataset.progressEnd ? document.getElementById(root.dataset.progressEnd) : null;
+      const rangeHeight = endElement ? window.scrollY + endElement.getBoundingClientRect().bottom - start : root.scrollHeight;
+      const scrollable = Math.max(1, rangeHeight - window.innerHeight);
       const nextProgress = Math.min(100, Math.max(0, ((window.scrollY - start) / scrollable) * 100));
       const marker = window.innerHeight * 0.38;
       const nextActive = sections.reduce((current, section) => {
@@ -1286,7 +1288,7 @@ function HomePage({ clock, navigate }) {
         </nav>
       </section>
 
-      <section className="home-collaborators" aria-labelledby="home-collaborators-title">
+      <section id="home-collaborators" data-progress-end="work" className="home-collaborators" aria-labelledby="home-collaborators-title">
         <div className="home-collaborators-heading">
           <p>Who I’ve worked with</p>
           <div>
@@ -4055,7 +4057,7 @@ export default function App() {
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const isUtopia = selectedProject?.slug === "utopia-vinyl";
   const homeProgress = {
-    work: { label: "Projects section", containerId: "work", sections: [{ id: "work", label: "Projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-project-collection", label: "All projects" }] },
+    work: { label: "Projects section", containerId: "home-collaborators", sections: [{ id: "home-collaborators", label: "Collaborators" }, { id: "work", label: "Projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-project-collection", label: "All projects" }] },
     experience: { label: "Professional experience", containerId: "experience", sections: about.experience.map((item,index)=>({id:`experience-role-${index}`,label:item.organization})) },
     "home-education": { label: "Education section", containerId: "home-education", sections: [{id:"home-education",label:"Education"}] },
   };
