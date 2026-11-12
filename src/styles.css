@@ -3439,3 +3439,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .home-work-heading h2 span { color:var(--tech-purple); }
 .home-work-heading > p:last-child { margin:0; max-width:440px; font-size:clamp(14px,1.3vw,18px); line-height:1.6; }
 @media(max-width:809px) { .home-work-heading { gap:20px; } .home-work-heading h2 { font-size:clamp(52px,10vw,80px); } }
+
+.home-hero-live-project { flex-wrap:wrap; gap:12px 24px; }
+.home-hero-live-project a { white-space:nowrap; }
+.home-hero-live-project a:nth-child(2) .home-hero-live-dot { background:var(--tech-purple); }
