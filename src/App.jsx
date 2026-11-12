@@ -1,7 +1,7 @@
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, workProjects } from "./data";
+import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import GtaEmailCaseStudy from "./GtaEmailCaseStudy";
 import UtopiaBuyerJourney from "./UtopiaBuyerJourney";
@@ -248,7 +248,7 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
     const update = () => {
       let active = page === "home" ? "work" : (page.startsWith("project/") || page.startsWith("project-log")) ? "work" : page.startsWith("playground") ? "about" : page;
       if (page === "home") {
-        for (const [id, name] of [["experience", "experience"], ["home-playground", "about"]]) {
+        for (const [id, name] of [["work", "work"], ["experience", "experience"], ["home-education", "education"], ["home-playground", "about"]]) {
           if (document.getElementById(id)?.getBoundingClientRect().top <= window.innerHeight * .4) active = name;
         }
       }
@@ -706,12 +706,12 @@ function ProjectCard({ project, index }) {
           <a className="project-case-link" href={href}>Read case study <Arrow /></a>
         </div>
         <section className="project-impact-summary" aria-label="Utopia Vinyl impact">
-          <div className="project-impact-heading"><span>Impact</span><span>As of {utopiaMetrics.asOf}</span></div>
+          <div className="project-impact-heading"><span>Impact</span><span>As of {utopiaLifetimeTotals.asOf}</span></div>
           <dl className="project-impact-metrics">
-            <div><dt>Orders</dt><dd>{utopiaMetrics.paidOrders}</dd></div>
-            <div><dt>Sales</dt><dd>{utopiaMetrics.paidTotal}</dd></div>
+            <div><dt>Orders</dt><dd>{utopiaLifetimeTotals.orders}</dd></div>
+            <div><dt>Sales</dt><dd>{utopiaLifetimeTotals.sales}</dd></div>
           </dl>
-          <p className="project-impact-note">Past 30 days · checked {utopiaMetrics.asOf}. Confirmed payments only. {utopiaMetrics.shippingNote}</p>
+          <p className="project-impact-note">{utopiaLifetimeTotals.period} · total website orders and sales.</p>
         </section>
       </div>
     </article>
@@ -1289,22 +1289,23 @@ function HomePlayground({ navigate }) {
   </section>;
 }
 
-function HomeEducation({ navigate }) {
-  return (
-    <section className="home-education-section" id="home-education" aria-labelledby="home-education-title">
-      <header className="home-education-heading">
-        <div><p className="section-label">Education</p><h2 id="home-education-title">Digital business.<br />Human-centred design.</h2></div>
-        <a href={routeHref("education")} onClick={(event) => navigate(event, "/", "education")}>Explore my education <Arrow /></a>
-      </header>
-      <div className="home-education-credentials">
-        {about.education.map((item, index) => <article key={item.school}>
-          <span className="home-education-number">{String(index + 1).padStart(2, "0")}</span>
-          <div><p className="home-education-school">{item.school}</p><h3>{item.program}</h3></div>
-          <p className="home-education-period">{item.period}</p>
-        </article>)}
-      </div>
-    </section>
-  );
+function HomeEducation() {
+  return <EducationPage embedded />;
+}
+
+function HomeProjects({ navigate }) {
+  const utopia = workProjects.find(project => project.slug === "utopia-vinyl");
+  return <section id="work" className="portfolio-section home-work-section">
+    <div className="home-work-heading"><p className="section-label">Projects</p><p>Independent products, ongoing studio collaborations, and selected client work.</p></div>
+    <div className="home-project-features">
+      <ProjectCard project={utopia} index={0} />
+      <article className="home-ao-feature" id="home-ao-studio">
+        <a className="home-ao-cover" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}><img src={assetHref("/projects/ao-studio/ao-studio-wordmark-dark.png")} alt="AO Studio" /></a>
+        <div className="home-ao-copy"><div className="home-ao-heading"><h3>AO Studio</h3><span className="project-status">Ongoing</span></div><p className="home-ao-role">Founder · Creative Director · Designer · Developer</p><p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p><div className="project-card-actions"><a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a><a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a></div><h4>Clients &amp; collaborations</h4><ul>{aoStudioProjectSlugs.map(slug => { const project=workProjects.find(p=>p.slug===slug); return project && <li key={slug}><a href={routeHref(`project/${slug}`)}><span>{project.organization || project.title}</span><Arrow /></a></li>; })}</ul></div>
+      </article>
+    </div>
+    <div className="home-all-projects" id="home-project-collection"><header><h3>Explore all projects</h3><a href={routeHref("work")}>Open project index <Arrow /></a></header><div className="home-client-projects">{workProjects.filter(project=>project.slug!=="utopia-vinyl").map(project=><article key={project.slug}><a className="home-client-cover" href={routeHref(`project/${project.slug}`)} aria-label={`View ${project.title}`}><ProjectVisual project={project} surface="card" /></a><p>{project.organization}</p><h4><a href={routeHref(`project/${project.slug}`)}>{project.title} <Arrow /></a></h4><span>{project.role}</span></article>)}</div></div>
+  </section>;
 }
 
 function HomePage({ clock, navigate }) {
@@ -1323,13 +1324,7 @@ function HomePage({ clock, navigate }) {
         <CollaboratorCarousel navigate={navigate} />
       </section>
 
-      <section id="work" className="portfolio-section home-work-section">
-        <div className="home-work-heading reveal">
-          <p className="section-label">projects</p>
-          <p>Selected independent, client, and creative projects across digital products, brand systems, and visual storytelling.</p>
-        </div>
-        <ProjectColumns projects={workProjects} />
-      </section>
+      <HomeProjects navigate={navigate} />
       <HomeExperience navigate={navigate} />
       <HomeEducation navigate={navigate} />
       <HomeToolkits />
@@ -3092,10 +3087,10 @@ const utopiaScenes = [
     label: "Results",
     kicker: "Measure, then improve",
     title: "Early sales results.",
-    body: `Real orders now show how the store performs. This snapshot covers the dashboard’s past 30 days, checked ${utopiaMetrics.asOf}.`,
+    body: `Since October 19, 2026, the website has recorded ${utopiaLifetimeTotals.orders} orders and ${utopiaLifetimeTotals.sales} in total sales, as of ${utopiaLifetimeTotals.asOf}.`,
     image: "/projects/work/utopia-vinyl/results-current.svg",
-    alt: `Utopia Vinyl: ${utopiaMetrics.paidOrders} orders and ${utopiaMetrics.paidTotal} in sales over the past 30 days, checked ${utopiaMetrics.asOf}`,
-    caption: `${utopiaMetrics.period} · checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone})`,
+    alt: `Utopia Vinyl: ${utopiaLifetimeTotals.orders} orders and ${utopiaLifetimeTotals.sales} total sales, ${utopiaLifetimeTotals.period}`,
+    caption: `${utopiaLifetimeTotals.period} · total sales and orders`,
     tags: ["Order evidence", "Careful analytics", "Search visibility", "Continuous improvement"],
     background: "#cfd8d1",
     accent: "#2f6550",
@@ -3154,13 +3149,13 @@ function UtopiaResultsGraphic() {
     <div className="utopia-results-graphic" aria-label="Verified sales snapshot">
       <p className="utopia-results-eyebrow">Store performance</p>
       <p className="utopia-results-heading">Sales at a glance.</p>
-      <p className="utopia-results-period">{utopiaMetrics.period} · checked {utopiaMetrics.asOf}<br />{utopiaMetrics.timeZone}</p>
+      <p className="utopia-results-period">{utopiaLifetimeTotals.period}<br />Updated {utopiaLifetimeTotals.asOf}</p>
       <dl className="utopia-results-grid">
-        <div><dt>{utopiaMetrics.paidOrders}</dt><dd>Orders</dd></div>
-        <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Sales</dd></div>
+        <div><dt>{utopiaLifetimeTotals.orders}</dt><dd>Total orders</dd></div>
+        <div><dt>{utopiaLifetimeTotals.sales}</dt><dd>Total sales</dd></div>
       </dl>
-      <p className="utopia-results-definition">{utopiaMetrics.salesScopeNote} {utopiaMetrics.shippingNote}</p>
-      <p className="utopia-results-graphic-source">{utopiaMetrics.sourceNote}</p>
+      <p className="utopia-results-definition">Total website sales and orders since October 19, 2026.</p>
+      <p className="utopia-results-graphic-source">Updated {utopiaLifetimeTotals.asOf}</p>
     </div>
   );
 }
@@ -3291,16 +3286,16 @@ function UtopiaVinylPage({ clock, navigate, project }) {
 
       <section className="utopia-outcome" id="utopia-outcome" aria-labelledby="utopia-outcome-title">
         <div className="utopia-outcome-copy">
-          <p>VERIFIED RESULTS · {utopiaMetrics.asOf.toUpperCase()}</p>
+          <p>TOTAL RESULTS · {utopiaLifetimeTotals.asOf.toUpperCase()}</p>
           <h2 id="utopia-outcome-title">From launch to real orders.</h2>
-          <p>A storefront my father can run, with early sales to learn from. Each dated snapshot shows the dashboard’s preceding 30 days.</p>
+          <p>A storefront my father can run, with real orders to learn from. These totals cover October 19 to November 12, 2026.</p>
           <dl className="utopia-metrics">
-            <div><dt>{utopiaMetrics.paidOrders}</dt><dd>Orders · past 30 days</dd></div>
-            <div><dt>{utopiaMetrics.paidTotal}</dt><dd>Sales · past 30 days</dd></div>
+            <div><dt>{utopiaLifetimeTotals.orders}</dt><dd>Total orders · since October 19</dd></div>
+            <div><dt>{utopiaLifetimeTotals.sales}</dt><dd>Total sales · since October 19</dd></div>
           </dl>
         </div>
         <UtopiaSalesChart />
-        <p className="utopia-results-source">Latest snapshot: {utopiaMetrics.period.toLowerCase()}, checked {utopiaMetrics.asOf} ({utopiaMetrics.timeZone}). {utopiaMetrics.salesScopeNote} {utopiaMetrics.shippingNote} Source: {utopiaMetrics.sourceNote}.</p>
+        <p className="utopia-results-source">Total website results: {utopiaLifetimeTotals.period}. The chart above retains the earlier, dated 30-day snapshots for comparison.</p>
         <div className="utopia-outcome-actions">
           <a href={reportUrl} target="_blank" rel="noreferrer">Read the archived November 4 review (24 pages) <Arrow /></a>
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Return to selected work <span aria-hidden="true">↑</span></a>
@@ -3463,7 +3458,9 @@ function IcffGalleryPage({ clock, navigate, project }) {
   );
 }
 
-function EducationPage() {
+function EducationPage({ embedded = false }) {
+  const Container = embedded ? "section" : "main";
+  const IntroHeading = embedded ? "h2" : "h1";
   const pageRef = useRef(null);
   const degreeRef = useRef(null);
   const threadsRef = useRef(null);
@@ -3564,10 +3561,10 @@ function EducationPage() {
   };
 
   return (
-    <main className="main-content education-page" ref={pageRef}>
+    <Container className={embedded ? "education-page education-home-section" : "main-content education-page"} id={embedded ? "home-education" : undefined} ref={pageRef}>
       <header className="education-intro">
         <p className="section-label">Education</p>
-        <h1>Learning that shapes<br />the way I work.</h1>
+        <IntroHeading>Learning that shapes<br />the way I work.</IntroHeading>
         <p>Digital Enterprise Management at the University of Toronto, with a foundation in UX design and a hands-on creative practice.</p>
       </header>
       <div className="education-degree-stage">
@@ -3651,7 +3648,7 @@ function EducationPage() {
         </div>
         <p className="education-thread-detail" aria-live="polite"><span>{String(activeThread + 1).padStart(2, "0")}</span>{studyThreads[activeThread][1]}</p>
       </section>
-    </main>
+    </Container>
   );
 }
 
@@ -3904,34 +3901,23 @@ function projectProgressFor(project, detail) {
 export default function App() {
   const { page, route, navigate } = usePage();
   const clock = useClock();
-  const [experienceInView, setExperienceInView] = useState(false);
-
-
+  const [homeSection, setHomeSection] = useState("work");
   useEffect(() => {
-    if (page !== "home") {
-      setExperienceInView(false);
-      return;
-    }
+    if (page !== "home") return;
     let frame = 0;
     const update = () => {
       frame = 0;
-      const bounds = document.getElementById("experience")?.getBoundingClientRect();
       const marker = window.innerHeight * .38;
-      setExperienceInView((current) => {
-        // Keep the bar stable when its own height shifts the section boundary.
-        const visible = !!bounds && bounds.top <= marker + (current ? 80 : 0) && bounds.bottom > marker;
-        return current === visible ? current : visible;
-      });
+      let next = "work";
+      for (const id of ["work", "experience", "home-education"]) {
+        const element = document.getElementById(id);
+        if (element && element.getBoundingClientRect().top <= marker) next = id;
+      }
+      setHomeSection(current => current === next ? current : next);
     };
-    const queueUpdate = () => { if (!frame) frame = window.requestAnimationFrame(update); };
-    update();
-    window.addEventListener("scroll", queueUpdate, { passive: true });
-    window.addEventListener("resize", queueUpdate);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", queueUpdate);
-      window.removeEventListener("resize", queueUpdate);
-    };
+    const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update(); window.addEventListener("scroll", queue, { passive: true }); window.addEventListener("resize", queue);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", queue); window.removeEventListener("resize", queue); };
   }, [page]);
   const selectedDetail = detailFromRoute(page);
   const selectedProject = selectedDetail?.project || projectFromRoute(page);
@@ -3942,15 +3928,12 @@ export default function App() {
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const isUtopia = selectedProject?.slug === "utopia-vinyl";
-  const projectProgress = !isPlayground ? projectProgressFor(selectedProject, selectedDetail) || (page === "home" && experienceInView ? {
-    label: "Professional experience journey",
-    containerId: "experience",
-    sections: about.experience.map((experience, index) => ({
-      id: `experience-role-${index}`,
-      label: `${experience.organization} · ${experience.role}`,
-      summary: `${experience.organization} · ${experience.role}`,
-    })),
-  } : null) : null;
+  const homeProgress = {
+    work: { label: "Projects section", containerId: "work", sections: [{ id: "work", label: "Projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-project-collection", label: "All projects" }] },
+    experience: { label: "Professional experience", containerId: "experience", sections: about.experience.map((item,index)=>({id:`experience-role-${index}`,label:item.organization})) },
+    "home-education": { label: "Education section", containerId: "home-education", sections: [{id:"home-education",label:"Education"}] },
+  };
+  const projectProgress = !isPlayground ? projectProgressFor(selectedProject, selectedDetail) || (page === "home" ? homeProgress[homeSection] : page === "education" ? { label: "Education page", sections: [{id:"education-degree-title",label:"Degree"},{id:"education-beyond-title",label:"Credentials"}] } : null) : null;
   const usesTopbar = !isPlayground;
 
   useEffect(() => {

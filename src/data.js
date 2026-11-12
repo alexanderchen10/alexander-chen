@@ -218,6 +218,10 @@ export const aoStudioProjectSlugs = ["corcoran-oakville-grand-opening", "icff-la
 // Verified against the signed-in Sales & Traffic and Orders dashboards.
 // Current valid order totals include awaiting payment. Paid and traffic metrics
 // use the dashboard's rolling 30-day window, separate from weekly Progress.
+export const utopiaLifetimeTotals = {
+  orders: 28, sales: "NT$22,229", asOf: "November 12, 2026", period: "October 19–November 12, 2026",
+};
+
 export const utopiaMetrics = {
   asOf: "November 11, 2026",
   timeZone: "Toronto time",
@@ -285,11 +289,12 @@ export const workProjects = [
     image: "/projects/work/utopia-vinyl/utopia-vinyl-homepage-cover.webp",
     imageAlt: "Utopia Vinyl storefront homepage with the 黑膠理想國 turntable hero",
     coverEyebrow: "Product design · Independent commerce",
-    homeMetric: `${utopiaMetrics.paidOrders} orders · ${utopiaMetrics.paidTotal} in sales · past 30 days · checked ${utopiaMetrics.asOf}`,
+    homeMetric: `${utopiaLifetimeTotals.orders} orders · ${utopiaLifetimeTotals.sales} total sales · ${utopiaLifetimeTotals.period}`,
     aspect: "16 / 9",
     sourceUrl: "/projects/work/utopia-vinyl/utopia-vinyl-portfolio.pdf",
     sourceLabel: "Open the archived November 4 project review (24 pages)",
     impact: [
+      `${utopiaLifetimeTotals.orders} total orders and ${utopiaLifetimeTotals.sales} in total website sales from October 19 to ${utopiaLifetimeTotals.asOf}.`,
       `${utopiaMetrics.paidOrders} orders generated ${utopiaMetrics.paidTotal} in sales over the dashboard's past 30 days, checked ${utopiaMetrics.asOf} (${utopiaMetrics.timeZone}). ${utopiaMetrics.salesScopeNote} ${utopiaMetrics.shippingNote}`,
       `Recorded ${utopiaMetrics.pageViews} page views across ${utopiaMetrics.visitors} visitors in the same 30-day dashboard window. Traffic is reported separately from paid sales.`,
       "Turned a catalogue prototype into a complete selling routine spanning accessible uploads, inventory, guest ordering, manual payment confirmation, fulfilment, and customer guidance.",
