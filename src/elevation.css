@@ -1,0 +1,151 @@
+/* Depth describes a surface's purpose: controls, content, floating UI, overlays. */
+:root {
+  --shadow-control: 0 1px 2px rgba(25, 23, 55, .07), 0 3px 8px rgba(25, 23, 55, .05);
+  --shadow-surface: 0 2px 5px rgba(25, 23, 55, .045), 0 10px 26px -8px rgba(25, 23, 55, .12);
+  --shadow-raised: 0 5px 12px -4px rgba(25, 23, 55, .09), 0 20px 40px -14px rgba(25, 23, 55, .2);
+  --shadow-floating: 0 3px 10px -3px rgba(25, 23, 55, .07), 0 18px 48px -14px rgba(25, 23, 55, .18);
+  --shadow-overlay: 0 8px 20px -6px rgba(25, 23, 55, .16), 0 28px 68px -14px rgba(25, 23, 55, .26);
+}
+
+/* One shadow per content surface, including media and case-study frames. */
+.project-card,
+.overview-project-card,
+.home-ao-feature,
+.home-client-cover,
+.home-playground-grid a,
+.home-contact nav a,
+.work-project-preview,
+.work-log-record,
+.education-certificate,
+.home-experience-item,
+.home-collaborator,
+.structured-glossary-trigger,
+.toolkit-asset-card > button,
+.toolkit-asset-tray,
+.gta-walkthrough,
+.gta-story-chart,
+.utopia-sales-chart,
+.utopia-report-frame,
+.utopia-report-frame:hover,
+.immersive-media-frame,
+.structured-media-frame,
+.about-portrait,
+.fa-memory-media {
+  box-shadow: var(--shadow-surface);
+}
+
+.immersive-project-123dentist .immersive-media-portrait-grid .immersive-media-frame {
+  box-shadow: var(--shadow-surface);
+}
+
+.immersive-project-hero,
+.structured-case-study-hero,
+.project-detail-hero,
+.utopia-hero,
+.education-degree,
+.education-credential-detail {
+  box-shadow: var(--shadow-raised);
+}
+
+/* Interaction lifts the outer card; its picture does not cast a second shadow. */
+.project-card .project-media,
+.project-card:is(:hover, :focus-visible) .project-media,
+.structured-media-instagram-phone .structured-media-frame,
+.utopia-report-frame .utopia-sales-chart {
+  box-shadow: none;
+}
+
+.project-card:is(:hover, :focus-visible),
+.overview-project-card:is(:hover, :focus-visible),
+.home-client-cover:is(:hover, :focus-visible),
+.home-playground-grid a:is(:hover, :focus-visible),
+.home-contact nav a:is(:hover, :focus-visible),
+.work-project-preview:is(:hover, :focus-visible),
+.home-collaborator-linked:is(:hover, :focus-visible),
+.structured-glossary-trigger:is(:hover, :focus-visible),
+.toolkit-asset-card > button:is(:hover, :focus-visible),
+.toolkit-asset-card.is-active > button,
+.education-certificate:is(:hover, :focus-within) {
+  box-shadow: var(--shadow-raised);
+}
+
+.immersive-media-item:is(:hover, :focus-within) .immersive-media-frame,
+.immersive-project-123dentist .immersive-media-portrait-grid .immersive-media-item:is(:hover, :focus-within) .immersive-media-frame {
+  box-shadow: var(--shadow-raised);
+}
+
+/* Keep navigation visibly above the page without elevating its nested progress bar. */
+.global-topbar,
+.global-topbar:is(:hover, :focus-within),
+.utopia-journey {
+  box-shadow: var(--shadow-floating);
+}
+
+.mobile-header {
+  box-shadow: 0 3px 12px rgba(25, 23, 55, .065);
+}
+
+.home-experience-project-preview,
+.project-progress-compact .project-progress-tooltip {
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Small, filled controls get tactile depth. Inline links and text stay flat. */
+.home-hero-actions a:first-child,
+.home-hero-motion-toggle,
+.work-action.primary,
+.work-filters button[aria-pressed="true"],
+.home-experience-project,
+.experience-skills-heading button,
+.collaborator-scroll-controls button:not(:disabled),
+.project-detail-gallery-toolbar button,
+.toolkit-asset-tray-controls button,
+.utopia-demo-toggle,
+.gta-products button,
+.gta-comparison-scrub button,
+.gta-play-controls button,
+.utopia-sales-snapshot-controls button,
+.photography-lightbox button,
+.media-lightbox > button,
+.icff-lightbox-control,
+.gta-lightbox > button {
+  box-shadow: var(--shadow-control);
+}
+
+.home-hero-actions a:first-child:is(:hover, :focus-visible),
+.work-action.primary:is(:hover, :focus-visible),
+.home-experience-project:is(:hover, :focus-visible),
+.experience-skills-heading button:is(:hover, :focus-visible),
+.collaborator-scroll-controls button:not(:disabled):is(:hover, :focus-visible),
+.project-detail-gallery-toolbar button:is(:hover, :focus-visible),
+.toolkit-asset-tray-controls button:is(:hover, :focus-visible),
+.utopia-demo-toggle:is(:hover, :focus-visible) {
+  box-shadow: var(--shadow-surface);
+}
+
+.utopia-sales-snapshot-controls button[aria-pressed="true"],
+.work-filters button:active,
+.home-hero-actions a:first-child:active,
+.work-action.primary:active,
+.home-experience-project:active,
+.toolkit-asset-tray-controls button:active {
+  box-shadow: inset 0 1px 3px rgba(25, 23, 55, .1);
+}
+
+/* Shadows never require continuous animation or additional rendering layers. */
+@media (max-width: 809px) {
+  :root {
+    --shadow-surface: 0 2px 4px rgba(25, 23, 55, .045), 0 8px 18px -7px rgba(25, 23, 55, .12);
+    --shadow-raised: 0 4px 8px -3px rgba(25, 23, 55, .08), 0 14px 28px -10px rgba(25, 23, 55, .18);
+  }
+}
+
+@media print {
+  :root {
+    --shadow-control: none;
+    --shadow-surface: none;
+    --shadow-raised: none;
+    --shadow-floating: none;
+    --shadow-overlay: none;
+  }
+}
