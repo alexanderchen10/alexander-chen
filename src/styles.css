@@ -3490,3 +3490,25 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .collaborator-scroll-controls { margin-top:8px; }
 .collaborator-scroll-controls button { width:36px; height:36px; }
 @media(max-width:809px) { .home-collaborators { padding-top:44px; padding-bottom:36px; } .home-collaborators-heading { grid-template-columns:1fr; gap:14px; } .home-collaborators-heading h2 { font-size:clamp(32px,6.5vw,46px); } .home-collaborator-marquee { margin-top:24px; } .home-collaborator,.home-collaborator-item { width:220px; flex-basis:220px; } .home-collaborator { min-height:146px; } .home-collaborator-mark { padding:18px; } .home-collaborator-mark img { height:60px; } }
+
+/* One headline throughout the entrance and final hero: no cloned layout. */
+.hero-name-mask { overflow:hidden; padding-block:.14em; margin-block:-.14em; }
+.hero-name-mask em { display:inline-block; font-style:normal; }
+.home-hero.is-entering::after { content:""; position:absolute; inset:0; z-index:5; pointer-events:none; background:radial-gradient(ellipse at 50% 115%,#8a75df80,transparent 55%),#17118f; transform-origin:top; animation:hero-curtain 850ms 1250ms cubic-bezier(.22,1,.36,1) both; }
+.home-hero.is-entering .home-hero-copy { z-index:7; }
+.home-hero.is-entering h1 { animation:hero-ink 650ms 1300ms ease both; }
+.home-hero.is-entering .home-hero-surname { animation:hero-outline-ink 650ms 1300ms ease both; }
+.home-hero.is-entering .hero-name-mask em { animation:hero-letter-rise 760ms cubic-bezier(.22,1,.36,1) both; animation-delay:calc(80ms + var(--letter-index)*40ms); }
+.home-hero.is-entering .home-hero-surname em { animation-delay:calc(230ms + var(--letter-index)*40ms); }
+.home-hero.is-entering .home-hero-eyebrow,.home-hero.is-entering .home-hero-actions,.home-hero.is-entering .home-hero-details,.home-hero.is-entering .home-hero-portrait-stage,.home-hero.is-entering .home-hero-motion-toggle { animation:hero-support-enter 650ms 1650ms cubic-bezier(.22,1,.36,1) both; }
+.home-hero.is-entering .home-hero-actions { animation-delay:1750ms; }
+.home-hero.is-entering .home-hero-details { animation-delay:1800ms; }
+.home-hero.is-entering .home-hero-portrait-stage { animation-delay:1500ms; }
+@keyframes hero-letter-rise { from { transform:translateY(125%) rotate(7deg); opacity:0; } to { transform:translateY(0) rotate(0); opacity:1; } }
+@keyframes hero-curtain { from { transform:scaleY(1); } to { transform:scaleY(0); } }
+@keyframes hero-ink { from { color:#fffaf0; } to { color:var(--tech-navy); } }
+@keyframes hero-outline-ink { from { -webkit-text-stroke-color:#fffaf0; } to { -webkit-text-stroke-color:var(--tech-navy); } }
+@keyframes hero-support-enter { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .home-hero.is-entering::after { display:none; } .home-hero.is-entering h1,.home-hero.is-entering .home-hero-surname,.home-hero.is-entering .hero-name-mask em,.home-hero.is-entering .home-hero-eyebrow,.home-hero.is-entering .home-hero-actions,.home-hero.is-entering .home-hero-details,.home-hero.is-entering .home-hero-portrait-stage,.home-hero.is-entering .home-hero-motion-toggle { animation:none; } }
+
+html { scrollbar-gutter:stable; }

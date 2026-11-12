@@ -1018,7 +1018,26 @@ function CollaboratorCard({ collaborator, index, navigate, duplicate = false }) 
   );
 }
 
+let homepageIntroSeen = false;
 function HomeHero() {
+  const [intro, setIntro] = useState(() => {
+    if (homepageIntroSeen || window.scrollY > 0 || window.location.hash || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    try { if (sessionStorage.getItem("ac-home-intro")) return false; } catch {}
+    return true;
+  });
+  useEffect(() => {
+    homepageIntroSeen = true;
+    try { sessionStorage.setItem("ac-home-intro", "1"); } catch {}
+    if (!intro) return;
+    const previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    const finish = () => { document.documentElement.style.overflow = previousOverflow; setIntro(false); };
+    const timeout = window.setTimeout(finish, 2450);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const changed = () => { if (motion.matches) finish(); };
+    motion.addEventListener("change", changed);
+    return () => { clearTimeout(timeout); motion.removeEventListener("change", changed); document.documentElement.style.overflow = previousOverflow; };
+  }, [intro]);
   const [motionPaused, setMotionPaused] = useState(false);
   const [cameraAimed, setCameraAimed] = useState(false);
   const [cameraHovered, setCameraHovered] = useState(false);
@@ -1065,7 +1084,7 @@ function HomeHero() {
 
   return (
     <section
-      className={`home-hero${motionPaused ? " is-paused" : ""}`}
+      className={`home-hero${motionPaused ? " is-paused" : ""}${intro ? " is-entering" : ""}`}
       aria-labelledby="home-hero-title"
       onPointerMove={updateParallax}
       onPointerLeave={resetParallax}
@@ -1076,9 +1095,9 @@ function HomeHero() {
 
       <div className="home-hero-copy">
         <p className="home-hero-eyebrow">{profile.hero.eyebrow}</p>
-        <h1 id="home-hero-title">
-          <span>{givenName}</span>{" "}
-          <span className="home-hero-surname">{surname.join(" ")}</span>
+        <h1 id="home-hero-title" aria-label={profile.name}>
+          <span className="hero-name-mask" aria-label={givenName}>{[...givenName].map((letter,index) => <em aria-hidden="true" style={{ "--letter-index": index }} key={index}>{letter}</em>)}</span>{" "}
+          <span className="home-hero-surname hero-name-mask" aria-label={surname.join(" ")}>{[...surname.join(" ")].map((letter,index) => <em aria-hidden="true" style={{ "--letter-index": index }} key={index}>{letter}</em>)}</span>
         </h1>
         <div className="home-hero-actions">
           <a href={routeHref("work")}>See the work <span aria-hidden="true">↓</span></a>
