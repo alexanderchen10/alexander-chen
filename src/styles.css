@@ -3473,3 +3473,20 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .global-topbar .primary-navigation .numbered-links a.active::after { opacity:1; background:#7357ff16; border-color:#7357ff28; }
 .global-topbar .primary-navigation .numbered-links a:hover::after,.global-topbar .primary-navigation .numbered-links a:focus-visible::after { opacity:1; }
 .global-topbar .primary-navigation .numbered-links a:focus-visible { outline:2px solid var(--tech-purple); outline-offset:10px; border-radius:999px; }
+
+/* Compact collaborator strip. */
+.home-collaborators { padding-top:clamp(44px,5vw,72px); padding-bottom:clamp(36px,4vw,56px); }
+.home-collaborators-heading { grid-template-columns:minmax(140px,.3fr) minmax(0,1.7fr); gap:24px; }
+.home-collaborators-heading h2 { max-width:840px; margin:0; font-size:clamp(32px,4.2vw,60px); line-height:1.04; }
+.home-collaborator-marquee { margin-top:28px; padding-bottom:14px; }
+.home-collaborator-track,.home-collaborator-set { gap:10px; }
+.home-collaborator,.home-collaborator-item { flex-basis:clamp(210px,21vw,290px); width:clamp(210px,21vw,290px); }
+.home-collaborator { min-height:156px; border-radius:14px; box-shadow:0 4px 12px #14152f05; }
+.home-collaborator-mark { padding:20px 24px; }
+.home-collaborator-mark img { height:64px; }
+.home-collaborator-meta { min-height:38px; padding:10px 13px; gap:10px; }
+.home-collaborator:hover { transform:translateY(-2px); box-shadow:0 6px 16px #14152f0c; }
+.home-collaborator:hover .home-collaborator-mark img { transform:none; }
+.collaborator-scroll-controls { margin-top:8px; }
+.collaborator-scroll-controls button { width:36px; height:36px; }
+@media(max-width:809px) { .home-collaborators { padding-top:44px; padding-bottom:36px; } .home-collaborators-heading { grid-template-columns:1fr; gap:14px; } .home-collaborators-heading h2 { font-size:clamp(32px,6.5vw,46px); } .home-collaborator-marquee { margin-top:24px; } .home-collaborator,.home-collaborator-item { width:220px; flex-basis:220px; } .home-collaborator { min-height:146px; } .home-collaborator-mark { padding:18px; } .home-collaborator-mark img { height:60px; } }
