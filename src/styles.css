@@ -3463,3 +3463,13 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .education-thread-button > span:last-child { font-size:22px; }
 .education-thread-button:focus-visible { outline:2px solid var(--tech-purple); outline-offset:4px; }
 @media(max-width:809px) { .education-thread-words { font-size:clamp(23px,4.5vw,32px); } .education-thread-button { gap:12px; padding:18px 0; grid-template-columns:24px minmax(0,1fr) 20px; } }
+
+/* Rounded active-section marker, without changing navigation spacing. */
+.primary-navigation .navigation-beam { display:none; }
+.global-topbar .primary-navigation .numbered-links a { isolation:isolate; transition:color .2s ease; }
+.global-topbar .primary-navigation .numbered-links a:hover,.global-topbar .primary-navigation .numbered-links a:focus-visible { transform:none; }
+.global-topbar .primary-navigation .numbered-links a::after { display:block; inset:-9px -10px; height:auto; border-radius:999px; border:1px solid transparent; background:#7357ff0a; clip-path:none; box-shadow:none; z-index:-1; transform:none; opacity:0; transition:opacity .2s ease,background .2s ease; }
+.global-topbar .primary-navigation .numbered-links a.active { color:#4931a7; }
+.global-topbar .primary-navigation .numbered-links a.active::after { opacity:1; background:#7357ff16; border-color:#7357ff28; }
+.global-topbar .primary-navigation .numbered-links a:hover::after,.global-topbar .primary-navigation .numbered-links a:focus-visible::after { opacity:1; }
+.global-topbar .primary-navigation .numbered-links a:focus-visible { outline:2px solid var(--tech-purple); outline-offset:10px; border-radius:999px; }
