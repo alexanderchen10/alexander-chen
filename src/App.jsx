@@ -1184,20 +1184,18 @@ function CollaboratorCarousel({ navigate }) {
   useEffect(() => {
     const rail = railRef.current;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let frame, previous = 0, position = rail.scrollLeft, direction = 1, held = false, hovered = false;
+    let frame, previous = 0, position = rail.scrollLeft, direction = 1, held = false;
     const pause = () => { resumeAt.current = performance.now() + 4000; };
     const down = () => { held = true; pause(); };
     const up = () => { held = false; pause(); };
-    const enter = (event) => { if (event.pointerType === "mouse") hovered = true; };
-    const leave = () => { hovered = false; pause(); };
     const tick = (now) => {
       const elapsed = previous ? Math.min(now - previous, 50) : 0;
       previous = now;
-      if (motion.matches || document.hidden || held || hovered || now < resumeAt.current) {
+      if (motion.matches || document.hidden || held || now < resumeAt.current) {
         position = rail.scrollLeft;
       } else {
         const maximum = rail.scrollWidth - rail.clientWidth;
-        position = Math.max(0, Math.min(maximum, position + direction * elapsed * 0.032));
+        position = Math.max(0, Math.min(maximum, position + direction * elapsed * 0.022));
         rail.scrollLeft = position;
         if (position >= maximum) direction = -1;
         else if (position <= 0) direction = 1;
@@ -1205,8 +1203,6 @@ function CollaboratorCarousel({ navigate }) {
       frame = requestAnimationFrame(tick);
     };
     rail.addEventListener("pointerdown", down);
-    rail.addEventListener("pointerenter", enter);
-    rail.addEventListener("pointerleave", leave);
     rail.addEventListener("wheel", pause, { passive: true });
     rail.addEventListener("focusin", pause);
     window.addEventListener("pointerup", up);
@@ -1215,8 +1211,6 @@ function CollaboratorCarousel({ navigate }) {
     return () => {
       cancelAnimationFrame(frame);
       rail.removeEventListener("pointerdown", down);
-      rail.removeEventListener("pointerenter", enter);
-      rail.removeEventListener("pointerleave", leave);
       rail.removeEventListener("wheel", pause);
       rail.removeEventListener("focusin", pause);
       window.removeEventListener("pointerup", up);
