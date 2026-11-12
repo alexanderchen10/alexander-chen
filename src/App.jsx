@@ -1823,6 +1823,15 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
           }
         }}
       >
+        <svg className="playground-alpha-filter" aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="pixel-alex-alpha-cleanup" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="1.06" intercept="-0.03" />
+              </feComponentTransfer>
+            </filter>
+          </defs>
+        </svg>
         <div className="playground-scene-plane" key={activeScene.id} ref={scenePlane} style={planeStyle}>
           <div className="playground-world" aria-hidden="true" />
           <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
