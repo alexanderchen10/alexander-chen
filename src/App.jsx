@@ -9,6 +9,15 @@ import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
+import {
+  PLAYGROUND_SCENE_HEIGHT,
+  PLAYGROUND_SCENE_WIDTH,
+  clipPathForScenePolygon,
+  findPlaygroundRoute,
+  movePlaygroundPosition,
+  perspectiveScaleForScene,
+  playgroundScenes,
+} from "./playgroundWorld";
 
 const Arrow = ({ className }) => <span className={className} aria-hidden="true">↗</span>;
 const BASE_URL = import.meta.env.BASE_URL;
@@ -1501,51 +1510,45 @@ function PlaygroundNavigation({ clock, navigate }) {
   );
 }
 
-const playgroundScenes = [
-  { id: "taipei", label: "Taiwan", chapter: "chapter 01 · origin", title: "Taipei, Taiwan", image: "/projects/playground/taipei-101-pixel-background.png" },
-  { id: "toronto", label: "Toronto", chapter: "chapter 02 · next stop", title: "Toronto, Canada", image: "/projects/playground/toronto-city-hall-pixel-background.png" },
-];
-
 function PlaygroundPage({ clock, navigate, embedded = false }) {
   const Wrapper = embedded ? "section" : "main";
   const Heading = embedded ? "h2" : "h1";
   const gameScene = useRef(null);
+  const scenePlane = useRef(null);
   const alexActor = useRef(null);
   const [sceneId, setSceneId] = useState(playgroundScenes[0].id);
-  const [alexPosition, setAlexPosition] = useState({ x: 42, y: 82 });
+  const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
+  const [alexPosition, setAlexPosition] = useState(() => ({ ...playgroundScenes[0].spawn }));
   const [alexFacing, setAlexFacing] = useState(1);
   const [alexWalking, setAlexWalking] = useState(false);
   const [alexJumping, setAlexJumping] = useState(false);
+  const [alexJumpHeight, setAlexJumpHeight] = useState(0);
   const [pressedDirections, setPressedDirections] = useState(() => new Set());
+  const [gameFocused, setGameFocused] = useState(false);
+  const [routeDestination, setRouteDestination] = useState(null);
+  const [sceneLayout, setSceneLayout] = useState({ left: 0, top: 0, width: 0, height: 0 });
   const heldMoves = useRef(new Map());
-  const alexVelocity = useRef({ x: 0, y: 0 });
-  const jumpTimer = useRef(null);
+  const alexPositionRef = useRef({ ...playgroundScenes[0].spawn });
+  const routeRef = useRef([]);
+  const jumpRef = useRef({ active: false, elapsed: 0 });
   const walkingPulseTimer = useRef(null);
-  const activeScene = playgroundScenes.find(scene => scene.id === sceneId) || playgroundScenes[0];
 
-  const pulseWalking = useCallback(() => {
-    window.clearTimeout(walkingPulseTimer.current);
-    setAlexWalking(true);
-    walkingPulseTimer.current = window.setTimeout(() => {
-      if (!heldMoves.current.size) setAlexWalking(false);
-    }, 320);
+  const updateAlexPosition = useCallback(position => {
+    alexPositionRef.current = position;
+    setAlexPosition(position);
   }, []);
 
-  const nudgeAlex = useCallback((horizontal, vertical) => {
-    if (horizontal) setAlexFacing(horizontal);
-    alexVelocity.current = { x: horizontal * 11, y: vertical * 9 };
-    setAlexPosition(position => ({
-      x: Math.max(8, Math.min(92, position.x + horizontal * 3.5)),
-      y: Math.max(54, Math.min(88, position.y + vertical * 3)),
-    }));
-    pulseWalking();
-  }, [pulseWalking]);
+  const clearRoute = useCallback(() => {
+    routeRef.current = [];
+    setRouteDestination(null);
+  }, []);
 
   const syncPressedDirections = useCallback(() => {
     setPressedDirections(new Set([...heldMoves.current.values()].map(direction => direction.name).filter(Boolean)));
   }, []);
 
   const beginMove = useCallback((token, name, horizontal, vertical) => {
+    clearRoute();
     heldMoves.current.set(token, { name, horizontal, vertical });
     if (horizontal) {
       const facing = Math.sign(horizontal);
@@ -1555,22 +1558,63 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     syncPressedDirections();
     window.clearTimeout(walkingPulseTimer.current);
     setAlexWalking(true);
-  }, [syncPressedDirections]);
+  }, [clearRoute, syncPressedDirections]);
 
   const endMove = useCallback((token) => {
     heldMoves.current.delete(token);
     syncPressedDirections();
-    if (!heldMoves.current.size) {
-      alexVelocity.current = { x: 0, y: 0 };
-      setAlexWalking(false);
-    }
+    if (!heldMoves.current.size && !routeRef.current.length) setAlexWalking(false);
   }, [syncPressedDirections]);
 
   const jumpAlex = useCallback(() => {
-    window.clearTimeout(jumpTimer.current);
-    setAlexJumping(false);
-    window.requestAnimationFrame(() => window.requestAnimationFrame(() => setAlexJumping(true)));
-    jumpTimer.current = window.setTimeout(() => setAlexJumping(false), 680);
+    jumpRef.current = { active: true, elapsed: 0 };
+    setAlexJumpHeight(0);
+    setAlexJumping(true);
+  }, []);
+
+  const stopMoving = useCallback(() => {
+    heldMoves.current.clear();
+    setPressedDirections(new Set());
+    clearRoute();
+    setAlexWalking(false);
+  }, [clearRoute]);
+
+  const nudgeAlex = useCallback((horizontal, vertical) => {
+    clearRoute();
+    if (horizontal) setAlexFacing(Math.sign(horizontal));
+    const next = movePlaygroundPosition(activeScene, alexPositionRef.current, { x: horizontal * 28, y: vertical * 28 });
+    updateAlexPosition(next);
+    window.clearTimeout(walkingPulseTimer.current);
+    setAlexWalking(true);
+    walkingPulseTimer.current = window.setTimeout(() => setAlexWalking(false), 180);
+  }, [activeScene, clearRoute, updateAlexPosition]);
+
+  useEffect(() => {
+    const stage = gameScene.current;
+    if (!stage) return undefined;
+    const updateLayout = () => {
+      const width = stage.clientWidth;
+      const height = stage.clientHeight;
+      if (!width || !height) return;
+      const scale = Math.max(width / PLAYGROUND_SCENE_WIDTH, height / PLAYGROUND_SCENE_HEIGHT);
+      const renderedWidth = PLAYGROUND_SCENE_WIDTH * scale;
+      const renderedHeight = PLAYGROUND_SCENE_HEIGHT * scale;
+      const mobile = window.matchMedia("(max-width: 809px)").matches;
+      setSceneLayout({
+        width: renderedWidth,
+        height: renderedHeight,
+        left: (width - renderedWidth) / 2,
+        top: mobile ? height - renderedHeight : (height - renderedHeight) / 2,
+      });
+    };
+    updateLayout();
+    const observer = new ResizeObserver(updateLayout);
+    observer.observe(stage);
+    window.addEventListener("orientationchange", updateLayout);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("orientationchange", updateLayout);
+    };
   }, []);
 
   useEffect(() => {
@@ -1579,58 +1623,81 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     const animateMovement = (currentTime) => {
       const elapsed = Math.min((currentTime - previousTime) / 1000, .04);
       previousTime = currentTime;
-      const movement = [...heldMoves.current.values()].reduce((total, direction) => ({
+      const keyboardMovement = [...heldMoves.current.values()].reduce((total, direction) => ({
         horizontal: total.horizontal + direction.horizontal,
         vertical: total.vertical + direction.vertical,
       }), { horizontal: 0, vertical: 0 });
-      const hasInput = Boolean(movement.horizontal || movement.vertical);
-      const magnitude = Math.hypot(movement.horizontal, movement.vertical) || 1;
-      const inputX = movement.horizontal / magnitude;
-      const inputY = movement.vertical / magnitude;
-      const maxSpeedX = 18;
-      const maxSpeedY = 15;
-      const targetX = inputX * maxSpeedX;
-      const targetY = inputY * maxSpeedY;
-      const velocity = alexVelocity.current;
-      if (hasInput) {
-        velocity.x = targetX;
-        velocity.y = targetY;
-      } else {
-        velocity.x = 0;
-        velocity.y = 0;
+      const hasKeyboardInput = Boolean(keyboardMovement.horizontal || keyboardMovement.vertical);
+      const speed = 190;
+      let desiredX = 0;
+      let desiredY = 0;
+      let current = alexPositionRef.current;
+
+      if (hasKeyboardInput) {
+        const magnitude = Math.hypot(keyboardMovement.horizontal, keyboardMovement.vertical) || 1;
+        desiredX = keyboardMovement.horizontal / magnitude;
+        desiredY = keyboardMovement.vertical / magnitude;
+      } else if (routeRef.current.length) {
+        let target = routeRef.current[0];
+        let distance = Math.hypot(target.x - current.x, target.y - current.y);
+        while (distance < 3 && routeRef.current.length) {
+          routeRef.current.shift();
+          target = routeRef.current[0];
+          if (!target) break;
+          distance = Math.hypot(target.x - current.x, target.y - current.y);
+        }
+        if (target) {
+          desiredX = (target.x - current.x) / (distance || 1);
+          desiredY = (target.y - current.y) / (distance || 1);
+        } else {
+          setRouteDestination(null);
+        }
       }
-      const speedRatio = Math.min(1, Math.hypot(velocity.x / maxSpeedX, velocity.y / maxSpeedY));
-      const isMoving = hasInput;
+
+      let movedDistance = 0;
+      if (desiredX || desiredY) {
+        const next = movePlaygroundPosition(activeScene, current, { x: desiredX * speed * elapsed, y: desiredY * speed * elapsed });
+        movedDistance = Math.hypot(next.x - current.x, next.y - current.y);
+        if (movedDistance > .01) {
+          current = next;
+          updateAlexPosition(next);
+          if (Math.abs(desiredX) > .08) setAlexFacing(Math.sign(desiredX));
+        } else if (routeRef.current.length) {
+          routeRef.current.shift();
+          if (!routeRef.current.length) setRouteDestination(null);
+        }
+      }
+
+      const isMoving = movedDistance > .01;
       setAlexWalking(isMoving);
-      if (movement.horizontal) setAlexFacing(Math.sign(movement.horizontal));
       if (alexActor.current) {
-        const stepDuration = Math.round(500 - speedRatio * 180);
-        alexActor.current.style.setProperty("--alex-step-duration", `${stepDuration}ms`);
-        alexActor.current.style.setProperty("--alex-dust-duration", `${stepDuration * 2}ms`);
-        alexActor.current.style.setProperty("--alex-lean", `${(velocity.x / maxSpeedX * 2.4).toFixed(2)}deg`);
+        alexActor.current.style.setProperty("--alex-step-duration", "330ms");
+        alexActor.current.style.setProperty("--alex-dust-duration", "660ms");
+        alexActor.current.style.setProperty("--alex-lean", `${(isMoving ? desiredX * 2.2 : 0).toFixed(2)}deg`);
       }
-      if (isMoving) {
-        setAlexPosition(position => {
-          const nextX = Math.max(8, Math.min(92, position.x + velocity.x * elapsed));
-          const nextY = Math.max(54, Math.min(88, position.y + velocity.y * elapsed));
-          if ((nextX === 8 && velocity.x < 0) || (nextX === 92 && velocity.x > 0)) velocity.x = 0;
-          if ((nextY === 54 && velocity.y < 0) || (nextY === 88 && velocity.y > 0)) velocity.y = 0;
-          return { x: nextX, y: nextY };
-        });
+
+      if (jumpRef.current.active) {
+        jumpRef.current.elapsed += elapsed;
+        const progress = Math.min(1, jumpRef.current.elapsed / .62);
+        setAlexJumpHeight(Math.sin(progress * Math.PI) * 72);
+        if (progress >= 1) {
+          jumpRef.current = { active: false, elapsed: 0 };
+          setAlexJumpHeight(0);
+          setAlexJumping(false);
+        }
       }
       movementFrame = window.requestAnimationFrame(animateMovement);
     };
     movementFrame = window.requestAnimationFrame(animateMovement);
     return () => window.cancelAnimationFrame(movementFrame);
-  }, []);
+  }, [activeScene, updateAlexPosition]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      const bounds = gameScene.current?.getBoundingClientRect();
-      if (embedded && bounds && (bounds.top > window.innerHeight * .6 || bounds.bottom < window.innerHeight * .3)) return;
+      if (!gameScene.current?.contains(document.activeElement)) return;
       const tagName = event.target?.tagName?.toLowerCase();
       const gameControl = event.target?.closest?.(".playground-pixel-character, .playground-game-controls");
-      if (["input", "textarea", "select"].includes(tagName) || (tagName === "button" && !gameControl) || event.target?.isContentEditable) return;
+      if (["input", "textarea", "select"].includes(tagName) || event.target?.isContentEditable) return;
       const direction = {
         ArrowLeft: ["left", -1, 0], KeyA: ["left", -1, 0],
         ArrowRight: ["right", 1, 0], KeyD: ["right", 1, 0],
@@ -1640,7 +1707,7 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       if (direction) {
         event.preventDefault();
         if (!event.repeat) beginMove(`keyboard:${event.code}`, direction[0], direction[1], direction[2]);
-      } else if (event.code === "Space") {
+      } else if (event.code === "Space" && !event.repeat && (tagName !== "button" || gameControl)) {
         event.preventDefault();
         jumpAlex();
       }
@@ -1650,38 +1717,59 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
         endMove(`keyboard:${event.code}`);
       }
     };
-    const stopMoving = () => {
-      heldMoves.current.clear();
-      setPressedDirections(new Set());
-      alexVelocity.current = { x: 0, y: 0 };
-      setAlexWalking(false);
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopMoving();
     };
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     window.addEventListener("blur", stopMoving);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("blur", stopMoving);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [beginMove, endMove, jumpAlex, embedded]);
+  }, [beginMove, endMove, jumpAlex, stopMoving]);
 
   useEffect(() => () => {
-    window.clearTimeout(jumpTimer.current);
     window.clearTimeout(walkingPulseTimer.current);
   }, []);
 
   const chooseScene = (scene) => {
+    stopMoving();
     setSceneId(scene.id);
-    setAlexPosition(scene.id === "taipei" ? { x: 42, y: 82 } : { x: 48, y: 82 });
+    updateAlexPosition({ ...scene.spawn });
     setAlexFacing(1);
-    heldMoves.current.clear();
-    setPressedDirections(new Set());
-    alexVelocity.current = { x: 0, y: 0 };
-    setAlexWalking(false);
+    jumpRef.current = { active: false, elapsed: 0 };
+    setAlexJumpHeight(0);
+    setAlexJumping(false);
   };
 
-  const alexScale = .76 + ((alexPosition.y - 54) / 34) * .24;
+  const handleScenePointerDown = event => {
+    if (event.button !== 0 || event.target.closest("button, a, [data-playground-ui]")) return;
+    const plane = scenePlane.current;
+    if (!plane) return;
+    const bounds = plane.getBoundingClientRect();
+    const target = {
+      x: Math.max(0, Math.min(PLAYGROUND_SCENE_WIDTH, (event.clientX - bounds.left) / bounds.width * PLAYGROUND_SCENE_WIDTH)),
+      y: Math.max(0, Math.min(PLAYGROUND_SCENE_HEIGHT, (event.clientY - bounds.top) / bounds.height * PLAYGROUND_SCENE_HEIGHT)),
+    };
+    gameScene.current?.focus({ preventScroll: true });
+    setGameFocused(true);
+    heldMoves.current.clear();
+    setPressedDirections(new Set());
+    const route = findPlaygroundRoute(activeScene, alexPositionRef.current, target);
+    if (route) {
+      routeRef.current = route.points;
+      setRouteDestination(route.destination);
+    } else {
+      clearRoute();
+    }
+    event.preventDefault();
+  };
+
+  const alexScale = perspectiveScaleForScene(activeScene, alexPosition.y);
   const movementButtonProps = (name, horizontal, vertical) => {
     const releasePointer = (event) => {
       endMove(`pointer:${name}:${event.pointerId}`);
@@ -1691,6 +1779,9 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
       "aria-pressed": pressedDirections.has(name),
       onPointerDown: (event) => {
         event.preventDefault();
+        event.stopPropagation();
+        gameScene.current?.focus({ preventScroll: true });
+        setGameFocused(true);
         event.currentTarget.setPointerCapture?.(event.pointerId);
         beginMove(`pointer:${name}:${event.pointerId}`, name, horizontal, vertical);
       },
@@ -1703,18 +1794,81 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
     };
   };
 
+  const planeStyle = sceneLayout.width ? {
+    left: `${sceneLayout.left}px`, top: `${sceneLayout.top}px`, width: `${sceneLayout.width}px`, height: `${sceneLayout.height}px`,
+    "--playground-background": `url(${assetHref(activeScene.image)})`,
+  } : { inset: 0, "--playground-background": `url(${assetHref(activeScene.image)})` };
+
   return (
     <Wrapper className={embedded ? "about-playground" : "playground-page"} id={embedded ? "about-playground" : undefined}>
       {!embedded && <PlaygroundNavigation clock={clock} navigate={navigate} />}
       {embedded && <header className="about-section-heading"><p>playground</p><h2>Made from curiosity.</h2><p>Photography, design experiments, games, and stories beyond the brief.</p></header>}
       <section
-        className="playground-stage"
+        className={`playground-stage${gameFocused ? " is-game-focused" : ""}`}
         ref={gameScene}
         aria-labelledby="playground-title"
-        style={{ "--playground-background": `url(${assetHref(activeScene.image)})` }}
+        aria-label={`${activeScene.title} interactive Playground. Click the pavement to focus and move.`}
+        tabIndex="0"
+        onPointerDown={handleScenePointerDown}
+        onFocusCapture={() => setGameFocused(true)}
+        onBlurCapture={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setGameFocused(false);
+            stopMoving();
+          }
+        }}
       >
-        <div className="playground-world" key={activeScene.id} aria-hidden="true" />
-        <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
+        <div className="playground-scene-plane" key={activeScene.id} ref={scenePlane} style={planeStyle}>
+          <div className="playground-world" aria-hidden="true" />
+          <div className="playground-cloud-layer" aria-hidden="true"><i /><i /><i /><i /></div>
+          {activeScene.foregrounds.map(item => (
+            <div
+              className="playground-foreground-object"
+              key={item.id}
+              aria-hidden="true"
+              style={{ clipPath: clipPathForScenePolygon(item.points), zIndex: 100 + item.depth }}
+            />
+          ))}
+          {routeDestination && (
+            <span
+              className="playground-route-target"
+              aria-hidden="true"
+              style={{ left: `${routeDestination.x / PLAYGROUND_SCENE_WIDTH * 100}%`, top: `${routeDestination.y / PLAYGROUND_SCENE_HEIGHT * 100}%`, zIndex: 101 + Math.round(routeDestination.y) }}
+            />
+          )}
+          <div
+            ref={alexActor}
+            className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
+            data-facing={alexFacing < 0 ? "left" : "right"}
+            style={{
+              left: `${alexPosition.x / PLAYGROUND_SCENE_WIDTH * 100}%`,
+              top: `${alexPosition.y / PLAYGROUND_SCENE_HEIGHT * 100}%`,
+              zIndex: 100 + Math.round(alexPosition.y),
+              "--alex-facing": alexFacing,
+              "--alex-scale": alexScale.toFixed(3),
+              "--alex-jump": `${(-alexJumpHeight / 230 * 100).toFixed(2)}%`,
+            }}
+          >
+            <button
+              className="playground-pixel-character"
+              type="button"
+              aria-label="Make Pixel Alex jump"
+              onPointerDown={event => event.stopPropagation()}
+              onClick={event => { event.stopPropagation(); jumpAlex(); }}
+            >
+              <span className="playground-character-lift">
+                <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
+                <span
+                  className="playground-character-sprite"
+                  style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-directional-walk-cycle.png")})` }}
+                  aria-hidden="true"
+                />
+              </span>
+              <span className="playground-step-dust" aria-hidden="true"><i /><i /><i /></span>
+              <span className="playground-pixel-shadow" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
         <Heading className="playground-title" id="playground-title">Alex’s Playground</Heading>
         <p className="playground-kicker">personal archive · ongoing</p>
         <p className="playground-note">A space for things made from curiosity.</p>
@@ -1724,33 +1878,11 @@ function PlaygroundPage({ clock, navigate, embedded = false }) {
             <button key={scene.id} type="button" aria-pressed={scene.id === activeScene.id} onClick={() => chooseScene(scene)}>{scene.label}</button>
           ))}
         </div>
-        <div
-          ref={alexActor}
-          className={`playground-center playground-pixel-hub${alexWalking ? " is-walking" : ""}${alexJumping ? " is-jumping" : ""}`}
-          data-facing={alexFacing < 0 ? "left" : "right"}
-          style={{ "--alex-x": `${alexPosition.x}%`, "--alex-y": `${alexPosition.y}%`, "--alex-facing": alexFacing, "--alex-scale": alexScale.toFixed(3) }}
-        >
-          <button
-            className="playground-pixel-character"
-            type="button"
-            aria-label="Make Pixel Alex jump"
-            onClick={jumpAlex}
-          >
-            <span className="playground-pixel-burst" aria-hidden="true"><i /><i /><i /><i /></span>
-            <span
-              className="playground-character-sprite"
-              style={{ "--alex-walk-sprite": `url(${assetHref("/projects/playground/pixel-chibi-alex-directional-walk-cycle.png")})` }}
-              aria-hidden="true"
-            />
-            <span className="playground-step-dust" aria-hidden="true"><i /><i /><i /></span>
-            <span className="playground-pixel-shadow" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="playground-game-hud" aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>Hold WASD / arrows or two buttons to move · Space to jump</small></div>
-        <div className="playground-game-controls" role="group" aria-label="Move Pixel Alex">
+        <div className="playground-game-hud" data-playground-ui aria-live="polite"><span>{activeScene.chapter}</span><strong>{activeScene.title}</strong><small>{gameFocused ? "WASD / arrows · click pavement · Space to jump" : "Click or tap the pavement to play"}</small></div>
+        <div className="playground-game-controls" data-playground-ui role="group" aria-label="Move Pixel Alex">
           <button type="button" className="control-up" aria-label="Move Alex up" {...movementButtonProps("up", 0, -1)}>↑</button>
           <button type="button" className="control-left" aria-label="Move Alex left" {...movementButtonProps("left", -1, 0)}>←</button>
-          <button type="button" className="control-jump" aria-label="Make Alex jump" onClick={jumpAlex}>◆</button>
+          <button type="button" className="control-jump" aria-label="Make Alex jump" onClick={event => { event.stopPropagation(); jumpAlex(); }}>◆</button>
           <button type="button" className="control-right" aria-label="Move Alex right" {...movementButtonProps("right", 1, 0)}>→</button>
           <button type="button" className="control-down" aria-label="Move Alex down" {...movementButtonProps("down", 0, 1)}>↓</button>
         </div>
