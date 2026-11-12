@@ -142,7 +142,7 @@ function usePage() {
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
-        if (nextPage === "home" && ["projects", "experience"].includes(currentRoute)) {
+        if (nextPage === "home" && ["projects", "experience", "toolkits"].includes(currentRoute)) {
           document.getElementById(currentRoute === "projects" ? "work" : currentRoute)?.scrollIntoView({ block: "start" });
         } else {
           window.scrollTo({ top: 0 });
