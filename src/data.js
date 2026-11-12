@@ -1538,8 +1538,8 @@ export const about = {
     },
     {
       organization: "Loblaw Companies Limited",
-      projectSlugs: ["loblaw-employer-brand"],
-      projectLabels: { "loblaw-employer-brand": "Employer Brand Campaigns & Systems" },
+      projectSlugs: ["loblaw-employer-brand", "loblaw-careers-page"],
+      projectLabels: { "loblaw-employer-brand": "Employer Brand Campaigns & Systems", "loblaw-careers-page": "Loblaw Companies Limited Career Site" },
       location: "Brampton, Canada",
       badge: "LCL",
       role: "Creative Specialist, Talent Strategy & Employer Branding",
