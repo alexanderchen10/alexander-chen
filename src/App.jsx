@@ -1263,8 +1263,8 @@ function HomeEducation() {
 
 function HomeProjects({ navigate }) {
   const utopia = workProjects.find(project => project.slug === "utopia-vinyl");
-  return <section id="work" className="portfolio-section home-work-section">
-    <div className="home-work-heading"><p className="section-label">Projects</p><p>Independent products, ongoing studio collaborations, and selected client work.</p></div>
+  return <section id="work" className="portfolio-section home-work-section" aria-labelledby="home-projects-title">
+    <div className="home-work-heading"><h2 id="home-projects-title">Projects<span aria-hidden="true">.</span></h2><p>Independent products, ongoing studio collaborations, and selected client work.</p></div>
     <div className="home-project-features">
       <ProjectCard project={utopia} index={0} />
       <article className="home-ao-feature" id="home-ao-studio">

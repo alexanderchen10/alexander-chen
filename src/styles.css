@@ -3433,3 +3433,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 
 .education-resume-link { display:inline-flex; align-items:center; gap:12px; width:fit-content; padding:10px 0; border-bottom:1px solid currentColor; color:var(--tech-purple); font-size:14px; }
 .education-resume-link:hover { color:var(--tech-navy); }
+
+.home-work-heading { margin-bottom:clamp(32px,4vw,56px); gap:24px; }
+.home-work-heading h2 { margin:0; color:var(--tech-navy); font-size:clamp(56px,8vw,112px); font-weight:600; line-height:1; letter-spacing:-.065em; }
+.home-work-heading h2 span { color:var(--tech-purple); }
+.home-work-heading > p:last-child { margin:0; max-width:440px; font-size:clamp(14px,1.3vw,18px); line-height:1.6; }
+@media(max-width:809px) { .home-work-heading { gap:20px; } .home-work-heading h2 { font-size:clamp(52px,10vw,80px); } }
