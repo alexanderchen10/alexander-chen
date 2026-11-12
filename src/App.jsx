@@ -1297,14 +1297,6 @@ function HomePage({ clock, navigate }) {
   return (
     <main className="main-content home-main">
       <HomeHero />
-      <section className="home-contact" aria-labelledby="home-contact-title">
-        <header><p className="section-label">Get in touch</p><h2 id="home-contact-title">Let’s make something happen.</h2></header>
-        <nav aria-label="Contact Alexander">
-          <a href={`tel:${profile.phone.replace(/[^+\d]/g, "")}`}><span>Phone <Arrow /></span><strong>{profile.phone}</strong></a>
-          <a href={profile.socials[0].href} target="_blank" rel="noreferrer"><span>LinkedIn <Arrow /></span><strong>in/alexanderchen-</strong></a>
-        </nav>
-      </section>
-
       <section id="home-collaborators" data-progress-end="work" className="home-collaborators" aria-labelledby="home-collaborators-title">
         <div className="home-collaborators-heading">
           <p>Who I’ve worked with</p>
@@ -4169,6 +4161,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
