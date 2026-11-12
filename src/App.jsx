@@ -8,6 +8,7 @@ import UtopiaBuyerJourney from "./UtopiaBuyerJourney";
 import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
+import "./HeroNaturalAvatar.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 import {
   PLAYGROUND_SCENE_HEIGHT,
@@ -1118,7 +1119,7 @@ function HomeHero() {
           {motionPaused ? "Play motion" : "Pause motion"}
         </button>
         <button
-          className="home-hero-avatar"
+          className="home-hero-avatar home-hero-avatar-natural"
           type="button"
           aria-label="Take a photo with Alex"
           aria-pressed={cameraAimed}
@@ -1128,44 +1129,9 @@ function HomeHero() {
           onClick={toggleCameraPose}
         >
           <span className="home-hero-avatar-art" aria-hidden="true">
-            <img
-              className="home-hero-avatar-idle"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-idle.webp")}
-              alt=""
-              fetchPriority="high"
-              decoding="async"
-            />
-            <img
-              className="home-hero-avatar-camera"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
-              alt=""
-              decoding="async"
-            />
-            {/* Reuse the idle head in both poses so the hair never shifts with the camera. */}
-            <img
-              className="home-hero-avatar-shared-head"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-idle.webp")}
-              alt=""
-              decoding="async"
-            />
-            <img
-              className="home-hero-avatar-camera-foreground"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
-              alt=""
-              decoding="async"
-            />
-            <img
-              className="home-hero-avatar-camera-eye"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-aim.webp")}
-              alt=""
-              decoding="async"
-            />
-            <img
-              className="home-hero-avatar-blink"
-              src={assetHref("/projects/about/alexander-chen-hero-bust-blink.webp")}
-              alt=""
-              decoding="async"
-            />
+            <img className="home-hero-avatar-idle" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" fetchPriority="high" decoding="async" />
+            <img className="home-hero-avatar-camera" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" />
+            <img className="home-hero-avatar-blink" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-blink.png")} alt="" width="1254" height="1254" decoding="async" />
             {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
           </span>
         </button>
@@ -4159,6 +4125,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

@@ -1,0 +1,14 @@
+/* Versioned natural avatar assets share one fixed canvas in every pose. */
+.home-hero-avatar-natural {
+  --camera-flash-x: 44%;
+  --camera-flash-y: 37%;
+}
+.home-hero-avatar-natural .home-hero-avatar-art {
+  filter: drop-shadow(0 20px 26px rgba(40, 34, 30, .12));
+}
+.home-hero-avatar-natural .home-hero-avatar-idle,
+.home-hero-avatar-natural .home-hero-avatar-camera,
+.home-hero-avatar-natural .home-hero-avatar-blink { clip-path: none; }
+.home-hero-avatar-natural .home-hero-avatar-camera { z-index: 1; }
+.home-hero-avatar-natural .home-hero-avatar-blink { z-index: 2; }
+
