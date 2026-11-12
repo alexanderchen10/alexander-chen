@@ -12,6 +12,7 @@ import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
 import "./HeroNaturalAvatar.css";
+import "./TtCaseStudy.css";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 import {
   PLAYGROUND_SCENE_HEIGHT,
@@ -4104,6 +4105,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

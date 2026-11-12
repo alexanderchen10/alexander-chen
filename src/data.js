@@ -499,6 +499,205 @@ export const workProjects = [
   },
   {
     slug: "tt-supermarket",
+    "image": "/projects/work/tt-supermarket/instagram-fantuan-poster.jpg",
+    "bannerVideo": "/projects/work/tt-supermarket/instagram-fantuan.mp4",
+    "imageAlt": "Freshly prepared fantuan in a T&T short-form food video",
+    "thesis": "Make the food, the stores, and the people the story.",
+    "projectCollectionEyebrow": "Selected work · April–August 2026",
+    "projectCollectionTitle": "Made for the feed. Built around real moments.",
+    "projectCollection": [
+      {
+        "number": "01",
+        "title": "Food stories",
+        "meta": "Instagram · short-form production",
+        "summary": "Four product videos, from rice rolls to seasonal seafood.",
+        "image": "/projects/work/tt-supermarket/instagram-fantuan-poster.jpg",
+        "imageAlt": "Fantuan preparation close-up",
+        "target": "project-feature-0"
+      },
+      {
+        "number": "02",
+        "title": "Store launches",
+        "meta": "Meta · Reddit · teaser creative",
+        "summary": "San Jose launch ads and a Sherway Gardens concept.",
+        "image": "/projects/work/tt-supermarket/san-jose-meta-ad-02-poster.png",
+        "imageAlt": "San Jose launch video creative",
+        "target": "project-feature-1"
+      },
+      {
+        "number": "03",
+        "title": "Seasonal moments",
+        "meta": "Food films · localized social design",
+        "summary": "Afternoon tea and holiday shopping announcements.",
+        "image": "/projects/work/tt-supermarket/canada-day.webp",
+        "imageAlt": "Canada Day social campaign design",
+        "target": "project-feature-3"
+      },
+      {
+        "number": "04",
+        "title": "People behind the brand",
+        "meta": "Employer branding · recruitment",
+        "summary": "A colleague film and hiring campaign design.",
+        "image": "/projects/work/tt-supermarket/hr-peisi-poster.jpg",
+        "imageAlt": "Peisi in the T&T employer-brand film",
+        "target": "project-feature-5"
+      }
+    ],
+    "showProofStrip": false,
+    "mediaSections": [
+      {
+        "eyebrow": "Social content · product discovery",
+        "title": "Food you can almost taste through the screen.",
+        "description": "Four short-form videos I created for T&T’s Canadian and US feeds. Close-ups, preparation, and a quick visual hook give each product its own story.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/instagram-fantuan.mp4",
+            "poster": "/projects/work/tt-supermarket/instagram-fantuan-poster.jpg",
+            "caption": "Fantuan · from preparation to the finished rice roll",
+            "aspect": "9 / 16"
+          },
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/instagram-dubai-chocolate-doughnut.mp4",
+            "poster": "/projects/work/tt-supermarket/instagram-dubai-chocolate-doughnut-poster.jpg",
+            "caption": "Dubai chocolate doughnut · a game-day treat",
+            "aspect": "9 / 16"
+          },
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/instagram-fruit-ice-cream.mp4",
+            "poster": "/projects/work/tt-supermarket/instagram-fruit-ice-cream-poster.jpg",
+            "caption": "Fruit ice cream · a playful product reveal",
+            "aspect": "9 / 16"
+          },
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/instagram-spot-prawns.mp4",
+            "poster": "/projects/work/tt-supermarket/instagram-spot-prawns-poster.jpg",
+            "caption": "Spot prawns · seasonal product discovery",
+            "aspect": "9 / 16"
+          }
+        ]
+      },
+      {
+        "eyebrow": "San Jose · paid launch creative",
+        "title": "Introduce a store through its food and energy.",
+        "description": "Food-led and store-led cuts for Reddit and Meta, adapted to square and portrait placements. The wider California launch recorded 5.22M impressions; this is a campaign total, not a result attributed to one video.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/san-jose-reddit.mp4",
+            "poster": "/projects/work/tt-supermarket/san-jose-reddit-poster.jpg",
+            "caption": "San Jose · food-led Reddit creative",
+            "aspect": "1 / 1"
+          },
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/san-jose-meta-ad-01.mp4",
+            "poster": "/projects/work/tt-supermarket/san-jose-meta-ad-01-poster.png",
+            "caption": "San Jose · portrait Meta placement",
+            "aspect": "9 / 16"
+          },
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/san-jose-meta-ad-02.mp4",
+            "poster": "/projects/work/tt-supermarket/san-jose-meta-ad-02-poster.png",
+            "caption": "San Jose · square Meta placement",
+            "aspect": "1 / 1"
+          }
+        ]
+      },
+      {
+        "eyebrow": "Sherway Gardens · creative exploration",
+        "title": "A familiar character. A new location.",
+        "description": "A mascot-led store reveal made for the social feed. This export is a teaser draft, shown as a creative exploration.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/sherway-teaser-draft.mp4",
+            "poster": "/projects/work/tt-supermarket/sherway-teaser-draft-poster.jpg",
+            "caption": "Sherway Gardens · teaser draft",
+            "aspect": "9 / 16"
+          }
+        ]
+      },
+      {
+        "eyebrow": "Seasonal storytelling · Moon Festival",
+        "title": "Give the product an occasion.",
+        "description": "An afternoon-tea film with Chinese-language captions. The final export and clean master support different text treatments.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/afternoon-tea.mp4",
+            "poster": "/projects/work/tt-supermarket/afternoon-tea-poster.jpg",
+            "caption": "Afternoon tea · Chinese final",
+            "aspect": "9 / 16"
+          }
+        ]
+      },
+      {
+        "eyebrow": "Canada Day & Independence Day · social design",
+        "title": "Useful information, made easy to spot.",
+        "description": "A paired set of holiday-hours visuals for Canada and the US. Localized holiday cues sit alongside a clear shopping message.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "image",
+            "src": "/projects/work/tt-supermarket/canada-day.webp",
+            "alt": "Canada Day · Instagram store-hours announcement",
+            "caption": "Canada Day · Instagram store-hours announcement",
+            "aspect": "4 / 5"
+          },
+          {
+            "type": "image",
+            "src": "/projects/work/tt-supermarket/independence-day.webp",
+            "alt": "Independence Day · Instagram store-hours announcement",
+            "caption": "Independence Day · Instagram store-hours announcement",
+            "aspect": "4 / 5"
+          }
+        ]
+      },
+      {
+        "eyebrow": "Employer brand · colleague film",
+        "title": "Let a colleague tell the story.",
+        "description": "Peisi’s experience at T&T, shaped into an interview-led film with workplace B-roll and branded question slides. The production set includes English landscape and portrait edits, alongside Chinese-language versions.",
+        "layout": "wide",
+        "items": [
+          {
+            "type": "video",
+            "src": "/projects/work/tt-supermarket/hr-peisi.mp4",
+            "poster": "/projects/work/tt-supermarket/hr-peisi-poster.jpg",
+            "caption": "Peisi · final English employer-brand film",
+            "aspect": "16 / 9"
+          }
+        ]
+      },
+      {
+        "eyebrow": "US recruitment · visual design",
+        "title": "A direct invitation to join the team.",
+        "description": "Hiring creative combines colleague imagery, a clear headline, and T&T’s identity. This selected poster comes from the San Francisco recruitment campaign folder.",
+        "layout": "portrait-pair",
+        "items": [
+          {
+            "type": "image",
+            "src": "/projects/work/tt-supermarket/sf-hiring.webp",
+            "alt": "US hiring campaign · selected recruitment poster",
+            "caption": "US hiring campaign · selected recruitment poster",
+            "aspect": "4 / 5"
+          }
+        ]
+      }
+    ],
+    "impact": [
+      "5,978 net new followers · 19.6M impressions · 174 posts. Instagram profile totals from May 1–July 21, 2026, recorded in the Sprout Social performance report. These reflect the full account during my management period.",
+      "5.22M impressions for the wider California launch. The launch also drew 500+ customers before opening; those results are campaign-level context, not an isolated test of the selected ads.",
+      "A production set spanning portrait and square paid ads, food videos, localized holiday designs, and multilingual colleague storytelling. My work connected planning, creative production, and platform-specific delivery."
+    ],
     showInWork: false,
     archiveStyle: true,
     archiveEyebrow: "Selected work / April–August 2026",
@@ -511,14 +710,14 @@ export const workProjects = [
       { value: "174", label: "published Instagram posts · account-wide totals" },
     ],
     title: "T&T Supermarket",
-    description: "Marketing across store openings, seasonal food stories, Instagram strategy, and employer branding. I created campaign videos, social content, and recruitment visuals for T&T’s Canadian and US audiences.",
+    description: "Food films, store launches, and the people behind the brand. Selected video and design work I created for T&T’s Canadian and US audiences.",
     organization: "T&T Supermarket Inc.",
     role: "Marketing Specialist, Media & Communications",
     period: "April 2026 – August 2026",
-    caseStudyVariant: "structured",
+    caseStudyVariant: "immersive",
     caseStudyTitle: "T&T Supermarket Inc.",
     visual: "tt",
-    coverEyebrow: "Social strategy · Paid media",
+    coverEyebrow: "Social content · campaigns · film",
     coverTitle: "California launch",
     coverMetric: "5.22M impressions",
     coverImage: "/projects/work/tt-supermarket/tt-logo-horizontal-green.png",
@@ -1762,3 +1961,4 @@ export const about = {
   ],
   cta: "Have a project, product, or story that could feel clearer?",
 };
+

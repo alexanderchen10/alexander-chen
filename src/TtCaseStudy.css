@@ -1,0 +1,20 @@
+/* Keep portrait work at its intended proportions within the Corcoran layout. */
+.immersive-project-tt-supermarket .immersive-media-portrait-pair:has(> :only-child) {
+  grid-auto-columns: min(46%, 520px);
+  justify-content: center;
+}
+.immersive-project-tt-supermarket .immersive-media-frame video {
+  object-fit: contain;
+  background: #101210;
+}
+.immersive-project-tt-supermarket .immersive-project-hero-media > .visual {
+  object-position: center;
+}
+.immersive-project-tt-supermarket .immersive-project-impact li {
+  line-height: 1.5;
+}
+@media (max-width: 760px) {
+  .immersive-project-tt-supermarket .immersive-media-portrait-pair:has(> :only-child) {
+    grid-auto-columns: 100%;
+  }
+}
