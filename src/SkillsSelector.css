@@ -116,12 +116,13 @@
 .skills-selector-panels {
   display: grid;
   min-width: 0;
-  align-self: center;
+  align-self: start;
+  padding-top: 18px;
 }
 
 .skills-selector-panel {
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: clamp(24px, 2vw, 32px);
   grid-area: 1 / 1;
   min-width: 0;
@@ -278,3 +279,5 @@
 
 /* Keep Alexander’s longer category names within the established two-column layout. */
 @media(min-width:1101px) { .skills-selector-tab { font-size:clamp(30px,3vw,50px); line-height:1.08; } }
+
+@media(max-width:1100px) { .skills-selector-panels { padding-top:0; } }
