@@ -799,6 +799,29 @@ function ExperienceProjectLink({ project, label, navigate }) {
   );
 }
 
+
+function ExperienceSkillsCarousel() {
+  const [paused, setPaused] = useState(false);
+  const skills = ["UX & Product Design", "Email Marketing", "Client Success", "Brand Strategy", "Photography & Video", "Creative Production", "Campaign Analytics", "Workflow Automation"];
+  return (
+    <div className={`experience-skills${paused ? " is-paused" : ""}`} role="region" aria-label="Professional skills carousel">
+      <div className="experience-skills-heading">
+        <p>Skills I bring to the table</p>
+        <button type="button" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-controls="experience-skills-track">{paused ? "▶ Play" : "Ⅱ Pause"} skills</button>
+      </div>
+      <div className="experience-skills-window">
+        <div className="experience-skills-track" id="experience-skills-track">
+          {[0, 1].map((copy) => (
+            <ul className="experience-skills-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
+              {skills.map((skill) => <li key={skill}><span aria-hidden="true">✦</span>{skill}</li>)}
+            </ul>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HomeExperience({ navigate }) {
   const cardStack = useRef(null);
 
@@ -881,13 +904,7 @@ function HomeExperience({ navigate }) {
         <h2 id="home-experience-title"><span>Professional</span>{" "}<span>experience</span></h2>
         <p className="home-experience-note">Six roles spanning client success, marketing, brand systems, community, and creative production.</p>
       </header>
-      <div className="home-experience-ticker" aria-hidden="true">
-        <div>
-          {[0, 1].map((copy) => (
-            <span key={copy}>Client success · Brand systems · Digital strategy · Creative production · </span>
-          ))}
-        </div>
-      </div>
+      <ExperienceSkillsCarousel />
       <div className="home-experience-list">
         <div className="home-experience-stack" ref={cardStack}>
           {about.experience.map((experience, index) => {
@@ -1132,8 +1149,8 @@ function HomeHero() {
           <div>
             <dt className="home-hero-detail-label">Now building</dt>
             <dd className="home-hero-live-project">
-              <a href={routeHref("project/utopia-vinyl")}><span className="home-hero-live-dot" aria-hidden="true" />Utopia Vinyl <Arrow /></a>
-              <a href={routeHref("ao-studio")}><span className="home-hero-live-dot" aria-hidden="true" />AO Studio <Arrow /></a>
+              <span className="home-hero-live-dot" aria-hidden="true" />
+              <a href={routeHref("project/utopia-vinyl")}>Utopia Vinyl <Arrow /></a>
             </dd>
           </div>
         </dl>
@@ -4152,6 +4169,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 

@@ -462,40 +462,6 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   font-size: clamp(16px, 1.55vw, 24px);
   line-height: 1.45;
 }
-.home-experience-ticker {
-  margin: clamp(30px, 3.8vw, 72px) 0 clamp(36px, 4.6vw, 86px);
-  overflow: clip;
-}
-.home-experience-ticker > div {
-  display: flex;
-  width: max-content;
-  gap: .25em;
-  padding-block: .06em .16em;
-  color: transparent;
-  -webkit-text-stroke: 1px #8875bd;
-  font-size: clamp(42px, 7.2vw, 116px);
-  font-weight: 500;
-  letter-spacing: -.063em;
-  line-height: 1;
-  white-space: nowrap;
-  transform: translateX(-12vw);
-}
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .home-experience-ticker {
-      view-timeline-name: --experience-ticker;
-      view-timeline-axis: block;
-    }
-    .home-experience-ticker > div {
-      animation: home-experience-ticker-travel linear both;
-      animation-timeline: --experience-ticker;
-    }
-    @keyframes home-experience-ticker-travel {
-      from { transform: translateX(-6vw); }
-      to { transform: translateX(-60vw); }
-    }
-  }
-}
 .home-experience-stack {
   --experience-deck-top: 128px;
   display: flex;
@@ -3440,6 +3406,20 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .home-work-heading > p:last-child { margin:0; max-width:440px; font-size:clamp(14px,1.3vw,18px); line-height:1.6; }
 @media(max-width:809px) { .home-work-heading { gap:20px; } .home-work-heading h2 { font-size:clamp(52px,10vw,80px); } }
 
-.home-hero-live-project { flex-wrap:wrap; gap:12px 24px; }
-.home-hero-live-project a { white-space:nowrap; }
-.home-hero-live-project a:nth-child(2) .home-hero-live-dot { background:var(--tech-purple); }
+/* Continuous skills carousel above the professional experience deck. */
+.experience-skills { margin: clamp(30px, 3.8vw, 72px) 0 clamp(36px, 4.6vw, 86px); }
+.experience-skills-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; padding-inline: clamp(22px, 3vw, 44px); }
+.experience-skills-heading p { margin: 0; color: var(--tech-purple); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.experience-skills-heading button { flex-shrink: 0; border: 1px solid #d2c9ed; border-radius: 999px; padding: 8px 14px; background: #fff; color: var(--tech-navy); font: inherit; font-size: 11px; cursor: pointer; }
+.experience-skills-heading button:hover { background: #eee9ff; }
+.experience-skills-heading button:focus-visible { outline: 2px solid var(--tech-purple); outline-offset: 4px; }
+.experience-skills-window { overflow: hidden; border-block: 1px solid #ded7ee; padding-block: 22px; background: linear-gradient(100deg, #f3efff, #fbfaff); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.experience-skills-track { display: flex; width: max-content; animation: experience-skills-loop 42s linear infinite; }
+.experience-skills-group { display: flex; flex: 0 0 auto; align-items: center; gap: 36px; margin: 0; padding: 0 36px 0 0; list-style: none; }
+.experience-skills-group li { display: flex; align-items: center; gap: 36px; color: var(--tech-navy); font-size: clamp(24px, 3.4vw, 52px); font-weight: 500; letter-spacing: -.045em; line-height: 1.2; white-space: nowrap; }
+.experience-skills-group li > span { color: var(--tech-purple); font-size: .65em; }
+.experience-skills.is-paused .experience-skills-track, .experience-skills-window:hover .experience-skills-track { animation-play-state: paused; }
+@keyframes experience-skills-loop { to { transform: translateX(-50%); } }
+@media (max-width: 680px) { .experience-skills-heading { padding-inline: 12px; } .experience-skills-heading p { max-width: 19ch; font-size: 10px; } .experience-skills-group, .experience-skills-group li { gap: 24px; } .experience-skills-group { padding-right: 24px; } }
+@media (prefers-reduced-motion: reduce) { .experience-skills-track { animation: none; } .experience-skills-window { overflow-x: auto; mask-image: none; } .experience-skills-group[aria-hidden="true"], .experience-skills-heading button { display: none; } }
+
