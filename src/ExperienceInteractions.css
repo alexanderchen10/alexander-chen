@@ -48,3 +48,37 @@ body .immersive-project-brief dd { font-size: clamp(16px, 1.5vw, 20px); line-hei
   .interactive-stats-grid > article, .home-experience-item { transition: none; }
   .interactive-stats-grid > article:hover { transform: none; }
 }
+
+/* Compact experience cards with a level, horizontal scroll transition. */
+.home-experience-stack .home-experience-card > .home-experience-item {
+  padding: 44px 32px 56px;
+  gap: 28px;
+}
+.home-experience-stack .home-experience-sequence { top: 16px; left: 32px; font-size: 10px; }
+.home-experience-stack .home-experience-side h3 { margin-bottom: 10px; font-size: clamp(25px, 2.5vw, 35px); }
+.home-experience-stack .home-experience-content h4 { font-size: clamp(23px, 2.1vw, 30px); }
+.home-experience-stack .home-experience-summary { margin: 12px 0 20px; font-size: 14px; line-height: 1.5; }
+.home-experience-stack .home-experience-highlights { gap: 18px 22px; }
+.home-experience-stack .home-experience-highlights li { padding-top: 10px; }
+.home-experience-stack .home-experience-highlights strong { font-size: clamp(18px, 1.5vw, 22px); }
+.home-experience-stack .home-experience-highlights p { margin-top: 6px; font-size: 13px; line-height: 1.5; }
+.home-experience-stack .home-experience-projects { margin-top: 16px; gap: 6px; }
+.home-experience-stack .home-experience-project { min-height: 40px; padding: 7px 12px; font-size: 12px; }
+.home-experience-stack .experience-card-open { bottom: 18px; right: 32px; font-size: 12px; }
+.home-experience-stack .home-experience-item:hover .home-experience-side h3 { transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .home-experience-stack.is-deck:not(:has(:focus-visible)) .home-experience-card .home-experience-item {
+    transform: translateX(calc(clamp(32px, 6vw, 80px) * (1 - var(--experience-arrival, 1) - var(--experience-cover, 0))));
+    transform-origin: center;
+  }
+}
+@media (max-width: 760px) {
+  .home-experience-stack .home-experience-card > .home-experience-item { padding: 42px 22px 58px; gap: 16px; }
+  .home-experience-stack .home-experience-sequence { left: 22px; }
+  .home-experience-stack .home-experience-side { padding-bottom: 14px; }
+  .home-experience-stack .home-experience-side h3 { font-size: 27px; }
+  .home-experience-stack .home-experience-content h4 { font-size: 24px; }
+  .home-experience-stack .home-experience-highlights { gap: 16px; }
+  .home-experience-stack .experience-card-open { right: 22px; }
+}
+
