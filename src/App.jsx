@@ -2,6 +2,7 @@ import { commitPage, trackPlayground } from "./analytics";
 import { normalizeRoute } from "./analyticsRoutes";
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import SkillsSelector from "./SkillsSelector";
+import EditorialHome from "./EditorialHome";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
@@ -147,7 +148,7 @@ function usePage() {
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
-        if (nextPage === "home" && ["projects", "experience", "toolkits"].includes(currentRoute)) {
+        if (nextPage === "home" && ["projects", "experience", "toolkits", "home-about", "home-education", "home-playground", "home-collaborators", "home-ao-studio", "draft-main"].includes(currentRoute)) {
           document.getElementById(currentRoute === "projects" ? "work" : currentRoute)?.scrollIntoView({ block: "start" });
         } else {
           window.scrollTo({ top: 0 });
@@ -4067,6 +4068,8 @@ export default function App() {
   useEffect(() => {
     commitPage(route);
   }, [page, route]);
+
+  if (page === "home") return <EditorialHome />;
 
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>

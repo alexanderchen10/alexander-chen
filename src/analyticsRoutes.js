@@ -2,13 +2,13 @@ import { workProjects } from './data.js';
 
 export const ORIGIN = 'https://alexanderchenworks.com';
 export const HOME_SECTIONS = [
-  ['.home-hero', 'hero', 'Introduction'],
+  ['.home-hero, .draft-hero', 'hero', 'Introduction'],
   ['#home-collaborators', 'collaborators', 'Collaborators'],
-  ['.home-main #work', 'projects', 'Featured projects'],
+  ['.home-main #work, .draft-work', 'projects', 'Featured projects'],
   ['#home-ao-studio', 'ao_studio', 'AO Studio'],
   ['#experience', 'experience', 'Professional experience'],
   ['#home-education', 'education', 'Education'],
-  ['.home-main #toolkits', 'toolkits', 'Skills and toolkits'],
+  ['.home-main #toolkits, .draft-capabilities', 'toolkits', 'Skills and toolkits'],
   ['#home-playground', 'playground', 'Playground'],
 ];
 export const routes = [];
@@ -52,7 +52,7 @@ export function resolvePage(value = '') {
   const known = routes.find(item => item.route === route);
   if (known) return known;
   // These are scroll anchors on the home document, never separate pages.
-  if (!route || ['projects', 'experience', 'home-education', 'home-playground', 'toolkits', 'home-collaborators', 'home-ao-studio'].includes(route)) return routes[0];
+  if (!route || ['projects', 'experience', 'home-about', 'home-education', 'home-playground', 'toolkits', 'home-collaborators', 'home-ao-studio'].includes(route)) return routes[0];
   if (route.startsWith('project-log/')) return { route: 'project-log/not-found', page_path: '/project-log/not-found', page_name: 'Project Record Not Found', page_title: 'Project Record Not Found | Alexander Chen', page_type: 'not_found' };
   // The router renders Home for unrecognized hashes; do not transmit arbitrary user input.
   return routes[0];

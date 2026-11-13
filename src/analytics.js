@@ -158,7 +158,7 @@ function handleClick(event) {
   }
   const dialog = button.closest('[role="dialog"]');
   if (dialog && modalType(dialog)) send('modal_interaction', { modal_type: modalType(dialog), action: /close/i.test(button.getAttribute('aria-label') || button.textContent) ? 'close' : 'navigate' });
-  if (button.matches('.skills-selector [role="tab"]')) send('toolkit_select', { toolkit_id: button.id.replace(/^skills-tab-/, ''), toolkit_name: button.textContent.trim().slice(0, 80) });
+  if (button.matches('.skills-selector [role="tab"], .draft-skill-tabs [role="tab"]')) send('toolkit_select', { toolkit_id: button.id.replace(/^(skills|draft)-tab-/, ''), toolkit_name: button.textContent.trim().slice(0, 80) });
   if (button.closest('.home-toolkit-list')) send('toolkit_expand', { toolkit_name: button.textContent.replace(/[+−]/g, '').trim().slice(0, 80), expanded: button.getAttribute('aria-expanded') !== 'true' });
-  if (button.matches('.home-hero-avatar')) send('hero_interaction', { action: 'camera_pose' });
+  if (button.matches('.home-hero-avatar, .draft-camera')) send('hero_interaction', { action: 'camera_pose' });
 }
