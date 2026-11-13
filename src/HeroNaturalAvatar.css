@@ -13,7 +13,34 @@
 .home-hero-avatar-natural .home-hero-avatar-camera { z-index:0; }
 .home-hero-avatar-natural .home-hero-avatar-camera-foreground {
   z-index:2;
-  clip-path:polygon(29% 28%, 39% 28%, 42% 30%, 53% 30%, 55% 32%, 61% 35%, 65% 48%, 100% 48%, 100% 100%, 0 100%, 0 48%, 25% 48%, 27% 33%);
+  clip-path:polygon(29% 28%,39% 28%,42% 30%,53% 30%,55% 32%,61% 35%,65% 48%,62% 56%,54% 56%,48% 46%,33% 46%,27% 53%,22% 49%,25% 38%,27% 33%);
 }
 .home-hero-avatar-natural .home-hero-avatar-camera-eye { z-index:3; clip-path:ellipse(4.5% 2.6% at 55.8% 29.1%); }
 .home-hero-avatar-natural .home-hero-avatar-blink { z-index:4; clip-path:inset(25.8% 37.7% 66.4% 38.2%); }
+
+/* Lift the camera and hands between their resting and shooting positions. */
+.home-hero-avatar-natural .home-hero-avatar-idle,
+.home-hero-avatar-natural .home-hero-avatar-camera,
+.home-hero-avatar-natural .home-hero-avatar-camera-foreground,
+.home-hero-avatar-natural .home-hero-avatar-camera-eye {
+  visibility:visible !important;
+}
+.home-hero-avatar-natural .home-hero-avatar-idle { opacity:1; transition:opacity 180ms 450ms ease; }
+.home-hero-avatar-natural .home-hero-avatar-camera { opacity:0; transition:opacity 180ms 450ms ease; }
+.home-hero-avatar-natural .home-hero-avatar-camera-foreground {
+  opacity:0;
+  transform:translate(6%,42%) rotate(3deg);
+  transform-origin:46% 39%;
+  transition:transform 650ms cubic-bezier(.22,1,.36,1),opacity 160ms 450ms ease;
+  will-change:transform;
+}
+.home-hero-avatar-natural .home-hero-avatar-camera-eye { opacity:0; transition:opacity 140ms ease; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-idle { opacity:0; transition-delay:0ms; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera { opacity:1; transition-delay:0ms; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-foreground { opacity:1; transform:translate(0,0) rotate(0); transition-delay:0ms; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-eye { opacity:1; transition-delay:420ms; }
+.home-hero-avatar-natural .home-hero-camera-flash { animation-delay:600ms; }
+.home-hero-avatar-natural[data-camera-aimed="false"] .home-hero-camera-flash { display:none; }
+@media(prefers-reduced-motion:reduce) {
+  .home-hero-avatar-natural .home-hero-avatar-idle,.home-hero-avatar-natural .home-hero-avatar-camera,.home-hero-avatar-natural .home-hero-avatar-camera-foreground,.home-hero-avatar-natural .home-hero-avatar-camera-eye { transition:none; }
+}
