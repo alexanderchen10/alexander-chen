@@ -2,7 +2,7 @@ import { commitPage, trackPlayground } from "./analytics";
 import { normalizeRoute } from "./analyticsRoutes";
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import SkillsSelector from "./SkillsSelector";
-import ArticulatedAvatar from "./ArticulatedAvatar";
+import GreetingAvatar from "./GreetingAvatar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
@@ -1053,34 +1053,22 @@ function HomeHero() {
     return () => { clearTimeout(timeout); motion.removeEventListener("change", changed); document.documentElement.style.overflow = previousOverflow; };
   }, [intro]);
   const [motionPaused, setMotionPaused] = useState(false);
-  const [cameraAimed, setCameraAimed] = useState(false);
-  const [cameraPoseReady, setCameraPoseReady] = useState(false);
-  const [cameraHovered, setCameraHovered] = useState(false);
-  const [cameraFlash, setCameraFlash] = useState(0);
+  const [greetingCount, setGreetingCount] = useState(0);
+  const [greetingActive, setGreetingActive] = useState(false);
+  const [greetingReady, setGreetingReady] = useState(false);
+  const [greetingHovered, setGreetingHovered] = useState(false);
   const [givenName, ...surname] = profile.name.split(" ");
-  const isCameraAimed = cameraPoseReady && (cameraAimed || (!motionPaused && cameraHovered));
-
-  const triggerCameraFlash = () => {
-    if (motionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setCameraFlash((value) => value + 1);
-  };
-
-  const enterCameraPose = (event) => {
-    if (motionPaused || event.pointerType === "touch") return;
-    setCameraHovered(true);
-    triggerCameraFlash();
-  };
-
-  const toggleCameraPose = () => {
-    const nextCameraAimed = !cameraAimed;
-    setCameraAimed(nextCameraAimed);
-    if (nextCameraAimed || cameraHovered) triggerCameraFlash();
-  };
-
+  const isGreetingActive = greetingReady && !motionPaused && (greetingActive || greetingHovered);
+  useEffect(() => {
+    if (!greetingCount) return;
+    setGreetingActive(true);
+    const timer = window.setTimeout(() => setGreetingActive(false), 2400);
+    return () => window.clearTimeout(timer);
+  }, [greetingCount]);
   const toggleMotion = () => {
-    setMotionPaused((value) => !value);
-    setCameraHovered(false);
-    setCameraFlash(0);
+    setMotionPaused(value => !value);
+    setGreetingHovered(false);
+    setGreetingActive(false);
   };
 
   const updateParallax = (event) => {
@@ -1134,16 +1122,13 @@ function HomeHero() {
         <button
           className="home-hero-avatar home-hero-avatar-natural"
           type="button"
-          aria-label="Take a photo with Alex"
-          aria-pressed={cameraAimed}
-          data-camera-aimed={isCameraAimed}
-          onPointerEnter={enterCameraPose}
-          onPointerLeave={() => setCameraHovered(false)}
-          onClick={toggleCameraPose}
+          aria-label="Say hi to Alex"
+          onPointerEnter={event => { if (!motionPaused && event.pointerType !== "touch") setGreetingHovered(true); }}
+          onPointerLeave={() => setGreetingHovered(false)}
+          onClick={() => setGreetingCount(value => value + 1)}
         >
           <span className="home-hero-avatar-art" aria-hidden="true">
-            <ArticulatedAvatar aimed={isCameraAimed} paused={motionPaused} onReady={setCameraPoseReady} />
-            {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
+            <GreetingAvatar active={isGreetingActive} paused={motionPaused} onReady={setGreetingReady} />
           </span>
         </button>
         <div className="home-hero-orbit" aria-label="Creative disciplines">
