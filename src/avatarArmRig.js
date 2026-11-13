@@ -1,7 +1,7 @@
 // Two shoulder/elbow/wrist chains articulate isolated sleeves and one rigid camera.
 // Camera and hands share a rigid transform; there are no pose frames or opacity blends.
-const LEFT = { s:[.342,.547], e:[.202,.695], w:[.303,.471], side:-1 };
-const RIGHT = { s:[.690,.540], e:[.735,.750], w:[.559,.537], side:1 };
+const LEFT = { s:[.285,.570], e:[.202,.695], w:[.303,.471], side:-1 };
+const RIGHT = { s:[.730,.570], e:[.735,.750], w:[.586,.515], side:1 };
 const length = (a,b) => Math.hypot(a[0]-b[0],a[1]-b[1]);
 function matrix(a,b,c,d) {
   const l=length(a,b),t=length(c,d),u=[(b[0]-a[0])/l,(b[1]-a[1])/l],v=[-u[1],u[0]],U=[(d[0]-c[0])/t,(d[1]-c[1])/t],V=[-U[1],U[0]],k=t/l;
@@ -31,5 +31,5 @@ export function armJoints(progress) {
 }
 
 export function upperSleeveMatrices(progress) {
-  return armJoints(progress).map(({s,e},i)=>matrix(i===0?[.27,.57]:[.72,.57],i===0?[.20,.82]:[.79,.84],s,e));
+  return armJoints(progress).map(({s,e},i)=>matrix(i===0?[.27,.57]:[.72,.57],i===0?[.20,.91]:[.79,.94],s,e));
 }

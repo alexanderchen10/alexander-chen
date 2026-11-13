@@ -1,0 +1,6 @@
+Avatar rig revision 5: dedicated upper sleeves and camera/hands assets.
+The upper-arm layers contain no jacket lapels, shirt or pockets. Camera/hands layer contains no navy clothing. Shoulder and wrist pivots are realigned, and the forearm masks retain the natural rounded elbow silhouettes.
+Assets edited using built-in image generation, preserving transparent alpha:
+- alex-rig-upper-sleeves-v5.png. Prompt: isolate only the two upper-arm sleeves from shoulder to elbow in the original canvas positions; remove head, torso, all lapels, shirt, pockets, camera, hands and forearms; reconstruct smooth fabric behind the bent forearms.
+- alex-rig-camera-hands-v5.png. Prompt: retain only the camera and skin hands/wrists in their exact original positions; remove all navy sleeves, cuffs, buttons and clothing scraps to transparency.
+Visual inspection fixture: tests/avatar-preview.html. Five paused positions are available locally at /tests/avatar-preview.html.

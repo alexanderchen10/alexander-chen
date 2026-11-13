@@ -6,7 +6,7 @@ const near=(a,b)=>a.forEach((v,i)=>assert.ok(Math.abs(v-b[i])<1e-9,`${a} must me
 test('elbows and wrists stay connected throughout raising and lowering',()=>{
   for(let sample=0;sample<=100;sample++) {
     const p=sample/100,arms=armMatrices(p),joints=armJoints(p),upper=upperSleeveMatrices(p);
-    for(const [i,e,w,s0,e0] of [[0,[.202,.695],[.303,.471],[.27,.57],[.20,.82]],[1,[.735,.750],[.559,.537],[.72,.57],[.79,.84]]]) {
+    for(const [i,e,w,s0,e0] of [[0,[.202,.695],[.303,.471],[.27,.57],[.20,.91]],[1,[.735,.750],[.586,.515],[.72,.57],[.79,.94]]]) {
       near(apply(arms[i*2+1],e),joints[i].e);
       near(apply(arms[i*2+1],w),apply(arms[4],w));
       near(apply(upper[i],s0),joints[i].s);
