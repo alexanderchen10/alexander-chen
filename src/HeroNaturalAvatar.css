@@ -1,40 +1,13 @@
-/* A fixed identity layer and a face-free transparent camera rig.
-   Never overlay a second face, glasses rim, blink patch, or hair image. */
+/* One fixed head/body plus a jointed sleeves and one rigid camera. No pose images crossfade. */
 .home-hero-avatar.home-hero-avatar-natural {
-  --camera-flash-x:46%;
-  --camera-flash-y:39%;
-  --camera-flash-size:14%;
+  --camera-flash-x:46%; --camera-flash-y:39%; --camera-flash-size:14%;
 }
-.home-hero-avatar-natural .home-hero-avatar-art {
-  filter:drop-shadow(0 20px 26px rgba(40,34,30,.12));
-}
-.home-hero-avatar-natural .home-hero-avatar-shared-head {
-  z-index:1;
-  clip-path:inset(0 0 52% 0);
-}
-.home-hero-avatar-natural .home-hero-avatar-idle {
-  visibility:visible !important;
-  clip-path:inset(48% 0 0);
-  opacity:1;
-  transition:opacity 220ms ease;
-}
-.home-hero-avatar-natural .home-hero-avatar-camera-foreground {
-  z-index:2;
-  visibility:visible;
-  clip-path:none;
-  opacity:0;
-  transform:translateY(8%);
-  transition:transform 650ms cubic-bezier(.22,1,.36,1),opacity 220ms ease;
-  will-change:transform;
-}
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-idle { opacity:0; }
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-foreground {
-  opacity:1;
-  transform:translateY(0);
-}
-.home-hero-avatar-natural .home-hero-camera-flash { animation-delay:600ms; }
+.home-hero-avatar-natural .home-hero-avatar-art { filter:drop-shadow(0 20px 26px rgba(40,34,30,.12)); }
+.articulated-avatar { position:absolute; inset:0; }
+.articulated-avatar-arms { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.home-hero-avatar-natural .home-hero-camera-flash { animation-delay:800ms; }
 .home-hero-avatar-natural[data-camera-aimed="false"] .home-hero-camera-flash { display:none; }
-@media(prefers-reduced-motion:reduce) {
-  .home-hero-avatar-natural .home-hero-avatar-idle,
-  .home-hero-avatar-natural .home-hero-avatar-camera-foreground { transition:none; }
-}
+
+.articulated-avatar:not(.is-ready) .articulated-avatar-body,
+.articulated-avatar:not(.is-ready) .articulated-avatar-arms { visibility:hidden; }
+.articulated-avatar.is-ready .articulated-avatar-fallback { visibility:hidden; }

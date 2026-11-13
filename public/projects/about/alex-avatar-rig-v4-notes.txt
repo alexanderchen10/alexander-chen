@@ -1,0 +1,6 @@
+Articulated 2D avatar, version 4.
+Runtime: src/ArticulatedAvatar.jsx and src/avatarArmRig.js. SVG groups pivot around shoulder/elbow/wrist joints. A rigid camera+hands group follows a curved path. No image crossfades or pose frames. Forearm length varies to suggest foreshortening while sleeve width stays constant.
+Body and arm textures edited with built-in image generation.
+Body prompt: Keep the original head, glasses, hair, neck, and torso fixed; remove both arms/hands/camera to transparency; reconstruct the hidden navy shirt and jacket.
+Arms prompt: Isolate the original camera, hands and full sleeves in place; remove the central torso to transparency; preserve camera details and original framing.
+Validation: scripts/avatar-arm-rig.test.mjs checks wrist/elbow continuity and positive transforms at 101 positions.

@@ -2,6 +2,7 @@ import { commitPage, trackPlayground } from "./analytics";
 import { normalizeRoute } from "./analyticsRoutes";
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import SkillsSelector from "./SkillsSelector";
+import ArticulatedAvatar from "./ArticulatedAvatar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
@@ -1141,9 +1142,7 @@ function HomeHero() {
           onClick={toggleCameraPose}
         >
           <span className="home-hero-avatar-art" aria-hidden="true">
-            <img className="home-hero-avatar-idle" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" fetchPriority="high" decoding="async" />
-            <img className="home-hero-avatar-shared-head" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" decoding="async" />
-            <img className="home-hero-avatar-camera-foreground" src={assetHref("/projects/about/alex-camera-rig-v3.png")} alt="" width="1254" height="1254" decoding="async" onLoad={() => setCameraPoseReady(true)} />
+            <ArticulatedAvatar aimed={isCameraAimed} paused={motionPaused} onReady={setCameraPoseReady} />
             {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
           </span>
         </button>
