@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {armMatrices,armJoints,upperSleeveMatrices} from '../src/avatarArmRig.js';
+import {armMatrices,armJoints,upperSleeveMatrices,armContours} from '../src/avatarArmRig.js';
 const apply=(m,p)=>[m[0]*p[0]+m[3]*p[1]+m[6],m[1]*p[0]+m[4]*p[1]+m[7]];
 const near=(a,b)=>a.forEach((v,i)=>assert.ok(Math.abs(v-b[i])<1e-9,`${a} must meet ${b}`));
 test('elbows and wrists stay connected throughout raising and lowering',()=>{
@@ -17,5 +17,19 @@ test('elbows and wrists stay connected throughout raising and lowering',()=>{
       assert.ok(m[0]*m[4]-m[1]*m[3]>0,'a sleeve must never flip inside out');
     }
     near(arms[4].slice(0,6),[1,0,0,0,1,0]);
+  }
+});
+
+test('plain sleeves stay closed and forearms retain natural length at every pose',()=>{
+  for(let sample=0;sample<=100;sample++) {
+    const p=sample/100,camera=armMatrices(p)[4];
+    armContours(p).forEach((arm,i)=>{
+      assert.ok(!/NaN|Infinity/.test(arm.d+arm.upper));
+      assert.ok(arm.d.startsWith('M') && arm.d.endsWith('Z'));
+      assert.ok(arm.upper.startsWith('M') && arm.upper.endsWith('Z'));
+      near(arm.wrist,apply(camera,i===0?[.303,.471]:[.586,.515]));
+      const length=Math.hypot(arm.wrist[0]-arm.elbow[0],arm.wrist[1]-arm.elbow[1]);
+      assert.ok(length>.12 && length<.3,'forearms must not collapse into the elbow');
+    });
   }
 });

@@ -1,0 +1,5 @@
+Version 6: plain navy crewneck outfit; same fixed identity and camera/hands.
+Body asset: alex-rig-crewneck-v6.png, edited with built-in image generation.
+Prompt: change only the jacket and button shirt to a plain dark navy crewneck sweatshirt; preserve the head, face, hair, glasses, neck, framing and transparent armless torso; no lapels, collar, buttons, pockets, belt, hands or camera added.
+Sleeves: native SVG closed tapered surfaces, round elbow/end caps, crewneck cloth texture and shading that follows arm direction. Upper arms render behind the torso; forearms render in front, extending underneath the wrist skin. There are no open jacket cuffs or isolated sleeve photographs.
+Left elbow's resting position is farther outward to preserve forearm length and prevent a compressed bend. Tests check both arm joins and forearm geometry across 101 poses.
