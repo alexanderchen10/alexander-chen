@@ -1143,10 +1143,7 @@ function HomeHero() {
           <span className="home-hero-avatar-art" aria-hidden="true">
             <img className="home-hero-avatar-idle" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" fetchPriority="high" decoding="async" />
             <img className="home-hero-avatar-shared-head" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" decoding="async" />
-            <img className="home-hero-avatar-camera" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" onLoad={() => setCameraPoseReady(true)} />
-            <img className="home-hero-avatar-camera-foreground" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" />
-            <img className="home-hero-avatar-camera-eye" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-blink.png")} alt="" width="1254" height="1254" decoding="async" />
-            <img className="home-hero-avatar-blink" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-blink.png")} alt="" width="1254" height="1254" decoding="async" />
+            <img className="home-hero-avatar-camera-foreground" src={assetHref("/projects/about/alex-camera-rig-v3.png")} alt="" width="1254" height="1254" decoding="async" onLoad={() => setCameraPoseReady(true)} />
             {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
           </span>
         </button>

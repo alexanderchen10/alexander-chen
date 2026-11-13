@@ -1,0 +1,5 @@
+Transparent 2D avatar rig. Not a 3D model.
+Fixed identity: original idle image; one head and glasses.
+Moving layer: alex-camera-rig-v3.png. Edited with built-in image generation.
+Prompt: Extract camera, hands, sleeves and torso from the original raised-camera avatar in place. Remove all head, hair, face, neck and spectacle pixels to true transparency. Preserve framing, camera, suit, fingers and lighting.
+Standalone SVG: hover or keyboard focus raises the camera; reduced motion skips transitions.

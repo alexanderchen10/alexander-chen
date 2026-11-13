@@ -1,46 +1,40 @@
-/* Every state uses the exact same idle head and hair pixels. */
+/* A fixed identity layer and a face-free transparent camera rig.
+   Never overlay a second face, glasses rim, blink patch, or hair image. */
 .home-hero-avatar.home-hero-avatar-natural {
-  --camera-flash-x: 46%;
-  --camera-flash-y: 39%;
-  --camera-flash-size: 14%;
+  --camera-flash-x:46%;
+  --camera-flash-y:39%;
+  --camera-flash-size:14%;
 }
 .home-hero-avatar-natural .home-hero-avatar-art {
-  filter: drop-shadow(0 20px 26px rgba(40, 34, 30, .12));
+  filter:drop-shadow(0 20px 26px rgba(40,34,30,.12));
 }
-.home-hero-avatar-natural .home-hero-avatar-idle,
-.home-hero-avatar-natural .home-hero-avatar-camera { clip-path: inset(48% 0 0 0); }
-.home-hero-avatar-natural .home-hero-avatar-shared-head { z-index:1; clip-path:inset(0 0 52% 0); }
-.home-hero-avatar-natural .home-hero-avatar-camera { z-index:0; }
+.home-hero-avatar-natural .home-hero-avatar-shared-head {
+  z-index:1;
+  clip-path:inset(0 0 52% 0);
+}
+.home-hero-avatar-natural .home-hero-avatar-idle {
+  visibility:visible !important;
+  clip-path:inset(48% 0 0);
+  opacity:1;
+  transition:opacity 220ms ease;
+}
 .home-hero-avatar-natural .home-hero-avatar-camera-foreground {
   z-index:2;
-  clip-path:polygon(29% 28%,39% 28%,42% 30%,53% 30%,55% 32%,61% 35%,65% 48%,100% 48%,100% 100%,0 100%,0 48%,25% 48%,27% 33%);
-}
-.home-hero-avatar-natural .home-hero-avatar-camera-eye { z-index:3; clip-path:ellipse(4.5% 2.6% at 55.8% 29.1%); }
-.home-hero-avatar-natural .home-hero-avatar-blink { z-index:4; clip-path:inset(25.8% 37.7% 66.4% 38.2%); }
-
-/* Keep hands, sleeves and torso connected throughout the pose transition. */
-.home-hero-avatar-natural .home-hero-avatar-idle,
-.home-hero-avatar-natural .home-hero-avatar-camera,
-.home-hero-avatar-natural .home-hero-avatar-camera-foreground,
-.home-hero-avatar-natural .home-hero-avatar-camera-eye {
-  visibility:visible !important;
-}
-.home-hero-avatar-natural .home-hero-avatar-idle { opacity:1; transition:opacity 360ms ease; }
-.home-hero-avatar-natural .home-hero-avatar-camera { opacity:0; transition:opacity 360ms ease; }
-.home-hero-avatar-natural .home-hero-avatar-camera-foreground {
+  visibility:visible;
+  clip-path:none;
   opacity:0;
   transform:translateY(8%);
-  transform-origin:46% 39%;
-  transition:transform 650ms cubic-bezier(.22,1,.36,1),opacity 360ms ease;
+  transition:transform 650ms cubic-bezier(.22,1,.36,1),opacity 220ms ease;
   will-change:transform;
 }
-.home-hero-avatar-natural .home-hero-avatar-camera-eye { opacity:0; transition:opacity 140ms ease; }
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-idle { opacity:0; transition-delay:0ms; }
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera { opacity:0; }
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-foreground { opacity:1; transform:translateY(0); transition-delay:0ms; }
-.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-eye { opacity:1; transition-delay:420ms; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-idle { opacity:0; }
+.home-hero-avatar-natural[data-camera-aimed="true"] .home-hero-avatar-camera-foreground {
+  opacity:1;
+  transform:translateY(0);
+}
 .home-hero-avatar-natural .home-hero-camera-flash { animation-delay:600ms; }
 .home-hero-avatar-natural[data-camera-aimed="false"] .home-hero-camera-flash { display:none; }
 @media(prefers-reduced-motion:reduce) {
-  .home-hero-avatar-natural .home-hero-avatar-idle,.home-hero-avatar-natural .home-hero-avatar-camera,.home-hero-avatar-natural .home-hero-avatar-camera-foreground,.home-hero-avatar-natural .home-hero-avatar-camera-eye { transition:none; }
+  .home-hero-avatar-natural .home-hero-avatar-idle,
+  .home-hero-avatar-natural .home-hero-avatar-camera-foreground { transition:none; }
 }
