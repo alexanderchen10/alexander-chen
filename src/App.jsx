@@ -1052,10 +1052,11 @@ function HomeHero() {
   }, [intro]);
   const [motionPaused, setMotionPaused] = useState(false);
   const [cameraAimed, setCameraAimed] = useState(false);
+  const [cameraPoseReady, setCameraPoseReady] = useState(false);
   const [cameraHovered, setCameraHovered] = useState(false);
   const [cameraFlash, setCameraFlash] = useState(0);
   const [givenName, ...surname] = profile.name.split(" ");
-  const isCameraAimed = cameraAimed || (!motionPaused && cameraHovered);
+  const isCameraAimed = cameraPoseReady && (cameraAimed || (!motionPaused && cameraHovered));
 
   const triggerCameraFlash = () => {
     if (motionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1140,7 +1141,10 @@ function HomeHero() {
         >
           <span className="home-hero-avatar-art" aria-hidden="true">
             <img className="home-hero-avatar-idle" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" fetchPriority="high" decoding="async" />
-            <img className="home-hero-avatar-camera" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" />
+            <img className="home-hero-avatar-shared-head" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-idle.png")} alt="" width="1254" height="1254" decoding="async" />
+            <img className="home-hero-avatar-camera" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" onLoad={() => setCameraPoseReady(true)} />
+            <img className="home-hero-avatar-camera-foreground" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-aim.png")} alt="" width="1254" height="1254" decoding="async" />
+            <img className="home-hero-avatar-camera-eye" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-blink.png")} alt="" width="1254" height="1254" decoding="async" />
             <img className="home-hero-avatar-blink" src={assetHref("/projects/about/alexander-chen-hero-natural-v2-blink.png")} alt="" width="1254" height="1254" decoding="async" />
             {cameraFlash > 0 && <span className="home-hero-camera-flash" key={cameraFlash} />}
           </span>

@@ -1,16 +1,19 @@
-/* Versioned natural avatar assets share one fixed canvas in every pose. */
+/* Every state uses the exact same idle head and hair pixels. */
 .home-hero-avatar.home-hero-avatar-natural {
-  --camera-flash-x: 48.7%;
-  --camera-flash-y: 31.7%;
+  --camera-flash-x: 46%;
+  --camera-flash-y: 39%;
   --camera-flash-size: 14%;
 }
 .home-hero-avatar-natural .home-hero-avatar-art {
   filter: drop-shadow(0 20px 26px rgba(40, 34, 30, .12));
 }
 .home-hero-avatar-natural .home-hero-avatar-idle,
-.home-hero-avatar-natural .home-hero-avatar-camera,
-.home-hero-avatar-natural .home-hero-avatar-blink { clip-path: none; }
-.home-hero-avatar-natural .home-hero-avatar-camera { z-index: 1; }
-.home-hero-avatar-natural .home-hero-avatar-blink { z-index: 2; }
-
-
+.home-hero-avatar-natural .home-hero-avatar-camera { clip-path: inset(48% 0 0 0); }
+.home-hero-avatar-natural .home-hero-avatar-shared-head { z-index:1; clip-path:inset(0 0 52% 0); }
+.home-hero-avatar-natural .home-hero-avatar-camera { z-index:0; }
+.home-hero-avatar-natural .home-hero-avatar-camera-foreground {
+  z-index:2;
+  clip-path:polygon(29% 28%, 39% 28%, 42% 30%, 53% 30%, 55% 32%, 61% 35%, 65% 48%, 100% 48%, 100% 100%, 0 100%, 0 48%, 25% 48%, 27% 33%);
+}
+.home-hero-avatar-natural .home-hero-avatar-camera-eye { z-index:3; clip-path:ellipse(4.5% 2.6% at 55.8% 29.1%); }
+.home-hero-avatar-natural .home-hero-avatar-blink { z-index:4; clip-path:inset(25.8% 37.7% 66.4% 38.2%); }
