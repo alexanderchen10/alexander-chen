@@ -1,0 +1,5 @@
+.project-detail-gallery-episode-and-production > .structured-media-youtube { grid-column: 1 / -1; }
+.structured-media-item figcaption a { color: inherit; text-decoration: none; line-height: 1.6; }
+.structured-media-item figcaption a:hover { text-decoration: underline; }
+.structured-media-item figcaption a:focus-visible { outline: 2px solid #7963dc; outline-offset: 5px; }
+.structured-media-item figcaption a small { display: block; margin-top: 5px; color: #64538e; font-size: 12px; }

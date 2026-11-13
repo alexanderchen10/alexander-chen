@@ -36,6 +36,105 @@ export const profile = {
   ],
 };
 
+const loblawCareerBannerVideos = [
+  {
+    "type": "youtube",
+    "videoId": "Dw00GgI6-Hg",
+    "title": "Shoppers Drug Mart · Pharmacy",
+    "caption": "Shoppers Drug Mart · Pharmacy · 0:27",
+    "href": "https://www.youtube.com/watch?v=Dw00GgI6-Hg",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "7SbvyThTgz4",
+    "title": "Shoppers Drug Mart · Cosmetics",
+    "caption": "Shoppers Drug Mart · Cosmetics · 0:28",
+    "href": "https://www.youtube.com/watch?v=7SbvyThTgz4",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "G_hlqotQ4Ws",
+    "title": "Shoppers Drug Mart · Retail",
+    "caption": "Shoppers Drug Mart · Retail · 0:27",
+    "href": "https://www.youtube.com/watch?v=G_hlqotQ4Ws",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "e-9KL9lFg0Q",
+    "title": "MediSystem",
+    "caption": "MediSystem · 0:48",
+    "href": "https://www.youtube.com/watch?v=e-9KL9lFg0Q",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "UP6XoQe_SdI",
+    "title": "Specialty Health System",
+    "caption": "Specialty Health System · 0:49",
+    "href": "https://www.youtube.com/watch?v=UP6XoQe_SdI",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "BXktaBRJR3E",
+    "title": "Health system overview",
+    "caption": "Health system overview · 1:14",
+    "href": "https://www.youtube.com/watch?v=BXktaBRJR3E",
+    "aspect": "16 / 9",
+    "hero": false
+  }
+];
+
+const loblawCareerCafeVideos = [
+  {
+    "type": "youtube",
+    "videoId": "o0BbRba09p0",
+    "title": "Career Café No. 2 · Meghan Murle interview",
+    "caption": "Career Café No. 2 · Meghan Murle interview · 8:02",
+    "href": "https://www.youtube.com/watch?v=o0BbRba09p0",
+    "aspect": "16 / 9",
+    "hero": false
+  }
+];
+
+const loblawToolkitTrainingVideos = [
+  {
+    "type": "youtube",
+    "videoId": "b1jtdAwmOlQ",
+    "title": "Welcome to the Digital Toolkit",
+    "caption": "Welcome to the Digital Toolkit · 1:50",
+    "href": "https://www.youtube.com/watch?v=b1jtdAwmOlQ",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "OO3e7bXg7yE",
+    "title": "Quick Start Video Guide",
+    "caption": "Quick Start Video Guide · 2:31",
+    "href": "https://www.youtube.com/watch?v=OO3e7bXg7yE",
+    "aspect": "16 / 9",
+    "hero": false
+  },
+  {
+    "type": "youtube",
+    "videoId": "UNSdd9jJXxQ",
+    "title": "How to Use Canva",
+    "caption": "How to Use Canva · 2:02",
+    "href": "https://www.youtube.com/watch?v=UNSdd9jJXxQ",
+    "aspect": "16 / 9",
+    "hero": false
+  }
+];
+
 export const loblawSubprojects = [
   {
     slug: "loblaw-careers-page",
@@ -56,6 +155,7 @@ export const loblawSubprojects = [
     coverTitle: "Careers Page",
     coverMetric: "23 standardized banners",
     aspect: "16 / 10",
+    mediaSections: [{ eyebrow: "Careers website · Video production", title: "Video banners across Shoppers Drug Mart and healthcare.", description: "Six selected video outputs from the wider careers-site system: pharmacy, cosmetics, retail, and healthcare. These are selected examples from the 23-banner project.", layout: "portrait-pair", items: loblawCareerBannerVideos }],
   },
   {
     slug: "sharepoint-digital-toolkit",
@@ -76,6 +176,7 @@ export const loblawSubprojects = [
     coverTitle: "Digital Toolkit",
     coverMetric: "640+ templates",
     aspect: "16 / 10",
+    mediaSections: [{ eyebrow: "Toolkit · Guided learning", title: "Helping teams use the system.", description: "The welcome, quick-start, and Canva training videos created for the employer-brand toolkit.", layout: "wide", items: loblawToolkitTrainingVideos }],
   },
   {
     slug: "career-cafe-talent-talks",
@@ -98,6 +199,7 @@ export const loblawSubprojects = [
     coverMetric: "Talent Talk Series",
     aspect: "4 / 3",
     mediaSections: [
+      { eyebrow: "Career Café · Full episode", title: "Meghan Murle’s career conversation.", description: "Career Café No. 2, presented as a full-length interview. The production photographs below show the wider Talent Talk setup and recording process.", layout: "wide", items: loblawCareerCafeVideos },
       {
         eyebrow: "Behind the scenes · Setup and production",
         title: "Building the Talent Talk experience",
@@ -1208,12 +1310,15 @@ export const workProjects = [
             number: "02",
             eyebrow: "Internal talent · Content production",
             title: "Career Café Talent Talk Series",
-            description: "I helped shape and document a live conversation about pathways into franchise ownership, store management, and corporate roles, supporting both the studio setup and production experience.",
+            description: "Career conversations about growth and mobility at Loblaw, brought to life through interview production and Talent Talks.",
+            workHeading: "Watch the episode, then see the production.",
+            workIntro: "Career Café No. 2 features Meghan Murle. The full interview sits alongside photographs from the Talent Talk production.",
             impact: "Co-created and produced 10+ Career Café episodes within six months, building an internal series focused on career development and colleague engagement.",
             cover: "/projects/work/loblaw/career-cafe/talent-talk-session.jpg",
             coverAlt: "Career Café Talent Talk speakers and audience during the session",
-            mediaPresentation: "documentary-pair",
+            mediaPresentation: "episode-and-production",
             items: [
+              ...loblawCareerCafeVideos,
               { type: "image", src: "/projects/work/loblaw/career-cafe/talent-talk-setup.jpg", alt: "Alexander filming a Career Café Talent Talk during studio setup", caption: "Camera and studio setup", aspect: "3 / 4", hero: false },
               { type: "image", src: "/projects/work/loblaw/career-cafe/talent-talk-session.jpg", alt: "Career Café Talent Talk speakers and audience during the session", caption: "The Talent Talk in progress", aspect: "4 / 3", hero: false },
             ],
@@ -1277,9 +1382,12 @@ export const workProjects = [
             eyebrow: "Careers UX · Visual system",
             title: "Revamping the careers experience",
             description: "I redesigned and standardized career-site banners in Figma, building a consistent system that could flex across candidate touchpoints and future recruitment needs.",
-            workIntro: "The system standardized 23 recruitment banners into a reusable visual foundation that could flex across career pages and future hiring needs.",
+            workIntro: "The careers-site system standardized 23 banners. These six selected video outputs show Shoppers Drug Mart Pharmacy, Cosmetics, Retail, and related healthcare stories; the library below is a selection from the wider project.",
             impact: "Designed and standardized 23 career-site banners, creating a reusable visual foundation for employer-brand content.",
-            items: [],
+            cover: "https://i.ytimg.com/vi/Dw00GgI6-Hg/hqdefault.jpg",
+            coverAlt: "Shoppers Drug Mart pharmacy career-site video",
+            workHeading: "Watch the career-site video banners.",
+            items: loblawCareerBannerVideos,
           },
         ],
       },
@@ -1383,9 +1491,9 @@ export const workProjects = [
               { type: "image", src: "/projects/work/loblaw/social-media-toolkit-2/storyboard/storyboard-02.png", alt: "Second page of the Social Media Toolkit 2.0 training storyboard", caption: "Storyboard · posting guidance, consistency, and the closing sequence", aspect: "16 / 9", hero: false },
             ],
             finalOutputItems: [
-              { type: "video", src: "/projects/work/loblaw/social-media-toolkit-2/videos/welcome.mp4", caption: "Welcome to the Digital Toolkit", aspect: "16 / 9" },
-              { type: "video", src: "/projects/work/loblaw/social-media-toolkit-2/videos/quick-start-video-guide.mp4", caption: "Quick Start Video Guide", aspect: "16 / 9" },
-              { type: "video", src: "/projects/work/loblaw/social-media-toolkit-2/videos/how-to-use-canva.mp4", caption: "How to Use Canva", aspect: "16 / 9" },
+              {"type":"youtube","videoId":"b1jtdAwmOlQ","title":"Welcome to the Digital Toolkit","caption":"Welcome to the Digital Toolkit · 1:50","href":"https://www.youtube.com/watch?v=b1jtdAwmOlQ","aspect":"16 / 9","hero":false},
+              {"type":"youtube","videoId":"OO3e7bXg7yE","title":"Quick Start Video Guide","caption":"Quick Start Video Guide · 2:31","href":"https://www.youtube.com/watch?v=OO3e7bXg7yE","aspect":"16 / 9","hero":false},
+              {"type":"youtube","videoId":"UNSdd9jJXxQ","title":"How to Use Canva","caption":"How to Use Canva · 2:02","href":"https://www.youtube.com/watch?v=UNSdd9jJXxQ","aspect":"16 / 9","hero":false},
             ],
           },
         ],
@@ -1961,4 +2069,5 @@ export const about = {
   ],
   cta: "Have a project, product, or story that could feel clearer?",
 };
+
 

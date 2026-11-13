@@ -13,6 +13,7 @@ import UtopiaSalesChart from "./UtopiaSalesChart";
 import "./ProjectJourneyNavigation.css";
 import "./HeroNaturalAvatar.css";
 import "./TtCaseStudy.css";
+import "./LoblawVideoLibrary.css";
 import { ExperienceCardLink, InteractiveStats, LoopingPreview } from "./ExperienceInteractions";
 import AlexLifeGameV2 from "./AlexLifeGameV2";
 import {
@@ -2441,7 +2442,7 @@ function StructuredMediaItem({ item, title, index, presentation }) {
           </div>
         </figcaption>
       ) : (
-        <figcaption><span>{String(index + 1).padStart(2, "0")}</span>{item.caption}</figcaption>
+        <figcaption><span>{String(index + 1).padStart(2, "0")}</span>{item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.caption}<span aria-hidden="true"> ↗</span><small>Watch on YouTube</small></a> : item.caption}</figcaption>
       ))}
     </figure>
   );
@@ -4116,6 +4117,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
