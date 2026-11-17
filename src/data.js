@@ -498,7 +498,7 @@ export const workProjects = [
       "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery."
     ],
     "projectCollectionEyebrow": "Two projects · one partnership",
-    "projectCollectionTitle": "Two campaigns.",
+    "projectCollectionTitle": "Ongoing campaigns",
     "projectCollection": [
       {
         "number": "01",
