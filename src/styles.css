@@ -2991,6 +2991,21 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
   .zoomable-image > span { opacity: .8; transform: none; }
 }
 
+.immersive-project-index-page .immersive-project-hero { min-height: 420px; }
+.immersive-project-index-page .immersive-project-hero-copy { min-height: 0; padding: clamp(28px, 4vw, 56px); }
+.immersive-project-index-page .case-study-back { margin-bottom: 32px; }
+.immersive-project-index-page .immersive-project-hero-copy h1 { font-size: clamp(44px, 5vw, 72px); line-height: .96; }
+.immersive-project-index-page .case-study-intro { max-width: 42ch; margin-top: 22px; }
+.immersive-project-index-page .immersive-project-actions { margin-top: 24px; }
+.immersive-project-index-page .immersive-project-index { padding-top: 56px; padding-bottom: 64px; }
+.immersive-project-index-page .immersive-project-index > header { padding-top: 0; border-top: 0; }
+.immersive-project-index-page .immersive-project-index > header h2 { font-size: clamp(36px, 4vw, 52px); }
+.immersive-project-index-page .immersive-project-index > div { margin-top: 32px; }
+.immersive-project-index-page .immersive-project-next { padding-top: 32px; padding-bottom: 32px; }
+.immersive-project-index-page .immersive-project-next > a { font-size: clamp(24px, 3vw, 36px); line-height: 1.15; }
+@media (max-width: 1180px) {
+  .immersive-project-index-page .immersive-project-hero-media { min-height: 0; height: clamp(190px, 32vw, 300px); }
+}
 @media (prefers-reduced-motion: reduce) {
   .zoomable-image img, .immersive-project-hero-media > .visual, .immersive-media-frame, .project-scroll-cue span { animation: none; transform: none; }
 }

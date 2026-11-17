@@ -475,147 +475,186 @@ export const workProjects = [
     ],
   },
   {
-    slug: "corcoran-oakville-grand-opening",
-    showInWork: false,
-    title: "Corcoran Horizon Realty",
-    description: "A multi-project content partnership spanning sponsored sports, real estate launches, social-first event coverage, and fast-turnaround editing.",
-    thesis: "Build a flexible production system that could move from the energy of a sponsored sports event to the polish of a real estate office launch without losing speed or storytelling clarity.",
-    organization: "Corcoran Horizon Realty",
-    role: "Video Production · Event Coverage · Editing · Social Content",
-    period: "September - November 2026",
-    image: "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
-    bannerVideo: "/projects/work/corcoran/oakville-banner.m4v",
-    imageAlt: "Speaker featured in the Corcoran Group Real Estate Oakville grand-opening film",
-    coverEyebrow: "Creative partnership · Ontario",
-    homeMetric: "2 campaigns · live + long-form",
-    aspect: "16 / 9",
-    sourceUrl: "https://vimeo.com/1247665834",
-    sourceLabel: "Watch Oakville launch film",
-    showSharedImpact: false,
-    showProofStrip: false,
-    outcomeTarget: "project-feature-0-outcome",
-    outcomeLabel: "See campaign outcomes",
-    impact: [
+    "slug": "corcoran-oakville-grand-opening",
+    "showInWork": false,
+    "title": "Corcoran Horizon Realty",
+    "description": "Event coverage and video production for Corcoran Horizon Realty, from the Grand River Rapids playoffs to the Oakville office launch.",
+    "organization": "Corcoran Horizon Realty",
+    "role": "Video Production · Event Coverage · Editing · Social Content",
+    "period": "September - November 2026",
+    "image": "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
+    "bannerVideo": "/projects/work/corcoran/oakville-banner.m4v",
+    "imageAlt": "Speaker featured in the Corcoran Group Real Estate Oakville grand-opening film",
+    "coverEyebrow": "Creative partnership · Ontario",
+    "homeMetric": "2 campaigns · live + long-form",
+    "aspect": "16 / 9",
+    "showSharedImpact": false,
+    "showProofStrip": false,
+    "outcomeTarget": "project-collection-index",
+    "outcomeLabel": "Explore campaigns",
+    "impact": [
       "Delivered the first Grand River Rapids playoff reel by 3:30 PM, immediately after a three-hour live capture session.",
       "Extended Corcoran's sponsorship into same-day Story clips, two social reels, match coverage, reactions, and a team testimonial.",
-      "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery.",
+      "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery."
     ],
-    projectCollectionEyebrow: "Two projects · one partnership",
-    projectCollectionTitle: "Built for the pace of each moment.",
-    projectCollection: [
+    "projectCollectionEyebrow": "Two projects · one partnership",
+    "projectCollectionTitle": "Two campaigns.",
+    "projectCollection": [
       {
-        number: "01",
-        title: "Grand River Rapids CNPL Playoffs",
-        meta: "Sponsor activation · Waterloo",
-        summary: "Live event coverage, same-day social clips, and two fast-turnaround reels for Corcoran's sponsored pickleball team.",
-        image: "/projects/work/corcoran/pickleball/grand-river-rapids-poster.png",
-        imageAlt: "Grand River Rapids pickleball player at the CNPL Playoff Championships",
-        target: "project-feature-0",
+        "number": "01",
+        "title": "Grand River Rapids CNPL Playoffs",
+        "meta": "Sponsor activation · Waterloo",
+        "summary": "Live event coverage, same-day social clips, and two fast-turnaround reels for Corcoran's sponsored pickleball team.",
+        "image": "/projects/work/corcoran/pickleball/grand-river-rapids-poster.png",
+        "imageAlt": "Grand River Rapids pickleball player at the CNPL Playoff Championships",
+        "route": "project/corcoran-grand-river-rapids",
+        "previewVideo": "/projects/work/corcoran/pickleball/grand-river-rapids-reel.m4v"
       },
       {
-        number: "02",
-        title: "Oakville Grand Opening",
-        meta: "Office launch · Oakville",
-        summary: "An interview-led launch film, social cutdowns, and event storytelling for Corcoran's new Oakville office.",
-        image: "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
-        imageAlt: "Speaker featured in the Corcoran Horizon Realty Oakville grand-opening film",
-        target: "project-feature-1",
-      },
+        "number": "02",
+        "title": "Oakville Grand Opening",
+        "meta": "Office launch · Oakville",
+        "summary": "An interview-led launch film, social cutdowns, and event storytelling for Corcoran's new Oakville office.",
+        "image": "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
+        "imageAlt": "Speaker featured in the Corcoran Horizon Realty Oakville grand-opening film",
+        "route": "project/corcoran-oakville-launch",
+        "previewVideo": "/projects/work/corcoran/oakville-banner.m4v"
+      }
     ],
-    mediaSections: [
+    "caseStudyVariant": "campaign-index",
+    "backLink": {
+      "route": "ao-studio",
+      "label": "AO Studio"
+    },
+    "subprojects": [
       {
-        eyebrow: "Sponsor activation",
-        title: "Turn three live hours into same-day playoff energy.",
-        description: "Corcoran Horizon Realty sponsored the Grand River Rapids at the CNPL Playoff Championships. The brief covered the Rapids match, behind-the-scenes moments, sponsor visibility, and the people around the team, then moved the strongest footage into live Story clips and a first reel delivered before the session ended.",
-        outcomes: [
+        "slug": "corcoran-grand-river-rapids",
+        "parentSlug": "corcoran-oakville-grand-opening",
+        "parentTitle": "Corcoran Horizon Realty",
+        "showInWork": false,
+        "title": "Grand River Rapids CNPL Playoffs",
+        "description": "Same-day event coverage and social edits for Corcoran Horizon Realty’s sponsored pickleball team at the CNPL Playoff Championships.",
+        "thesis": "Capture the playoff atmosphere and turn the strongest moments into same-day social content.",
+        "organization": "Corcoran Horizon Realty",
+        "role": "Event coverage · Video editing · Social content",
+        "period": "2026",
+        "image": "/projects/work/corcoran/pickleball/grand-river-rapids-poster.png",
+        "bannerVideo": "/projects/work/corcoran/pickleball/grand-river-rapids-reel.m4v",
+        "imageAlt": "Grand River Rapids pickleball player at the CNPL Playoff Championships",
+        "coverEyebrow": "Corcoran Horizon Realty · Sponsor activation",
+        "aspect": "16 / 9",
+        "showProofStrip": false,
+        "impact": [
           "Delivered the first Grand River Rapids playoff reel by 3:30 PM, immediately after a three-hour live capture session.",
-          "Extended Corcoran's sponsorship into same-day Story clips, two social reels, match coverage, reactions, and a team testimonial.",
+          "Extended Corcoran's sponsorship into same-day Story clips, two social reels, match coverage, reactions, and a team testimonial."
         ],
-        layout: "portrait-pair",
-        quote: {
-          text: "We’re impressed with the quick turnaround and quality; that’s what we’re looking for.",
-          attribution: "Client feedback · Corcoran Horizon Realty",
-        },
-        items: [
+        "mediaSections": [
           {
-            type: "video",
-            src: "/projects/work/corcoran/pickleball/grand-river-rapids-reel.m4v",
-            mime: "video/mp4",
-            poster: "/projects/work/corcoran/pickleball/grand-river-rapids-poster.png",
-            caption: "Reel #1 · delivered within the three-hour event session",
-            aspect: "9 / 16",
-          },
-          {
-            type: "image",
-            src: "/projects/work/corcoran/pickleball/grand-river-rapids-team.png",
-            alt: "Grand River Rapids team members watching the CNPL Playoff Championships court",
-            caption: "Grand River Rapids · CNPL Playoff Championships",
-            aspect: "9 / 16",
-          },
-        ],
+            "eyebrow": "Sponsor activation",
+            "title": "Turn three live hours into same-day playoff energy.",
+            "description": "Corcoran Horizon Realty sponsored the Grand River Rapids at the CNPL Playoff Championships. The brief covered the Rapids match, behind-the-scenes moments, sponsor visibility, and the people around the team, then moved the strongest footage into live Story clips and a first reel delivered before the session ended.",
+            "layout": "portrait-pair",
+            "quote": {
+              "text": "We’re impressed with the quick turnaround and quality; that’s what we’re looking for.",
+              "attribution": "Client feedback · Corcoran Horizon Realty"
+            },
+            "items": [
+              {
+                "type": "video",
+                "src": "/projects/work/corcoran/pickleball/grand-river-rapids-reel.m4v",
+                "mime": "video/mp4",
+                "poster": "/projects/work/corcoran/pickleball/grand-river-rapids-poster.png",
+                "caption": "Reel #1 · delivered within the three-hour event session",
+                "aspect": "9 / 16"
+              },
+              {
+                "type": "image",
+                "src": "/projects/work/corcoran/pickleball/grand-river-rapids-team.png",
+                "alt": "Grand River Rapids team members watching the CNPL Playoff Championships court",
+                "caption": "Grand River Rapids · CNPL Playoff Championships",
+                "aspect": "9 / 16"
+              }
+            ]
+          }
+        ]
       },
       {
-        eyebrow: "Oakville campaign",
-        title: "Oakville Grand Opening",
-        description: "From interview planning to social cutdowns and the complete launch film.",
-        outcomes: [
-          "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery.",
+        "slug": "corcoran-oakville-launch",
+        "parentSlug": "corcoran-oakville-grand-opening",
+        "parentTitle": "Corcoran Horizon Realty",
+        "showInWork": false,
+        "title": "Oakville Grand Opening",
+        "description": "An interview-led launch film, event coverage, and social cutdowns for Corcoran Horizon Realty’s new Oakville office.",
+        "thesis": "Create one launch story across three interviews, opening-night coverage, and social edits.",
+        "organization": "Corcoran Horizon Realty",
+        "role": "Video Production · Event Coverage · Editing · Social Content",
+        "period": "November 2026",
+        "image": "/projects/work/corcoran/oakville-grand-opening-poster.jpg",
+        "bannerVideo": "/projects/work/corcoran/oakville-banner.m4v",
+        "imageAlt": "Speaker featured in the Corcoran Group Real Estate Oakville grand-opening film",
+        "coverEyebrow": "Corcoran Horizon Realty · Office launch",
+        "aspect": "16 / 9",
+        "sourceUrl": "https://vimeo.com/1247665834",
+        "sourceLabel": "Watch Oakville launch film",
+        "showProofStrip": false,
+        "impact": [
+          "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery."
         ],
-        sections: [
+        "mediaSections": [
           {
-            eyebrow: "Script & edit plan",
-            title: "Find one story inside three interviews.",
-            description: "The editor outline mapped source clips, speaker balance, clean in and out points, lower thirds, and the intended talking-head runtime before the timeline was assembled. That structure kept the final cut focused while preserving a distinct voice for each speaker.",
-            layout: "wide",
-            items: [
+            "eyebrow": "Script & edit plan",
+            "title": "Find one story inside three interviews.",
+            "description": "The editor outline mapped source clips, speaker balance, clean in and out points, lower thirds, and the intended talking-head runtime before the timeline was assembled. That structure kept the final cut focused while preserving a distinct voice for each speaker.",
+            "layout": "wide",
+            "items": [
               {
-                type: "image",
-                src: "/projects/work/corcoran/process/editor-outline.png",
-                alt: "Oakville grand-opening editor outline showing three interview sources and the planned speaker balance",
-                caption: "Editor outline · source interviews, speaker balance, and timing",
-                aspect: "792 / 612",
-              },
-            ],
+                "type": "image",
+                "src": "/projects/work/corcoran/process/editor-outline.png",
+                "alt": "Oakville grand-opening editor outline showing three interview sources and the planned speaker balance",
+                "caption": "Editor outline · source interviews, speaker balance, and timing",
+                "aspect": "792 / 612"
+              }
+            ]
           },
           {
-            eyebrow: "Social cutdowns",
-            title: "Cut the opening for the feed.",
-            description: "Two compact edits show how the same production system moved from an event record into social-first storytelling. The shorter cuts prioritize pace, identity, and atmosphere while staying connected to the longer launch narrative.",
-            layout: "portrait-pair",
-            items: [
+            "eyebrow": "Social cutdowns",
+            "title": "Cut the opening for the feed.",
+            "description": "Two compact edits show how the same production system moved from an event record into social-first storytelling. The shorter cuts prioritize pace, identity, and atmosphere while staying connected to the longer launch narrative.",
+            "layout": "portrait-pair",
+            "items": [
               {
-                type: "video",
-                src: "/projects/work/corcoran/social/oakville-teaser.m4v",
-                mime: "video/mp4",
-                caption: "Oakville teaser · social cutdown",
-                aspect: "9 / 16",
+                "type": "video",
+                "src": "/projects/work/corcoran/social/oakville-teaser.m4v",
+                "mime": "video/mp4",
+                "caption": "Oakville teaser · social cutdown",
+                "aspect": "9 / 16"
               },
               {
-                type: "video",
-                src: "/projects/work/corcoran/social/oakville-cinematic.m4v",
-                mime: "video/mp4",
-                caption: "Cinematic Oakville trailer · social cutdown",
-                aspect: "9 / 16",
-              },
-            ],
+                "type": "video",
+                "src": "/projects/work/corcoran/social/oakville-cinematic.m4v",
+                "mime": "video/mp4",
+                "caption": "Cinematic Oakville trailer · social cutdown",
+                "aspect": "9 / 16"
+              }
+            ]
           },
           {
-            eyebrow: "Final launch film",
-            title: "A new Corcoran chapter in Oakville.",
-            description: "The finished event film brings the interview architecture, office details, guests, and opening-night energy into one focused public piece.",
-            layout: "wide",
-            items: [
+            "eyebrow": "Final launch film",
+            "title": "A new Corcoran chapter in Oakville.",
+            "description": "The finished event film brings the interview architecture, office details, guests, and opening-night energy into one focused public piece.",
+            "layout": "wide",
+            "items": [
               {
-                type: "vimeo",
-                videoId: "1247665834",
-                caption: "Oakville Grand Opening · complete event film",
-                aspect: "16 / 9",
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                "type": "vimeo",
+                "videoId": "1247665834",
+                "caption": "Oakville Grand Opening · complete event film",
+                "aspect": "16 / 9"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     slug: "tt-supermarket",

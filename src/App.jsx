@@ -3095,6 +3095,7 @@ function CaseStudyPage({ clock, navigate, project }) {
 
   const backRoute = project.backLink?.route || (project.parentSlug ? `project/${project.parentSlug}` : "work");
   const backLabel = project.backLink?.label || project.parentTitle || "selected work";
+  const isCampaignIndex = project.caseStudyVariant === "campaign-index";
   const sections = caseStudyProgressSectionsFor(project);
   const visibleProjects = workProjects.filter((item) => item.showInWork !== false);
   const projectIndex = visibleProjects.findIndex((item) => item.slug === project.slug);
@@ -3103,7 +3104,7 @@ function CaseStudyPage({ clock, navigate, project }) {
   const outcomeTarget = project.outcomeTarget || "project-impact";
 
   return (
-    <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}`}>
+    <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}${isCampaignIndex ? " immersive-project-index-page" : ""}`}>
       <article className="case-study immersive-case-study">
         <header className="immersive-project-hero" id="project-overview">
           <div className="immersive-project-hero-media reveal reveal-fast" style={{ "--aspect": project.aspect || "16 / 10" }}>
@@ -3127,7 +3128,7 @@ function CaseStudyPage({ clock, navigate, project }) {
             </div>
           </div>
         </header>
-        <section className="immersive-project-brief reveal" aria-label="Project brief">
+        {!isCampaignIndex && <section className="immersive-project-brief reveal" aria-label="Project brief">
           <div>
             <span>Project thesis</span>
             <h2>{project.thesis || project.description}</h2>
@@ -3137,7 +3138,7 @@ function CaseStudyPage({ clock, navigate, project }) {
             <div><dt>Organization</dt><dd>{project.organization}</dd></div>
             <div><dt>Timeline</dt><dd>{project.period}</dd></div>
           </dl>
-        </section>
+        </section>}
         {project.projectCollection?.length > 0 && (
           <nav className="immersive-project-index reveal" id="project-collection-index" aria-label={`${project.title} project collection`}>
             <header>
@@ -3145,13 +3146,17 @@ function CaseStudyPage({ clock, navigate, project }) {
               <h2>{project.projectCollectionTitle || "Explore the partnership."}</h2>
             </header>
             <div>
-              {project.projectCollection.map((item) => (
-                <a href={`#${item.target}`} key={item.title} onClick={(event) => {
-                  event.preventDefault();
-                  document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
+              {project.projectCollection.map((item) => {
+                const previewVideo = item.previewVideo || project.mediaSections?.[Number(item.target?.split("-").pop())]?.items?.find(media => media.type === "video")?.src;
+                return <a href={item.route ? routeHref(item.route) : `#${item.target}`} key={item.title} onClick={(event) => {
+                  if (item.route) navigate(event, "/", item.route);
+                  else {
+                    event.preventDefault();
+                    document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
+                  }
                 }}>
                   <figure>
-                    <LoopingPreview src={project.mediaSections?.[Number(item.target?.split("-").pop())]?.items?.find(media => media.type === "video")?.src ? assetHref(project.mediaSections[Number(item.target.split("-").pop())].items.find(media => media.type === "video").src) : undefined} poster={assetHref(item.image)} alt={item.imageAlt || ""} />
+                    <LoopingPreview src={previewVideo ? assetHref(previewVideo) : undefined} poster={assetHref(item.image)} alt={item.imageAlt || ""} />
                   </figure>
                   <span>{item.number}</span>
                   <div>
@@ -3159,9 +3164,9 @@ function CaseStudyPage({ clock, navigate, project }) {
                     <h3>{item.title}</h3>
                     <small>{item.summary}</small>
                   </div>
-                  <b aria-hidden="true">↓</b>
-                </a>
-              ))}
+                  <b aria-hidden="true">{item.route ? "↗" : "↓"}</b>
+                </a>;
+              })}
             </div>
           </nav>
         )}
@@ -3170,7 +3175,7 @@ function CaseStudyPage({ clock, navigate, project }) {
         {project.mediaSections?.map((section, sectionIndex) => section.sections?.length
           ? <CaseStudyCampaignSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />
           : <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
-        {project.subprojects?.length > 0 && (
+        {!isCampaignIndex && project.subprojects?.length > 0 && (
           <section className="case-study-subprojects immersive-project-collection reveal" id="project-collection" aria-labelledby={`${project.slug}-projects`}>
             <div className="case-study-subprojects-heading">
               <p>{project.subprojectsEyebrow || "Featured projects"}</p>
@@ -3967,7 +3972,7 @@ function caseStudyProgressSectionsFor(project) {
     ...(project.projectCollection?.length ? [{ id: "project-collection-index", label: "Project collection" }] : []),
     ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Results" }] : []),
     ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
-    ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
+    ...(project.subprojects?.length && project.caseStudyVariant !== "campaign-index" ? [{ id: "project-collection", label: "Project collection" }] : []),
     ...(project.showSharedImpact !== false ? [{ id: "project-impact", label: "Impact" }] : []),
   ];
 }
