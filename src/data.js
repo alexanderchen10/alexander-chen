@@ -489,7 +489,7 @@ export const workProjects = [
     coverEyebrow: "Creative partnership · Ontario",
     homeMetric: "2 campaigns · live + long-form",
     aspect: "16 / 9",
-    sourceUrl: "https://vimeo.com/1245220369",
+    sourceUrl: "https://vimeo.com/1247665834",
     sourceLabel: "Watch Oakville launch film",
     impact: [
       "Delivered the first Grand River Rapids playoff reel by 3:30 PM, immediately after a three-hour live capture session.",
@@ -591,7 +591,7 @@ export const workProjects = [
         items: [
           {
             type: "vimeo",
-            videoId: "1245220369",
+            videoId: "1247665834",
             caption: "Oakville Grand Opening · complete event film",
             aspect: "16 / 9",
           },
