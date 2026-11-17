@@ -2915,6 +2915,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .immersive-project-impact li { display: grid; grid-template-columns: 34px 1fr; gap: 17px; padding: 27px 0; border-top: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.67); font-size: 14px; line-height: 1.55; }
 .immersive-project-impact li:last-child { border-bottom: 1px solid rgba(255,255,255,.14); }
 .immersive-project-impact li > span { color: #9f8cff; font-family: var(--font-body); font-size: 8px; }
+.immersive-project-impact.immersive-campaign-outcome { gap: 32px; margin-top: clamp(48px, 7vw, 80px); padding: clamp(32px, 4vw, 56px); border-radius: 22px; }
+.immersive-campaign-outcome > div h3 { max-width: 15ch; margin-top: 22px; color: #fff; font-size: clamp(32px, 4vw, 50px); font-weight: 500; letter-spacing: -.055em; line-height: 1.05; }
 .immersive-project-next { display: grid; grid-template-columns: minmax(130px, .34fr) minmax(0, 1.66fr); gap: 32px; padding: clamp(74px, 9vw, 122px) clamp(28px, 7vw, 104px); border-bottom: 1px solid var(--ink-08); }
 .immersive-project-next > span { color: var(--tech-purple); font-family: var(--font-body); font-size: 9px; text-transform: uppercase; }
 .immersive-project-next > a { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; font-size: clamp(38px, 5vw, 72px); font-weight: 500; letter-spacing: -.065em; line-height: .95; }

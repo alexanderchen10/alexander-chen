@@ -2948,6 +2948,18 @@ function ProjectDetailPage({ clock, navigate, detail }) {
   );
 }
 
+function CaseStudyCampaignOutcome({ project, section, sectionIndex }) {
+  if (!section.outcomes?.length) return null;
+  const outcomeId = `project-feature-${sectionIndex}-outcome`;
+
+  return (
+    <section className="immersive-project-impact immersive-campaign-outcome reveal" id={outcomeId} aria-labelledby={`${project.slug}-${outcomeId}-title`}>
+      <div><span>Outcome</span><h3 id={`${project.slug}-${outcomeId}-title`}>What the work made possible.</h3></div>
+      <ol>{section.outcomes.map((outcome, index) => <li key={outcome}><span>{String(index + 1).padStart(2, "0")}</span>{outcome}</li>)}</ol>
+    </section>
+  );
+}
+
 function CaseStudyCampaignSection({ project, section, sectionIndex }) {
   const campaignId = `project-feature-${sectionIndex}`;
 
@@ -2967,12 +2979,17 @@ function CaseStudyCampaignSection({ project, section, sectionIndex }) {
             document.getElementById(`${campaignId}-stage-${stageIndex}`)?.scrollIntoView({ behavior: "smooth" });
           }}><span>{String(stageIndex + 1).padStart(2, "0")}</span>{stage.eyebrow}<span aria-hidden="true">↓</span></a>
         ))}
+        {section.outcomes?.length > 0 && <a href={`#${campaignId}-outcome`} onClick={(event) => {
+          event.preventDefault();
+          document.getElementById(`${campaignId}-outcome`)?.scrollIntoView({ behavior: "smooth" });
+        }}><span>{String(section.sections.length + 1).padStart(2, "0")}</span>Outcome<span aria-hidden="true">↓</span></a>}
       </nav>
       <div className="immersive-campaign-stages">
         {section.sections.map((stage, stageIndex) => (
           <CaseStudyFeatureSection project={project} section={stage} sectionIndex={`${sectionIndex}-stage-${stageIndex}`} sectionNumber={stageIndex + 1} nested key={stage.title} />
         ))}
       </div>
+      <CaseStudyCampaignOutcome project={project} section={section} sectionIndex={sectionIndex} />
     </section>
   );
 }
@@ -3066,6 +3083,7 @@ function CaseStudyFeatureSection({ project, section, sectionIndex, sectionNumber
           <cite>{section.quote.attribution}</cite>
         </blockquote>
       )}
+      <CaseStudyCampaignOutcome project={project} section={section} sectionIndex={sectionIndex} />
     </section>
   );
 }
@@ -3082,6 +3100,7 @@ function CaseStudyPage({ clock, navigate, project }) {
   const projectIndex = visibleProjects.findIndex((item) => item.slug === project.slug);
   const nextProject = projectIndex >= 0 ? visibleProjects[(projectIndex + 1) % visibleProjects.length] : null;
   const publishedArticle = project.mediaSections?.find((section) => section.article)?.article;
+  const outcomeTarget = project.outcomeTarget || "project-impact";
 
   return (
     <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}`}>
@@ -3104,7 +3123,7 @@ function CaseStudyPage({ clock, navigate, project }) {
             <div className="case-study-intro">{project.description}</div>
             <div className="immersive-project-actions">
               {project.sourceUrl && <a className="case-study-source" href={/^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl)} target="_blank" rel="noreferrer">{project.sourceLabel || "View source"} <Arrow /></a>}
-              <a href="#project-impact" onClick={(event) => { event.preventDefault(); document.getElementById("project-impact")?.scrollIntoView({ behavior: "smooth" }); }}>See the outcome <span aria-hidden="true">↓</span></a>
+              <a href={`#${outcomeTarget}`} onClick={(event) => { event.preventDefault(); document.getElementById(outcomeTarget)?.scrollIntoView({ behavior: "smooth" }); }}>{project.outcomeLabel || "See the outcome"} <span aria-hidden="true">↓</span></a>
             </div>
           </div>
         </header>
@@ -3164,12 +3183,12 @@ function CaseStudyPage({ clock, navigate, project }) {
             </div>
           </section>
         )}
-        <section className="case-study-impact immersive-project-impact reveal" id="project-impact" aria-labelledby={`${project.slug}-impact`}>
+        {project.showSharedImpact !== false && <section className="case-study-impact immersive-project-impact reveal" id="project-impact" aria-labelledby={`${project.slug}-impact`}>
           <div><span>Outcome</span><h2 id={`${project.slug}-impact`}>What the work made possible.</h2></div>
           <ol>
             {project.impact.map((item, index) => <li key={item}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}
           </ol>
-        </section>
+        </section>}
         <nav className="immersive-project-next reveal" aria-label="Continue exploring projects">
           <span>{nextProject ? "Next project" : "Continue exploring"}</span>
           <a href={routeHref(nextProject ? `project/${nextProject.slug}` : backRoute)} onClick={(event) => navigate(event, "/", nextProject ? `project/${nextProject.slug}` : backRoute)}>{nextProject ? nextProject.title : `Return to ${backLabel}`} <span aria-hidden="true">↗</span></a>
@@ -3949,7 +3968,7 @@ function caseStudyProgressSectionsFor(project) {
     ...(project.proofMetrics?.length ? [{ id: "structured-proof", label: "Results" }] : []),
     ...(project.mediaSections || []).map((section, index) => ({ id: `project-feature-${index}`, label: section.title })),
     ...(project.subprojects?.length ? [{ id: "project-collection", label: "Project collection" }] : []),
-    { id: "project-impact", label: "Impact" },
+    ...(project.showSharedImpact !== false ? [{ id: "project-impact", label: "Impact" }] : []),
   ];
 }
 

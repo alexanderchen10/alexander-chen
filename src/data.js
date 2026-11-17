@@ -491,6 +491,10 @@ export const workProjects = [
     aspect: "16 / 9",
     sourceUrl: "https://vimeo.com/1247665834",
     sourceLabel: "Watch Oakville launch film",
+    showSharedImpact: false,
+    showProofStrip: false,
+    outcomeTarget: "project-feature-0-outcome",
+    outcomeLabel: "See campaign outcomes",
     impact: [
       "Delivered the first Grand River Rapids playoff reel by 3:30 PM, immediately after a three-hour live capture session.",
       "Extended Corcoran's sponsorship into same-day Story clips, two social reels, match coverage, reactions, and a team testimonial.",
@@ -523,6 +527,10 @@ export const workProjects = [
         eyebrow: "Sponsor activation",
         title: "Turn three live hours into same-day playoff energy.",
         description: "Corcoran Horizon Realty sponsored the Grand River Rapids at the CNPL Playoff Championships. The brief covered the Rapids match, behind-the-scenes moments, sponsor visibility, and the people around the team, then moved the strongest footage into live Story clips and a first reel delivered before the session ended.",
+        outcomes: [
+          "Delivered the first Grand River Rapids playoff reel by 3:30 PM, immediately after a three-hour live capture session.",
+          "Extended Corcoran's sponsorship into same-day Story clips, two social reels, match coverage, reactions, and a team testimonial.",
+        ],
         layout: "portrait-pair",
         quote: {
           text: "We’re impressed with the quick turnaround and quality; that’s what we’re looking for.",
@@ -550,6 +558,9 @@ export const workProjects = [
         eyebrow: "Oakville campaign",
         title: "Oakville Grand Opening",
         description: "From interview planning to social cutdowns and the complete launch film.",
+        outcomes: [
+          "Produced a complete Oakville launch film and social cutdowns using a structured path from interview planning to final delivery.",
+        ],
         sections: [
           {
             eyebrow: "Script & edit plan",
