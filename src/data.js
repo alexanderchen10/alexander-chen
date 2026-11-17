@@ -520,7 +520,7 @@ export const workProjects = [
     ],
     mediaSections: [
       {
-        eyebrow: "01 / Sponsor activation",
+        eyebrow: "Sponsor activation",
         title: "Turn three live hours into same-day playoff energy.",
         description: "Corcoran Horizon Realty sponsored the Grand River Rapids at the CNPL Playoff Championships. The brief covered the Rapids match, behind-the-scenes moments, sponsor visibility, and the people around the team, then moved the strongest footage into live Story clips and a first reel delivered before the session ended.",
         layout: "portrait-pair",
@@ -547,53 +547,60 @@ export const workProjects = [
         ],
       },
       {
-        eyebrow: "02 / Oakville edit architecture",
-        title: "Find one story inside three interviews.",
-        description: "The editor outline mapped source clips, speaker balance, clean in and out points, lower thirds, and the intended talking-head runtime before the timeline was assembled. That structure kept the final cut focused while preserving a distinct voice for each speaker.",
-        layout: "wide",
-        items: [
+        eyebrow: "Oakville campaign",
+        title: "Oakville Grand Opening",
+        description: "From interview planning to social cutdowns and the complete launch film.",
+        sections: [
           {
-            type: "image",
-            src: "/projects/work/corcoran/process/editor-outline.png",
-            alt: "Oakville grand-opening editor outline showing three interview sources and the planned speaker balance",
-            caption: "Editor outline · source interviews, speaker balance, and timing",
-            aspect: "792 / 612",
-          },
-        ],
-      },
-      {
-        eyebrow: "03 / Oakville social campaign",
-        title: "Cut the opening for the feed.",
-        description: "Two compact edits show how the same production system moved from an event record into social-first storytelling. The shorter cuts prioritize pace, identity, and atmosphere while staying connected to the longer launch narrative.",
-        layout: "portrait-pair",
-        items: [
-          {
-            type: "video",
-            src: "/projects/work/corcoran/social/oakville-teaser.m4v",
-            mime: "video/mp4",
-            caption: "Oakville teaser · social cutdown",
-            aspect: "9 / 16",
+            eyebrow: "Script & edit plan",
+            title: "Find one story inside three interviews.",
+            description: "The editor outline mapped source clips, speaker balance, clean in and out points, lower thirds, and the intended talking-head runtime before the timeline was assembled. That structure kept the final cut focused while preserving a distinct voice for each speaker.",
+            layout: "wide",
+            items: [
+              {
+                type: "image",
+                src: "/projects/work/corcoran/process/editor-outline.png",
+                alt: "Oakville grand-opening editor outline showing three interview sources and the planned speaker balance",
+                caption: "Editor outline · source interviews, speaker balance, and timing",
+                aspect: "792 / 612",
+              },
+            ],
           },
           {
-            type: "video",
-            src: "/projects/work/corcoran/social/oakville-cinematic.m4v",
-            mime: "video/mp4",
-            caption: "Cinematic Oakville trailer · social cutdown",
-            aspect: "9 / 16",
+            eyebrow: "Social cutdowns",
+            title: "Cut the opening for the feed.",
+            description: "Two compact edits show how the same production system moved from an event record into social-first storytelling. The shorter cuts prioritize pace, identity, and atmosphere while staying connected to the longer launch narrative.",
+            layout: "portrait-pair",
+            items: [
+              {
+                type: "video",
+                src: "/projects/work/corcoran/social/oakville-teaser.m4v",
+                mime: "video/mp4",
+                caption: "Oakville teaser · social cutdown",
+                aspect: "9 / 16",
+              },
+              {
+                type: "video",
+                src: "/projects/work/corcoran/social/oakville-cinematic.m4v",
+                mime: "video/mp4",
+                caption: "Cinematic Oakville trailer · social cutdown",
+                aspect: "9 / 16",
+              },
+            ],
           },
-        ],
-      },
-      {
-        eyebrow: "04 / Oakville final launch film",
-        title: "A new Corcoran chapter in Oakville.",
-        description: "The finished event film brings the interview architecture, office details, guests, and opening-night energy into one focused public piece.",
-        layout: "wide",
-        items: [
           {
-            type: "vimeo",
-            videoId: "1247665834",
-            caption: "Oakville Grand Opening · complete event film",
-            aspect: "16 / 9",
+            eyebrow: "Final launch film",
+            title: "A new Corcoran chapter in Oakville.",
+            description: "The finished event film brings the interview architecture, office details, guests, and opening-night energy into one focused public piece.",
+            layout: "wide",
+            items: [
+              {
+                type: "vimeo",
+                videoId: "1247665834",
+                caption: "Oakville Grand Opening · complete event film",
+                aspect: "16 / 9",
+              },
+            ],
           },
         ],
       },

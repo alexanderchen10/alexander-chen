@@ -2837,6 +2837,15 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; }
 .immersive-chapter-heading > p span { display: grid; width: 34px; aspect-ratio: 1; place-content: center; border: 1px solid rgba(115,87,255,.25); border-radius: 50%; }
 .immersive-chapter-heading h2 { max-width: 12ch; font-size: clamp(50px, 6.5vw, 92px); font-weight: 500; letter-spacing: -.075em; line-height: .9; text-wrap: balance; }
 .immersive-chapter-heading > div > p { max-width: 650px; margin-top: 28px; color: var(--ink-50); font-size: clamp(14px, 1.4vw, 18px); line-height: 1.55; }
+.immersive-campaign-contents { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 40px 0 56px; }
+.immersive-campaign-contents a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 0; border-bottom: 1px solid var(--ink-08); color: var(--ink); font-size: 13px; transition: color 220ms ease, border-color 220ms ease; }
+.immersive-campaign-contents a > span:first-child { color: var(--tech-purple); font-size: 10px; }
+.immersive-campaign-contents a:hover, .immersive-campaign-contents a:focus-visible { color: var(--tech-purple); border-color: currentColor; }
+.immersive-project-campaign .immersive-campaign-stage { padding: clamp(40px, 6vw, 80px) 0; background: none; }
+.immersive-project-campaign .immersive-campaign-stage:first-child { padding-top: 0; }
+.immersive-project-campaign .immersive-campaign-stage:last-child { padding-bottom: 0; border-bottom: 0; }
+.immersive-campaign-stage .immersive-chapter-heading h3 { max-width: 21ch; font-size: clamp(32px, 4.2vw, 56px); font-weight: 500; letter-spacing: -.055em; line-height: 1.05; text-wrap: balance; }
+.immersive-campaign-stage .immersive-chapter-heading > div > p { margin-top: 20px; }
 .immersive-gallery-controls { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 70px; color: var(--ink-40); font-family: var(--font-body); font-size: 8px; letter-spacing: .03em; text-transform: uppercase; }
 .immersive-gallery-controls > div { display: flex; gap: 7px; }
 .immersive-gallery-controls button { display: grid; width: 38px; aspect-ratio: 1; place-content: center; border: 1px solid var(--ink-08); border-radius: 50%; background: #fff; cursor: pointer; transition: border-color 200ms ease, background 200ms ease, transform 200ms ease; }

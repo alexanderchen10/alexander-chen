@@ -2948,9 +2948,39 @@ function ProjectDetailPage({ clock, navigate, detail }) {
   );
 }
 
-function CaseStudyFeatureSection({ project, section, sectionIndex }) {
+function CaseStudyCampaignSection({ project, section, sectionIndex }) {
+  const campaignId = `project-feature-${sectionIndex}`;
+
+  return (
+    <section className="immersive-project-chapter immersive-project-campaign" id={campaignId} aria-labelledby={`${project.slug}-campaign-${sectionIndex}`}>
+      <header className="immersive-chapter-heading reveal">
+        <p><span>{String(sectionIndex + 1).padStart(2, "0")}</span>{section.eyebrow}</p>
+        <div>
+          <h2 id={`${project.slug}-campaign-${sectionIndex}`}>{section.title}</h2>
+          {section.description && <p>{section.description}</p>}
+        </div>
+      </header>
+      <nav className="immersive-campaign-contents reveal" aria-label={`${section.title} campaign stages`}>
+        {section.sections.map((stage, stageIndex) => (
+          <a href={`#${campaignId}-stage-${stageIndex}`} key={stage.title} onClick={(event) => {
+            event.preventDefault();
+            document.getElementById(`${campaignId}-stage-${stageIndex}`)?.scrollIntoView({ behavior: "smooth" });
+          }}><span>{String(stageIndex + 1).padStart(2, "0")}</span>{stage.eyebrow}<span aria-hidden="true">↓</span></a>
+        ))}
+      </nav>
+      <div className="immersive-campaign-stages">
+        {section.sections.map((stage, stageIndex) => (
+          <CaseStudyFeatureSection project={project} section={stage} sectionIndex={`${sectionIndex}-stage-${stageIndex}`} sectionNumber={stageIndex + 1} nested key={stage.title} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CaseStudyFeatureSection({ project, section, sectionIndex, sectionNumber = sectionIndex + 1, nested = false }) {
   const railRef = useRef(null);
   const [showAll, setShowAll] = useState(false);
+  const Heading = nested ? "h3" : "h2";
   const isPortraitGrid = section.layout === "portrait-grid";
   const isStaticGrid = isPortraitGrid || ["editorial-grid", "editorial-triptych"].includes(section.layout);
   const visibleItems = showAll || !section.initialCount ? section.items : section.items.slice(0, section.initialCount);
@@ -2963,11 +2993,11 @@ function CaseStudyFeatureSection({ project, section, sectionIndex }) {
   };
 
   return (
-    <section className="immersive-project-chapter reveal" id={`project-feature-${sectionIndex}`} aria-labelledby={`${project.slug}-feature-${sectionIndex}`}>
+    <section className={`immersive-project-chapter reveal${nested ? " immersive-campaign-stage" : ""}`} id={`project-feature-${sectionIndex}`} aria-labelledby={`${project.slug}-feature-${sectionIndex}`}>
       <header className="immersive-chapter-heading">
-        <p><span>{String(sectionIndex + 1).padStart(2, "0")}</span>{section.eyebrow}</p>
+        <p><span>{String(sectionNumber).padStart(2, "0")}</span>{section.eyebrow}</p>
         <div>
-          <h2 id={`${project.slug}-feature-${sectionIndex}`}>{section.title}</h2>
+          <Heading id={`${project.slug}-feature-${sectionIndex}`}>{section.title}</Heading>
           {section.description && <p>{section.description}</p>}
         </div>
       </header>
@@ -3118,7 +3148,9 @@ function CaseStudyPage({ clock, navigate, project }) {
         )}
         {project.showProofStrip !== false && project.impact?.length > 0 && <section className="immersive-proof-strip reveal" aria-label="Project proof">{project.impact.slice(0, 3).map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</section>}
         {project.proofMetrics?.length > 0 && <InteractiveStats key={project.slug} metrics={project.proofMetrics} />}
-        {project.mediaSections?.map((section, sectionIndex) => <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
+        {project.mediaSections?.map((section, sectionIndex) => section.sections?.length
+          ? <CaseStudyCampaignSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />
+          : <CaseStudyFeatureSection project={project} section={section} sectionIndex={sectionIndex} key={section.title} />)}
         {project.subprojects?.length > 0 && (
           <section className="case-study-subprojects immersive-project-collection reveal" id="project-collection" aria-labelledby={`${project.slug}-projects`}>
             <div className="case-study-subprojects-heading">
