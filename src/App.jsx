@@ -8,6 +8,8 @@ import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
 import AlexLifeGame from "./AlexLifeGame";
 import GtaEmailCaseStudy from "./GtaEmailCaseStudy";
+import YouTubeBanner from "./YouTubeBanner";
+import { ProjectHero, ProjectCollectionCard } from "./ProjectPresentation";
 import UtopiaBuyerJourney from "./UtopiaBuyerJourney";
 import UtopiaProcessTimeline from "./UtopiaProcessTimeline";
 import UtopiaSalesChart from "./UtopiaSalesChart";
@@ -500,16 +502,58 @@ function HoverLogoVideo({ logo, video, label }) {
   </div>;
 }
 
-function ProjectCardVideo({ project }) {
+function useReducedMotionPreference() {
   const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReduceMotion(media.matches);
     media.addEventListener("change", update);
+    update();
     return () => media.removeEventListener("change", update);
   }, []);
+  return reduceMotion;
+}
+
+function ProjectCardVideo({ project }) {
+  const reduceMotion = useReducedMotionPreference();
   if (reduceMotion) return <img className="visual project-asset" src={assetHref(project.cardImage)} alt={project.imageAlt || ""} loading="lazy" />;
   return <video className="visual project-asset" src={assetHref(project.cardVideo)} poster={assetHref(project.cardImage)} autoPlay muted loop playsInline preload="metadata" disablePictureInPicture aria-label="Utopia Vinyl walkthrough: browsing new arrivals and opening a record" />;
+}
+
+function ProjectFilmPlayer({ videoId, title }) {
+  return (
+    <iframe
+      className="project-film-player"
+      src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?controls=1&playsinline=1&rel=0`}
+      title={`${title} · complete film`}
+      allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+      referrerPolicy="strict-origin-when-cross-origin"
+      allowFullScreen
+    />
+  );
+}
+
+function ProjectBannerVideo({ project }) {
+  const reduceMotion = useReducedMotionPreference();
+  const { bannerVideo, bannerYouTubeId, bannerStart, bannerEnd, image, imageAlt, poster } = project;
+  if (project.bannerPresentation === "player" && bannerYouTubeId) return <ProjectFilmPlayer videoId={bannerYouTubeId} title={project.title || "Project film"} />;
+  if (reduceMotion) return <img className="visual project-asset" src={assetHref(poster || image)} alt={imageAlt || ""} loading="lazy" />;
+  if (bannerYouTubeId) return <YouTubeBanner videoId={bannerYouTubeId} poster={assetHref(poster || image)} title={project.title || imageAlt || "Project film preview"} start={bannerStart} end={bannerEnd} fit={project.bannerFit || "cover"} />;
+  return (
+    <video
+      className="visual project-asset"
+      src={assetHref(bannerVideo)}
+      poster={assetHref(poster || image)}
+      style={project.bannerFit === "contain" ? { background: "#11111b" } : undefined}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      disablePictureInPicture
+      aria-hidden="true"
+    />
+  );
 }
 
 function ProjectVisual({ project, surface = "detail" }) {
@@ -529,21 +573,8 @@ function ProjectVisual({ project, surface = "detail" }) {
     return <img className="visual project-asset" src={assetHref(cardImage)} alt={imageAlt || ""} loading="lazy" />;
   }
 
-  if (surface === "detail" && bannerVideo) {
-    return (
-      <video
-        className="visual project-asset"
-        src={assetHref(bannerVideo)}
-        poster={assetHref(poster || image)}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        aria-hidden="true"
-      />
-    );
+  if (surface === "detail" && (bannerVideo || project.bannerYouTubeId)) {
+    return <ProjectBannerVideo project={project} />;
   }
 
   if (image) {
@@ -2404,7 +2435,7 @@ function StructuredMediaItem({ item, title, index, presentation }) {
             Your browser does not support embedded video.
           </video>
         ) : item.type === "image" ? (
-          <ZoomableImage src={item.src} alt={item.alt || ""} />
+          <ZoomableImage src={item.src} previewSrc={item.previewSrc} alt={item.alt || ""} />
         ) : (
           <div className="structured-media-placeholder" aria-label={`${item.label} placeholder`}>
             <span>Media placeholder</span>
@@ -2431,21 +2462,17 @@ function StructuredMediaItem({ item, title, index, presentation }) {
 
 function OverviewProjectCard({ project, chapter, entry, projectIndex }) {
   const fallbackCover = [...(entry.items || []), ...(entry.storyboardItems || []), ...(entry.finalOutputItems || [])].find((item) => item.type === "image" || item.poster);
-  const loopVideo = [...(entry.items || []), ...(entry.finalOutputItems || [])].find(item => item.type === "video");
-  const cover = entry.cover ? { src: entry.cover, alt: entry.coverAlt || `${entry.title} project cover` } : fallbackCover;
+  const loopVideo = entry.bannerVideo ? { src: entry.bannerVideo } : [...(entry.items || []), ...(entry.finalOutputItems || [])].find(item => item.type === "video");
+  const cover = entry.bannerPoster || entry.cover ? { src: entry.bannerPoster || entry.cover, alt: entry.coverAlt || `${entry.title} project cover` } : fallbackCover;
   return (
-    <a className="overview-project-card reveal" href={routeHref(projectDetailRoute(project, chapter, projectIndex))}>
-      <div className="overview-project-cover">
-        {cover ? <LoopingPreview src={loopVideo ? assetHref(loopVideo.src) : undefined} poster={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} fit={entry.coverFit} background={entry.coverBackground} /> : <div className="overview-project-cover-placeholder"><span>{chapter.number} / {entry.number || String(projectIndex + 1).padStart(2, "0")}</span><strong>{entry.title}</strong></div>}
-        <span className="overview-project-open" aria-hidden="true">↗</span>
-      </div>
-      <div className="overview-project-copy">
-        <p>{entry.eyebrow}</p>
-        <h3>{entry.title}</h3>
-        <span>{entry.description}</span>
-        <small>View project <span aria-hidden="true">→</span></small>
-      </div>
-    </a>
+    <ProjectCollectionCard
+      href={routeHref(projectDetailRoute(project, chapter, projectIndex))}
+      media={cover ? <LoopingPreview src={loopVideo ? assetHref(loopVideo.src) : undefined} poster={assetHref(cover.poster || cover.src)} alt={cover.alt || ""} fit={entry.bannerFit || entry.coverFit} background={entry.coverBackground} /> : <ProjectVisual project={project} surface="card" />}
+      number={entry.number || String(projectIndex + 1).padStart(2, "0")}
+      eyebrow={entry.eyebrow}
+      title={entry.title}
+      description={entry.description}
+    />
   );
 }
 
@@ -2456,30 +2483,22 @@ function StructuredCaseStudyPage({ clock, navigate, project }) {
   const progressSections = useMemo(() => structuredProgressSectionsFor(project), [project]);
 
   return (
-    <main className={`main-content case-study-page structured-case-study-page immersive-project-page structured-case-study-${project.slug}`}>
+    <main className={`main-content project-presentation case-study-page structured-case-study-page immersive-project-page structured-case-study-${project.slug}`}>
       <article className="case-study structured-case-study">
-        <header className="structured-case-study-hero reveal reveal-fast" id="structured-overview">
-          <div className="structured-case-study-hero-media" style={{ "--hero-aspect": project.aspect || "16 / 10" }}>
-            <ProjectVisual project={project} />
-            <span className="structured-hero-index">01 / {String(progressSections.length).padStart(2, "0")}</span>
-          </div>
-          <div className="structured-case-study-hero-copy">
-            <a className="case-study-back" href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>
-              <span aria-hidden="true">←</span> selected work
-            </a>
-            <p>{project.coverEyebrow || "Selected case study"}</p>
-            <h1>{project.caseStudyTitle || project.organization || project.title}</h1>
-            <div className="structured-case-study-lede">{project.description}</div>
-            <dl className="structured-case-study-meta" aria-label="Project details">
-              <div><dt>Role</dt><dd>{project.role}</dd></div>
-              <div><dt>Timeline</dt><dd>{project.period}</dd></div>
-              {project.format && <div><dt>Format</dt><dd>{project.format}</dd></div>}
-            </dl>
-            <a className="project-scroll-cue" href={`#structured-work`} onClick={(event) => { event.preventDefault(); document.getElementById("structured-work")?.scrollIntoView({ behavior: "smooth" }); }}>
-              Explore the project <span aria-hidden="true">↓</span>
-            </a>
-          </div>
-        </header>
+        <ProjectHero
+          id="structured-overview"
+          title={project.caseStudyTitle || project.organization || project.title}
+          eyebrow={project.coverEyebrow || "Selected case study"}
+          description={project.description}
+          backHref={routeHref("work")}
+          backLabel="selected work"
+          onBack={(event) => navigate(event, "/", "work")}
+          media={<ProjectVisual project={project} />}
+          mediaFit={project.bannerFit || "cover"}
+          counter={`01 / ${String(progressSections.length).padStart(2, "0")}`}
+          meta={[{ label: "Role", value: project.role }, { label: "Timeline", value: project.period }, ...(project.format ? [{ label: "Format", value: project.format }] : [])]}
+          actions={<a className="project-scroll-cue" href="#structured-work" onClick={(event) => { event.preventDefault(); document.getElementById("structured-work")?.scrollIntoView({ behavior: "smooth" }); }}>Explore the project <span aria-hidden="true">↓</span></a>}
+        />
 
         {project.thesis && <section className="structured-thesis reveal" id="structured-thesis" aria-labelledby={`${project.slug}-thesis`}>
           <p>{project.thesis.label || "Working principle"}</p>
@@ -2796,6 +2815,10 @@ function ProjectDetailPage({ clock, navigate, detail }) {
   const sections = detailSectionsFor(entry);
   const projectRoute = `project/${project.slug}`;
   const heroImages = (entry.heroItems || entry.items || []).filter((item) => item.type === "image" && item.hero !== false);
+  const heroCover = entry.cover || heroImages[0]?.previewSrc || heroImages[0]?.src || (entry.items || []).find(item => item.poster)?.poster;
+  const heroCoverItem = [...(entry.heroItems || []), ...(entry.items || [])].find(item => item.type === "image" && (item.src === heroCover || item.previewSrc === heroCover));
+  const heroOriginal = heroCoverItem?.src || heroCover;
+  const supportingHeroImages = (entry.heroItems || []).filter(item => item.type === "image" && item.src !== heroOriginal && !(entry.items || []).some(media => media.src === item.src));
   const entries = project.chapters.flatMap((section) => section.projects.map((item, itemIndex) => ({ chapter: section, entry: item, index: itemIndex })));
   const currentIndex = entries.findIndex((item) => item.chapter.id === chapter.id && item.index === index);
   const next = entries[currentIndex + 1];
@@ -2809,7 +2832,7 @@ function ProjectDetailPage({ clock, navigate, detail }) {
   };
 
   return (
-    <main className={`main-content project-detail-page structured-case-study-${project.slug}${entry.mediaPresentation === "instagram-phone" ? " project-detail-editorial" : ""}`}>
+    <main className={`main-content project-presentation project-detail-page structured-case-study-${project.slug}${entry.mediaPresentation === "instagram-phone" ? " project-detail-editorial" : ""}`}>
       <article className={`project-detail${heroImages.length === 0 ? " project-detail-no-hero" : ""}`}>
         <nav className="project-detail-breadcrumb reveal reveal-fast" aria-label="Breadcrumb">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>work</a>
@@ -2818,21 +2841,26 @@ function ProjectDetailPage({ clock, navigate, detail }) {
           <span aria-hidden="true">/</span>
           <span aria-current="page">{entry.title}</span>
         </nav>
-        <nav className="project-detail-mobile-nav" aria-label={`${entry.title} sections`}>{sections.map((section) => <a href={routeHref(projectDetailRoute(project, chapter, index))} onClick={(event) => { event.preventDefault(); document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }} key={section.id}>{section.label}</a>)}</nav>
-        {heroImages.length > 0 && (
-          <div className={`project-detail-hero project-detail-hero-${heroImages.length} reveal`}>
-            {heroImages.map((item) => <ProjectDetailHeroItem item={item} key={item.src} />)}
-          </div>
-        )}
-        <header className="project-detail-intro reveal">
-          <p>{entry.eyebrow} <span>·</span> {project.title}</p>
-          <h1>{entry.title}</h1>
-          <div>{entry.description}</div>
-          {entry.meta?.length > 0 && <dl className="project-detail-intro-meta" aria-label={`${entry.title} project details`}>
-            {entry.meta.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}
-          </dl>}
-          {entry.profileUrl && <a className="project-detail-profile-button" href={entry.profileUrl} target="_blank" rel="noopener noreferrer">Explore @tt_supermarket on Instagram <span aria-hidden="true">↗</span></a>}
-        </header>
+        <ProjectHero
+          id="detail-overview"
+          title={entry.title}
+          eyebrow={<>{entry.eyebrow} · {project.title}</>}
+          description={entry.description}
+          backHref={routeHref(projectRoute)}
+          backLabel={project.title}
+          onBack={(event) => navigate(event, "/", projectRoute)}
+          media={entry.bannerVideo || entry.bannerYouTubeId ? <ProjectBannerVideo project={{ ...entry, poster: entry.bannerPoster || heroCover, image: heroCover, imageAlt: entry.coverAlt || entry.title }} /> : heroCover ? <ZoomableImage src={heroOriginal} previewSrc={heroCover} alt={entry.coverAlt || heroImages[0]?.alt || `${entry.title} project cover`} loading="eager" /> : <ProjectVisual project={{ ...project, bannerVideo: undefined, bannerYouTubeId: undefined }} />}
+          mediaPresentation={entry.bannerPresentation}
+          mediaFit={entry.bannerFit || (entry.bannerVideo || entry.bannerYouTubeId ? "cover" : entry.coverFit || heroImages[0]?.fit || "cover")}
+          counter={`01 / ${String(sections.length + 1).padStart(2, "0")}`}
+          meta={entry.meta}
+          actions={<>
+            <a href={hasSplitWork ? "#detail-storyboard" : "#detail-work"} onClick={(event) => { event.preventDefault(); document.getElementById(hasSplitWork ? "detail-storyboard" : "detail-work")?.scrollIntoView({ behavior: "smooth" }); }}>Explore the project <span aria-hidden="true">↓</span></a>
+            {entry.bannerSourceUrl && <a href={entry.bannerSourceUrl} target="_blank" rel="noopener noreferrer">Watch the film <span aria-hidden="true">↗</span></a>}
+            {entry.profileUrl && <a href={entry.profileUrl} target="_blank" rel="noopener noreferrer">Explore @tt_supermarket on Instagram <span aria-hidden="true">↗</span></a>}
+          </>}
+        />
+        {supportingHeroImages.length > 0 && <div className="project-presentation-supporting-media">{supportingHeroImages.map(item => <ProjectDetailHeroItem item={item} key={item.src} />)}</div>}
         <section className="project-detail-section reveal" id="detail-context">
           <ProjectDetailSectionHeading label={entry.mediaPresentation === "instagram-phone" ? "context" : "01 / context"} title={entry.contextHeading || "The bigger picture."} />
           <div className="project-detail-section-body">
@@ -3104,30 +3132,29 @@ function CaseStudyPage({ clock, navigate, project }) {
   const outcomeTarget = project.outcomeTarget || "project-impact";
 
   return (
-    <main className={`main-content case-study-page immersive-project-page immersive-project-${project.slug}${isCampaignIndex ? " immersive-project-index-page" : ""}`}>
+    <main className={`main-content project-presentation case-study-page immersive-project-page immersive-project-${project.slug}${isCampaignIndex ? " immersive-project-index-page" : ""}`}>
       <article className="case-study immersive-case-study">
-        <header className="immersive-project-hero" id="project-overview">
-          <div className="immersive-project-hero-media reveal reveal-fast" style={{ "--aspect": project.aspect || "16 / 10" }}>
-            <ProjectVisual project={project} />
-            {publishedArticle && (
-              <p className="immersive-project-publication-meta">
-                <span>{publishedArticle.publisher}</span>
-                <time dateTime={publishedArticle.dateTime}>{publishedArticle.date}</time>
-              </p>
-            )}
-            <span className="immersive-project-counter">01 / {String(sections.length).padStart(2, "0")}</span>
-          </div>
-          <div className="immersive-project-hero-copy reveal">
-            <a className="case-study-back" href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}><span aria-hidden="true">←</span> {backLabel}</a>
-            <p>{project.status && <span className="case-study-status">{project.status}</span>}{project.coverEyebrow}</p>
-            <h1>{project.title}</h1>
-            <div className="case-study-intro">{project.description}</div>
-            <div className="immersive-project-actions">
-              {project.sourceUrl && <a className="case-study-source" href={/^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl)} target="_blank" rel="noreferrer">{project.sourceLabel || "View source"} <Arrow /></a>}
-              <a href={`#${outcomeTarget}`} onClick={(event) => { event.preventDefault(); document.getElementById(outcomeTarget)?.scrollIntoView({ behavior: "smooth" }); }}>{project.outcomeLabel || "See the outcome"} <span aria-hidden="true">↓</span></a>
-            </div>
-          </div>
-        </header>
+        <ProjectHero
+          id="project-overview"
+          title={project.title}
+          eyebrow={project.coverEyebrow}
+          status={project.status}
+          description={project.description}
+          backHref={routeHref(backRoute)}
+          backLabel={backLabel}
+          onBack={(event) => navigate(event, "/", backRoute)}
+          media={<ProjectVisual project={project} />}
+          mediaFit={project.bannerFit || "cover"}
+          mediaPosition={project.slug === "veerah" ? "50% 38%" : undefined}
+          mediaPresentation={project.bannerPresentation}
+          mediaAspect={project.bannerAspect}
+          publishedArticle={publishedArticle}
+          counter={`01 / ${String(sections.length).padStart(2, "0")}`}
+          actions={<>
+            {project.sourceUrl && <a className="case-study-source" href={/^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl)} target="_blank" rel="noreferrer">{project.sourceLabel || "View source"} <Arrow /></a>}
+            <a href={`#${outcomeTarget}`} onClick={(event) => { event.preventDefault(); document.getElementById(outcomeTarget)?.scrollIntoView({ behavior: "smooth" }); }}>{project.outcomeLabel || "See the outcome"} <span aria-hidden="true">↓</span></a>
+          </>}
+        />
         {!isCampaignIndex && <section className="immersive-project-brief reveal" aria-label="Project brief">
           <div>
             <span>Project thesis</span>
@@ -3148,24 +3175,19 @@ function CaseStudyPage({ clock, navigate, project }) {
             <div>
               {project.projectCollection.map((item) => {
                 const previewVideo = item.previewVideo || project.mediaSections?.[Number(item.target?.split("-").pop())]?.items?.find(media => media.type === "video")?.src;
-                return <a href={item.route ? routeHref(item.route) : `#${item.target}`} key={item.title} onClick={(event) => {
-                  if (item.route) navigate(event, "/", item.route);
-                  else {
-                    event.preventDefault();
-                    document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}>
-                  <figure>
-                    <LoopingPreview src={previewVideo ? assetHref(previewVideo) : undefined} poster={assetHref(item.image)} alt={item.imageAlt || ""} />
-                  </figure>
-                  <span>{item.number}</span>
-                  <div>
-                    <p>{item.meta}</p>
-                    <h3>{item.title}</h3>
-                    <small>{item.summary}</small>
-                  </div>
-                  <b aria-hidden="true">{item.route ? "↗" : "↓"}</b>
-                </a>;
+                return <ProjectCollectionCard
+                  href={item.route ? routeHref(item.route) : `#${item.target}`}
+                  key={item.title}
+                  onClick={(event) => {
+                    if (item.route) navigate(event, "/", item.route);
+                    else { event.preventDefault(); document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" }); }
+                  }}
+                  media={<LoopingPreview src={previewVideo ? assetHref(previewVideo) : undefined} poster={assetHref(item.image)} alt={item.imageAlt || ""} />}
+                  number={item.number}
+                  eyebrow={item.meta}
+                  title={item.title}
+                  description={item.summary}
+                />;
               })}
             </div>
           </nav>
@@ -3183,7 +3205,7 @@ function CaseStudyPage({ clock, navigate, project }) {
             </div>
             <div className="case-study-subproject-grid">
               {project.subprojects.map((subproject, index) => (
-                <ProjectCard project={subproject} index={index} key={subproject.slug} />
+                <ProjectCollectionCard href={routeHref(`project/${subproject.slug}`)} onClick={(event) => navigate(event, "/", `project/${subproject.slug}`)} media={<ProjectVisual project={subproject} surface="card" />} number={String(index + 1).padStart(2, "0")} eyebrow={subproject.coverEyebrow} title={subproject.title} description={subproject.description} key={subproject.slug} />
               ))}
             </div>
           </section>
@@ -3406,28 +3428,30 @@ function UtopiaVinylPage({ clock, navigate, project }) {
   const reportUrl = /^https?:\/\//.test(project.sourceUrl) ? project.sourceUrl : assetHref(project.sourceUrl);
 
   return (
-    <main className="main-content utopia-page" ref={pageRef}>
-      <header className="utopia-hero" id="utopia-overview" aria-labelledby="utopia-title">
-        <div className="utopia-hero-media">
+    <main className="main-content project-presentation utopia-page" ref={pageRef}>
+      <ProjectHero
+        id="utopia-overview"
+        titleId="utopia-title"
+        title="Utopia Vinyl"
+        status="Ongoing"
+        eyebrow="Product design · Independent commerce"
+        description="I’m helping my father’s record collection find its next listeners."
+        backHref={routeHref("work")}
+        backLabel="selected work"
+        onBack={(event) => navigate(event, "/", "work")}
+        media={<div className="utopia-hero-media">
           <div className="utopia-storefront-preview">
             <div className="utopia-storefront-bar"><span aria-hidden="true"><i /><i /><i /></span><span>utopiavinyl.com.tw</span></div>
             <UtopiaStorefrontDemo />
           </div>
           <p className="utopia-hero-media-caption"><span>Guided storefront demo</span><span>Browse · catalogue · record details</span></p>
-        </div>
-        <div className="utopia-hero-copy">
-          <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}><span aria-hidden="true">←</span> selected work</a>
-          <div className="utopia-hero-intro">
-            <p className="utopia-hero-eyebrow"><span>Ongoing</span> Product design · Independent commerce</p>
-            <h1 id="utopia-title">Utopia Vinyl</h1>
-            <p className="utopia-hero-lede">I’m helping my father’s record collection find its next listeners.</p>
-            <div className="utopia-hero-actions">
-              <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Explore the project <span aria-hidden="true">↓</span></button>
-              <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
-            </div>
-          </div>
-        </div>
-      </header>
+        </div>}
+        counter="01 / 07"
+        actions={<>
+          <button type="button" onClick={() => scrollToScene(utopiaScenes[0])}>Explore the project <span aria-hidden="true">↓</span></button>
+          <a href={reportUrl} target="_blank" rel="noreferrer">November 4 report (archive) <Arrow /></a>
+        </>}
+      />
 
       <section className="utopia-origin" aria-labelledby="utopia-origin-title">
         <p>THE STARTING POINT</p>
@@ -3499,7 +3523,7 @@ function IcffCollectionPage({ clock, navigate, project }) {
   };
 
   return (
-    <main className="main-content icff-hub-page">
+    <main className="main-content project-presentation icff-hub-page">
       <article className="icff-hub" aria-labelledby="icff-hub-title">
         <nav className="icff-hub-mobile-nav" aria-label="ICFF collection navigation">
           <a href={routeHref("work")} onClick={(event) => navigate(event, "/", "work")}>Back to work</a>
@@ -3509,14 +3533,18 @@ function IcffCollectionPage({ clock, navigate, project }) {
           <a className={activeSection === "icff-featured-projects" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-featured-projects")}>Featured Projects</a>
         </nav>
 
-        <div className="icff-hub-cover reveal reveal-fast">
-          <img src={assetHref(project.image)} alt={project.imageAlt} fetchPriority="high" />
-        </div>
-        <header className="icff-hub-header reveal">
-          <p>{project.coverEyebrow}</p>
-          <h1 id="icff-hub-title">{project.title}</h1>
-          <div>{project.description}</div>
-        </header>
+        <ProjectHero
+          id="icff-hub-overview"
+          titleId="icff-hub-title"
+          title={project.title}
+          eyebrow={project.coverEyebrow}
+          description={project.description}
+          backHref={routeHref("work")}
+          backLabel="selected work"
+          onBack={(event) => navigate(event, "/", "work")}
+          media={<ProjectVisual project={project} />}
+          actions={<a href="#icff-featured-projects" onClick={(event) => scrollToSection(event, "icff-featured-projects")}>Explore the projects <span aria-hidden="true">↓</span></a>}
+        />
 
         <div className="icff-hub-facts">
           <section className="icff-hub-fact reveal" id="icff-role">
@@ -3593,30 +3621,28 @@ function IcffGalleryPage({ clock, navigate, project }) {
   );
 
   return (
-    <main className="main-content icff-page">
+    <main className="main-content project-presentation icff-page">
       <article aria-labelledby="icff-title">
-        <nav className="icff-mobile-subnav" aria-label="ICFF page navigation">
-          <a href={routeHref(backRoute)} onClick={(event) => navigate(event, "/", backRoute)}>{backLabel}</a>
-          <a className={activeSection === "icff-context" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-context")}>context</a>
-          <a className={activeSection === "icff-photoshoot" ? "active" : ""} href={routeHref(`project/${project.slug}`)} onClick={(event) => scrollToSection(event, "icff-photoshoot")}>photoshoot</a>
-        </nav>
-        <header className="icff-intro reveal reveal-fast" id="icff-context">
-          <div className="icff-intro-copy">
-            <p className="icff-eyebrow">ICFF · Lavazza IncluCity Festival</p>
-            <h1 id="icff-title">{project.title}</h1>
-            <p className="icff-lede">{project.description}</p>
-            <div className="icff-credit">
-              <span>{project.role}</span>
-              <span>Toronto, Canada</span>
-            </div>
-            <div className="icff-context-grid" aria-label="Project details">
-              <div><span>team</span><p>ICFF creative and production team</p></div>
-              <div><span>my role</span><p>{project.role}</p></div>
-              <div><span>focus</span><p>Editorial portraits<br />Candid festival storytelling</p></div>
-              <div><span>duration</span><p>{project.period}</p></div>
-            </div>
-          </div>
-        </header>
+        <ProjectHero
+          id="icff-context"
+          titleId="icff-title"
+          title={project.title}
+          eyebrow="ICFF · Lavazza IncluCity Festival"
+          description={project.description}
+          backHref={routeHref(backRoute)}
+          backLabel={backLabel}
+          onBack={(event) => navigate(event, "/", backRoute)}
+          media={<ProjectVisual project={project} />}
+          counter="01 / 02"
+          meta={[
+            { label: "Team", value: "ICFF creative and production team" },
+            { label: "My role", value: project.role },
+            { label: "Focus", value: "Editorial portraits · Candid festival storytelling" },
+            { label: "Duration", value: project.period },
+            { label: "Location", value: "Toronto, Canada" },
+          ]}
+          actions={<a href="#icff-photoshoot" onClick={(event) => scrollToSection(event, "icff-photoshoot")}>Explore the photographs <span aria-hidden="true">↓</span></a>}
+        />
 
         <section className="icff-photoshoot" id="icff-photoshoot" aria-label="ICFF Lavazza IncluCity Festival photo gallery">
           <div className="icff-gallery icff-gallery-portraits">
@@ -3981,7 +4007,7 @@ function projectProgressFor(project, detail) {
   if (detail) {
     return {
       label: `${detail.entry.title} project journey`,
-      sections: detailSectionsFor(detail.entry).map((section) => ({ id: section.id, label: section.label })),
+      sections: [{ id: "detail-overview", label: "Overview" }, ...detailSectionsFor(detail.entry).map((section) => ({ id: section.id, label: section.label }))],
     };
   }
 
@@ -4071,7 +4097,6 @@ export default function App() {
   const isPlayground = page.startsWith("playground");
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
-  const isUtopia = selectedProject?.slug === "utopia-vinyl";
   const homeProgress = {
     work: { label: "Projects section", containerId: "home-collaborators", sections: [{ id: "home-collaborators", label: "Collaborators" }, { id: "work", label: "Projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-project-collection", label: "All projects" }] },
     experience: { label: "Professional experience", containerId: "experience", sections: about.experience.map((item,index)=>({id:`experience-role-${index}`,label:item.organization})) },
@@ -4107,7 +4132,7 @@ export default function App() {
 
   return (
     <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
-      {!isPlayground && !isUtopia && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
+      {!isPlayground && !selectedProject && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
       {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
       {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
       {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD {...projectProgress} /></div>}

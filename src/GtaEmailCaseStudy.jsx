@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { beforeEmail, afterEmail } from './GtaEmailPreviews';
+import { ProjectHero } from './ProjectPresentation';
 import './GtaEmailCaseStudy.css';
 
 const reports = [
@@ -108,19 +109,27 @@ export default function GtaEmailCaseStudy() {
   const value=metric.before+(metric.after-metric.before)*chart.progress;
   const display=(n,rate)=>format(rate ? n : Math.round(n),rate);
   const max=Math.max(metric.before,metric.after)*1.15;
-  return <main className="main-content gta-case gta-case-v2">
-    <a href="#experience" className="gta-back">← GTA Imaging / Professional experience</a>
-    <header className="gta-hero" id="gta-overview">
-      <p className="gta-kicker">GTA Imaging / Campaign 01 / October 2026</p>
-      <h1>Email campaign<br/>improvements.</h1>
-      <p>I redesigned a B2B newsletter to help professional photographers discover print products, build premium packages and create thoughtful client gifts.</p>
+  return <main className="main-content gta-case gta-case-v2 project-presentation">
+    <ProjectHero
+      id="gta-overview"
+      titleId="gta-title"
+      title="Email campaign improvements."
+      eyebrow="GTA Imaging / Campaign 01 / October 2026"
+      description="I redesigned a B2B newsletter to help professional photographers discover print products, build premium packages and create thoughtful client gifts."
+      backHref="#experience"
+      backLabel="GTA Imaging / Professional experience"
+      media={<img className="visual project-asset" src={`${import.meta.env.BASE_URL}projects/work/gta-imaging/squarespace.png`} alt="GTA Imaging redesigned October newsletter" loading="eager" />}
+      meta={[{ label: 'Role', value: 'Client Success & Email Marketing Specialist' }, { label: 'Timeline', value: 'October 2026' }]}
+      actions={<a href="#gta-results" onClick={event=>{event.preventDefault();document.getElementById('gta-results')?.scrollIntoView({behavior:'smooth'});}}>Explore the results <span aria-hidden="true">↓</span></a>}
+    />
+    <div className="gta-overview-results" role="region" aria-label="Campaign improvement summary">
       <div className="gta-live-label"><span/> From Constant Contact to Squarespace</div>
       <div className="gta-highlights gta-countups" ref={hero.ref}>
         {[metrics[0],metrics[1],metrics[2]].map(item=><div key={item.label}><span className="gta-baseline">{display(item.before,item.rate)} <span aria-hidden="true">↗</span></span><strong aria-hidden="true">{display(item.before+(item.after-item.before)*hero.progress,item.rate)}</strong><span className="sr-only">{item.label}: {display(item.before,item.rate)} to {display(item.after,item.rate)}</span><span>{item.label.toLowerCase()}</span><small>Constant Contact → Squarespace</small></div>)}
       </div>
       <button className="gta-text-button" type="button" onClick={hero.replay}>↺ Replay the improvement</button>
       <p className="gta-small">My role: Client Success & Email Marketing Specialist · Content strategy, copywriting, newsletter design and performance analysis.</p>
-    </header>
+    </div>
     <nav className="gta-chapter-links" aria-label="Campaign chapters" onClick={event=>{const a=event.target.closest('a');if(a){event.preventDefault();document.getElementById(a.hash.slice(1))?.scrollIntoView({behavior:'smooth'});}}}><a href="#gta-design">01 / The opportunity</a><a href="#gta-changes">02 / What changed</a><a href="#gta-results">03 / The results</a></nav>
     <section id="gta-design"><p className="gta-kicker">01 / The opportunity</p><h2>Turn readers into product explorers.</h2><p>The existing newsletter provided useful onboarding and production information. I wanted to make the next step easier: connect albums and seasonal gifts to the services photographers could offer their own clients.</p><div className="gta-context-strip"><div><strong>Business goal</strong><p>Support product discovery and cross-selling.</p></div><div><strong>Audience</strong><p>Professional photographers across Canada.</p></div><div><strong>Creative approach</strong><p>Editorial design, product benefits and direct calls to action.</p></div></div></section>
     <section id="gta-changes"><p className="gta-kicker">02 / What changed</p><h2>A clearer path from inspiration to product.</h2><div className="gta-table-wrap"><table><thead><tr><th>Design & messaging</th><th>Previous campaign</th><th>My redesign</th></tr></thead><tbody>{comparisons.map(row=><tr key={row[0]}>{row.map((cell,i)=>i ? <td key={i}>{cell}</td> : <th scope="row" key={i}>{cell}</th>)}</tr>)}</tbody></table></div><p>I paired a cleaner editorial layout with product imagery, material swatches and clearer calls to action. The content connected print products to premium packages, repeat business and thoughtful client gifts.</p><div className="gta-screens"><EmailWalkthrough index={0}/><EmailWalkthrough index={1}/></div></section>

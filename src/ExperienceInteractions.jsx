@@ -118,7 +118,7 @@ export function LoopingPreview({ src, poster, alt = '', fit, background }) {
   }, [playing, loaded]);
   return <span className="looping-project-preview" ref={frame}>
     <img src={poster} alt={alt} loading="lazy" style={{ objectFit: fit, background }} />
-    {loaded && <video ref={video} src={src} poster={poster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} />}
+    {loaded && <video ref={video} src={src} poster={poster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} style={{ objectFit: fit, background }} />}
     {src && <span className="looping-preview-badge" aria-hidden="true">↻ Video preview</span>}
   </span>;
 }

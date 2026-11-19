@@ -1,0 +1,397 @@
+/* Corcoran is the common project shell. Content-specific galleries and tools stay intact. */
+.main-content.project-presentation {
+  --project-gutter: clamp(28px, 7vw, 104px);
+  --project-section-space: clamp(64px, 7vw, 104px);
+  --project-heading-size: clamp(36px, 4vw, 52px);
+  --structured-accent: var(--tech-purple);
+  --structured-accent-ink: var(--ink);
+  --structured-accent-soft: var(--tech-lilac);
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 14px 88px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.project-presentation > article,
+.project-presentation .structured-case-study,
+.project-presentation .project-detail,
+.project-presentation .icff-hub {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+.project-presentation .project-presentation-hero {
+  display: grid;
+  min-height: 420px;
+  height: auto;
+  max-height: none;
+  grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr);
+  overflow: hidden;
+  border: 0;
+  border-radius: 26px;
+  background: #11111b;
+  color: #fff;
+  box-shadow: var(--shadow-raised);
+}
+.project-presentation .project-presentation-hero .project-presentation-hero-media {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 420px;
+  height: auto;
+  aspect-ratio: auto;
+  overflow: hidden;
+  background: #e9eaf2;
+}
+.project-presentation .project-presentation-hero-media > :not(.immersive-project-publication-meta):not(.immersive-project-counter) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.project-presentation .project-presentation-hero-media :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: var(--project-media-fit, cover);
+  object-position: var(--project-media-position, center);
+}
+.project-presentation .project-presentation-hero-media .zoomable-image {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 0;
+}
+.project-presentation .project-presentation-hero-media > .utopia-hero-media {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: clamp(24px, 3vw, 48px);
+  background: radial-gradient(ellipse at 20% 25%, rgba(115, 87, 255, .18), transparent 65%), linear-gradient(145deg, #f1effc, #e0e7f5);
+}
+.project-presentation .project-presentation-hero-media .utopia-storefront-demo video { height: auto; object-fit: contain; }
+.project-presentation .project-presentation-hero-media .utopia-hero-media-caption { font-size: 12px; }
+.project-presentation .project-presentation-hero-media .utopia-storefront-preview { transform: none; }
+.project-presentation .utopia-demo-toggle { min-height: 44px; background: rgba(17,17,27,.9); color: #fff; }
+.project-presentation .utopia-demo-toggle:is(:hover, :focus-visible) { background: #eeeaff; color: #11111b; }
+.project-presentation .project-presentation-hero:hover .project-presentation-hero-media :is(.visual, img, video) {
+  transform: none;
+  filter: none;
+}
+.project-presentation .project-presentation-hero .project-presentation-hero-copy {
+  position: static;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(28px, 4vw, 56px);
+  background: radial-gradient(circle at 75% 15%, rgba(115, 87, 255, .28), transparent 32%), #11111b;
+}
+.project-presentation .project-presentation-hero-copy .case-study-back {
+  position: static;
+  align-self: flex-start;
+  width: fit-content;
+  margin: 0 0 32px;
+  color: #c5c2d2;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.project-presentation .project-presentation-hero-copy .case-study-back:hover {
+  color: #fff;
+}
+.project-presentation .project-presentation-hero-copy > .project-presentation-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #bcb0ff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+.project-presentation .project-presentation-eyebrow .case-study-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid #bcb0ff;
+  border-radius: 99px;
+  background: rgba(115, 87, 255, .18);
+  color: #ede8ff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.project-presentation .project-presentation-hero-media:has(> .utopia-hero-media) > .immersive-project-counter { display: none; }
+.project-presentation .project-presentation-hero-copy > h1 {
+  max-width: 100%;
+  margin: 25px 0 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(44px, 5vw, 72px);
+  font-weight: 500;
+  letter-spacing: -.055em;
+  line-height: .98;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.project-presentation .project-presentation-hero-copy > .case-study-intro {
+  max-width: 42ch;
+  margin: 22px 0 0;
+  color: #d0ced9;
+  font-family: var(--font-body);
+  font-size: clamp(16px, 1.3vw, 18px);
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+.project-presentation .project-presentation-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px 28px;
+  margin: 32px var(--project-gutter) 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--ink-08);
+  border-bottom: 1px solid var(--ink-08);
+}
+.project-presentation .project-presentation-meta > div { min-width: 0; }
+.project-presentation .project-presentation-meta dt {
+  margin: 0 0 6px;
+  color: #6046cf;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+.project-presentation .project-presentation-meta dd {
+  margin: 0;
+  color: var(--ink-65);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.project-presentation .project-presentation-hero-copy > .project-presentation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0 0;
+}
+.project-presentation .project-presentation-actions :is(a, button) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 99px;
+  background: transparent;
+  color: #e0dfe7;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.35;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+.project-presentation .project-presentation-actions :is(a, button):first-child {
+  border-color: #fff;
+  background: #fff;
+  color: #11111b;
+}
+.project-presentation .project-presentation-actions :is(a, button):hover {
+  border-color: #c1b5ff;
+  background: #e5deff;
+  color: #11111b;
+}
+.project-presentation .project-presentation-hero :is(a, button):focus-visible {
+  outline: 2px solid #c1b5ff;
+  outline-offset: 5px;
+}
+.project-presentation .immersive-project-counter { font-size: 12px; }
+.project-presentation .immersive-project-publication-meta { font-size: 12px; }
+
+.project-presentation :is(.immersive-project-index, .structured-thesis, .structured-glossary, .structured-archive, .immersive-project-brief, .immersive-project-chapter, .immersive-project-collection, .project-detail-section, .icff-hub-facts, .icff-hub-projects, .icff-photoshoot) {
+  padding-right: var(--project-gutter);
+  padding-left: var(--project-gutter);
+}
+.project-presentation :is(.structured-thesis, .structured-glossary, .immersive-project-brief, .immersive-project-chapter, .immersive-project-collection, .project-detail-section, .icff-hub-projects) {
+  padding-top: var(--project-section-space);
+  padding-bottom: var(--project-section-space);
+}
+.project-presentation :is(.immersive-project-index, .structured-archive) {
+  padding-top: 56px;
+  padding-bottom: 64px;
+}
+.project-presentation :is(.immersive-project-index > header, .structured-glossary > header, .structured-archive-header, .structured-chapter-header, .immersive-chapter-heading, .project-detail-section-heading) {
+  display: grid;
+  grid-template-columns: minmax(130px, .34fr) minmax(0, 1.66fr);
+  gap: 32px;
+  align-items: start;
+}
+.project-presentation :is(.immersive-project-index > header, .structured-archive-header) {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top: 0;
+}
+.project-presentation :is(.immersive-project-index > header h2, .structured-glossary h2, .structured-thesis h2, .structured-archive-header h2, .structured-chapter-header h2, .immersive-chapter-heading h2, .project-detail-section h2, .icff-hub-projects-heading h2) {
+  max-width: 21ch;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--project-heading-size);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.project-presentation :is(.immersive-project-index > header span, .structured-chapter-header > p, .structured-glossary > header > p, .structured-archive-header > p, .structured-thesis > p, .project-detail-section-label, .immersive-chapter-heading > p) {
+  color: var(--tech-purple);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.project-presentation .project-detail-section-body { margin-top: 24px; }
+.project-presentation .project-detail-breadcrumb { padding: 10px var(--project-gutter) 0; margin-bottom: 24px; font-size: 14px; }
+.project-presentation .project-detail-mobile-nav { margin-inline: var(--project-gutter); }
+.project-presentation .project-presentation-supporting-media { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 40px var(--project-gutter); overflow: hidden; border-radius: 20px; }
+.project-presentation.project-detail-page .project-detail-section h2 { font-size: var(--project-heading-size); font-weight: 500; line-height: 1.08; letter-spacing: -.05em; }
+.project-presentation .structured-chapter { padding-top: 64px; }
+.project-presentation .structured-chapter + .structured-chapter { margin-top: 64px; }
+.project-presentation .structured-archive-header { margin-bottom: 42px; }
+.project-presentation .overview-chapter .structured-chapter-header { margin-bottom: 32px; }
+.project-presentation .immersive-project-index > div,
+.project-presentation .project-presentation-grid,
+.project-presentation .overview-project-grid,
+.project-presentation .case-study-subproject-grid,
+.project-presentation .icff-hub-project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}
+.project-presentation .project-presentation-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 34% 20px minmax(0, 1fr) 24px;
+  gap: 14px;
+  align-items: center;
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid var(--ink-08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .8);
+  color: var(--ink);
+  box-shadow: var(--shadow-surface);
+  text-decoration: none;
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+.project-presentation .project-presentation-card:hover,
+.project-presentation .project-presentation-card:focus-visible {
+  border-color: rgba(115, 87, 255, .5);
+  box-shadow: var(--shadow-raised);
+  transform: none;
+}
+.project-presentation .project-presentation-card:focus-visible { outline: 2px solid var(--tech-purple); outline-offset: 4px; }
+.project-presentation .project-presentation-card > figure {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  margin: 0;
+  border-radius: 13px;
+  background: #e9eaf2;
+}
+.project-presentation .project-presentation-card > figure :is(img, video) { width: 100%; height: 100%; object-fit: cover; transform: none; }
+.project-presentation .project-presentation-card:hover > figure :is(img, video) { transform: none; }
+.project-presentation .project-presentation-card > figure > * { width: 100%; height: 100%; }
+.project-presentation .project-presentation-card-number { align-self: start; padding-top: 8px; color: var(--tech-purple); font-size: 12px; }
+.project-presentation .project-presentation-card > div { min-width: 0; }
+.project-presentation .project-presentation-card p { color: #6046cf; font-size: 12px; line-height: 1.4; letter-spacing: .02em; text-transform: uppercase; }
+.project-presentation .project-presentation-card h3 { margin: 12px 0 0; color: var(--ink); font-size: clamp(21px, 2.1vw, 30px); font-weight: 500; line-height: 1.08; letter-spacing: -.045em; overflow-wrap: anywhere; text-wrap: balance; }
+.project-presentation .project-presentation-card small { display: block; max-width: 38ch; margin-top: 13px; color: var(--ink-50); font-size: 14px; line-height: 1.5; }
+.project-presentation .project-presentation-card > .project-presentation-card-open { display: grid; width: 24px; aspect-ratio: 1; align-content: center; text-align: center; border: 1px solid rgba(115, 87, 255, .3); border-radius: 50%; color: var(--tech-purple); font-size: 14px; font-weight: 400; }
+.project-presentation .project-presentation-card:hover > .project-presentation-card-open { transform: none; }
+.project-presentation :is(.immersive-project-next, .project-detail-next) { padding: 32px var(--project-gutter); }
+.project-presentation :is(.immersive-project-next > a, .project-detail-next > a) { font-size: clamp(24px, 3vw, 36px); line-height: 1.15; }
+.project-presentation .icff-photoshoot { padding-top: var(--project-section-space); }
+.project-presentation.gta-case > :is(section, nav, .gta-live-label, .gta-highlights, .gta-text-button) { margin-right: var(--project-gutter); margin-left: var(--project-gutter); }
+.project-presentation.gta-case > .gta-overview-results { margin: 48px var(--project-gutter) 0; }
+.project-presentation.gta-case > section { margin-top: var(--project-section-space); }
+.project-presentation.gta-case > section > h2 { max-width: 21ch; font-size: var(--project-heading-size); line-height: 1.08; letter-spacing: -.05em; }
+.project-presentation .utopia-origin { margin-top: 56px; }
+
+@media (max-width: 900px) {
+  .project-presentation .project-presentation-hero { grid-template-columns: 1fr; min-height: 0; }
+  .project-presentation .project-presentation-hero .project-presentation-hero-media { min-height: 0; height: clamp(220px, 34vw, 360px); }
+  .project-presentation .project-presentation-hero .project-presentation-hero-copy { min-height: 0; }
+  .project-presentation .project-presentation-hero-copy > h1 { max-width: 22ch; }
+}
+@media (max-width: 809px) {
+  .main-content.project-presentation {
+    --project-gutter: 24px;
+    --project-section-space: 64px;
+    --project-heading-size: clamp(32px, 8vw, 44px);
+    padding: 64px 0 48px;
+  }
+  .project-presentation .project-presentation-hero { border-radius: 0 0 24px 24px; }
+  .project-presentation .project-presentation-hero .project-presentation-hero-media { height: clamp(220px, 52vw, 340px); }
+  .project-presentation .project-presentation-hero .project-presentation-hero-media:has(> .utopia-hero-media) { height: clamp(280px, 62vw, 400px); }
+  .project-presentation .project-presentation-hero .project-presentation-hero-copy { padding: 30px 24px 36px; }
+  .project-presentation .project-presentation-hero-copy .case-study-back { margin-bottom: 26px; }
+  .project-presentation .project-presentation-hero-copy > h1 { margin-top: 22px; font-size: clamp(36px, 9vw, 60px); line-height: 1.04; letter-spacing: -.05em; }
+  .project-presentation .project-presentation-hero-copy > .case-study-intro { font-size: 16px; }
+  .project-presentation .project-presentation-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .project-presentation .project-presentation-hero-media > .utopia-hero-media { gap: 10px; padding: 20px 24px; }
+  .project-presentation .project-presentation-hero-media .utopia-hero-media-caption { font-size: 10px; }
+  .project-presentation .project-presentation-supporting-media { grid-template-columns: 1fr; }
+  .project-presentation :is(.immersive-project-index > header, .structured-glossary > header, .structured-archive-header, .structured-chapter-header, .immersive-chapter-heading, .project-detail-section-heading) { grid-template-columns: 1fr; gap: 20px; }
+  .project-presentation .project-detail-section-heading h2 { grid-column: 1; }
+  .project-presentation .immersive-project-index > div,
+  .project-presentation .project-presentation-grid,
+  .project-presentation .overview-project-grid,
+  .project-presentation .case-study-subproject-grid,
+  .project-presentation .icff-hub-project-grid { grid-template-columns: 1fr; }
+  .project-presentation .project-presentation-card { grid-template-columns: 34% 18px minmax(0, 1fr) 22px; gap: 10px; padding: 12px; }
+  .project-presentation .project-presentation-card small { display: none; }
+  .project-presentation .project-presentation-card h3 { font-size: clamp(19px, 4.8vw, 27px); }
+  .project-presentation .project-presentation-card p { font-size: 12px; }
+  .project-presentation .project-detail-breadcrumb { padding-top: 22px; }
+  .project-presentation .structured-archive-header { margin-bottom: 36px; }
+}
+@media (max-width: 380px) {
+  .project-presentation .project-presentation-meta { grid-template-columns: 1fr; }
+  .project-presentation .project-presentation-card { grid-template-columns: 30% minmax(0, 1fr) 20px; }
+  .project-presentation .project-presentation-card-number { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-presentation .project-presentation-card,
+  .project-presentation .project-presentation-hero :is(img, video, a, button) { animation: none; transition: none; transform: none; }
+}
+
+/* A complete film keeps its native frame and usable controls within the shared hero. */
+.project-presentation .project-presentation-hero .project-presentation-hero-media-playable,
+.project-presentation .project-presentation-hero .project-presentation-hero-media-framed {
+  align-self: center;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: var(--project-media-aspect, 16 / 9);
+  background: #11111b;
+}
+.project-presentation .project-presentation-hero-media-playable > .project-film-player {
+  border: 0;
+  pointer-events: auto;
+}

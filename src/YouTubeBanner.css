@@ -1,0 +1,35 @@
+.youtube-banner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #11111b;
+  isolation: isolate;
+}
+.youtube-banner .youtube-banner-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.youtube-banner .youtube-banner-player {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.youtube-banner.youtube-banner-playing .youtube-banner-player { opacity: 1; }
+.youtube-banner .youtube-banner-player iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  max-width: none;
+  border: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
