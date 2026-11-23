@@ -45,7 +45,7 @@
   overflow: hidden;
   background: #e9eaf2;
 }
-.project-presentation .project-presentation-hero-media > :not(.immersive-project-publication-meta):not(.immersive-project-counter) {
+.project-presentation .project-presentation-hero-media > :not(.immersive-project-counter) {
   position: absolute;
   inset: 0;
   display: block;
@@ -154,6 +154,22 @@
   line-height: 1.55;
   letter-spacing: 0;
 }
+.project-presentation .project-presentation-publication-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 18px 0 0;
+  color: #bcb0ff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: .01em;
+}
+.project-presentation .project-presentation-publication-meta time {
+  color: #d0ced9;
+  white-space: nowrap;
+}
 .project-presentation .project-presentation-meta {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -221,7 +237,6 @@
   outline-offset: 5px;
 }
 .project-presentation .immersive-project-counter { font-size: 12px; }
-.project-presentation .immersive-project-publication-meta { font-size: 12px; }
 
 .project-presentation :is(.immersive-project-index, .structured-thesis, .structured-glossary, .structured-archive, .immersive-project-brief, .immersive-project-chapter, .immersive-project-collection, .project-detail-section, .icff-hub-facts, .icff-hub-projects, .icff-photoshoot) {
   padding-right: var(--project-gutter);

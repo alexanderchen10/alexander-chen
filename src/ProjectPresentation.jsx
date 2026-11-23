@@ -35,12 +35,6 @@ export function ProjectHero({
         style={{ "--project-media-fit": mediaFit, "--project-media-position": mediaPosition, "--project-media-aspect": mediaAspect }}
       >
         {media}
-        {publishedArticle && (
-          <p className="immersive-project-publication-meta">
-            <span>{publishedArticle.publisher}</span>
-            <time dateTime={publishedArticle.dateTime}>{publishedArticle.date}</time>
-          </p>
-        )}
         {counter && mediaPresentation !== "player" && !mediaAspect && <span className="immersive-project-counter" aria-hidden="true">{counter}</span>}
       </div>
       <div className="immersive-project-hero-copy project-presentation-hero-copy">
@@ -52,6 +46,12 @@ export function ProjectHero({
         {(eyebrow || status) && <p className="project-presentation-eyebrow">{status && <span className="case-study-status">{status}</span>}{eyebrow}</p>}
         <h1 id={titleId}>{title}</h1>
         {description && <div className="case-study-intro">{description}</div>}
+        {publishedArticle && (
+          <p className="project-presentation-publication-meta">
+            <span>{publishedArticle.publisher}</span>
+            <time dateTime={publishedArticle.dateTime}>{publishedArticle.date}</time>
+          </p>
+        )}
         {actions && <div className="immersive-project-actions project-presentation-actions">{actions}</div>}
       </div>
     </header>
