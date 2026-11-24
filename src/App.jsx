@@ -230,28 +230,41 @@ function ProjectProgressHUD({ sections, label = "Project journey", embedded = fa
 
 function ZoomableImage({ src, previewSrc, alt = "", loading = "lazy", className = "" }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef(null);
+  const closeButtonRef = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
+    const trigger = triggerRef.current;
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event) => event.key === "Escape" && setOpen(false);
+    const handleDialogKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+      } else if (event.key === "Tab") {
+        event.preventDefault();
+        closeButtonRef.current?.focus({ preventScroll: true });
+      }
+    };
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
+    closeButtonRef.current?.focus({ preventScroll: true });
+    window.addEventListener("keydown", handleDialogKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handleDialogKeyDown);
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     };
   }, [open]);
 
   return (
     <>
-      <button className={`zoomable-image ${className}`} type="button" onClick={() => setOpen(true)} aria-label={`Open ${alt || "project image"} full screen`}>
+      <button ref={triggerRef} className={`zoomable-image ${className}`} type="button" onClick={() => setOpen(true)} aria-label={`Open ${alt || "project image"} full screen`}>
         <img src={assetHref(previewSrc || src)} alt={alt} loading={loading} decoding="async" />
         <span aria-hidden="true">↗</span>
       </button>
       {open && createPortal(
         <div className="media-lightbox" role="dialog" aria-modal="true" aria-label={alt || "Expanded project image"} onClick={() => setOpen(false)}>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close image">×</button>
+          <button ref={closeButtonRef} type="button" onClick={() => setOpen(false)} aria-label="Close image">×</button>
           <img src={assetHref(src)} alt={alt} onClick={(event) => event.stopPropagation()} />
           {alt && <p>{alt}</p>}
         </div>,
