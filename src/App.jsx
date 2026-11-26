@@ -3,6 +3,7 @@ import { normalizeRoute } from "./analyticsRoutes";
 import { ProjectsPage, ProjectLogPage } from "./ProjectsPage";
 import SkillsSelector from "./SkillsSelector";
 import GreetingAvatar from "./GreetingAvatar";
+import FlowDraftHome from "./FlowDraftHome";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { about, aoStudioProjectSlugs, playgroundItems, profile, utopiaMetrics, utopiaLifetimeTotals, workProjects } from "./data";
@@ -150,7 +151,7 @@ function usePage() {
       setPage(nextPage);
 
       window.requestAnimationFrame(() => {
-        if (nextPage === "home" && ["projects", "experience", "toolkits", "home-about", "home-education", "home-playground", "home-collaborators", "home-ao-studio", "draft-main"].includes(currentRoute)) {
+        if (nextPage === "home" && ["projects", "experience", "toolkits", "home-about", "home-education", "home-playground", "home-collaborators", "home-practice", "home-ao-studio", "home-client-cases", "home-contact", "draft-main"].includes(currentRoute)) {
           document.getElementById(currentRoute === "projects" ? "work" : currentRoute)?.scrollIntoView({ block: "start" });
         } else {
           window.scrollTo({ top: 0 });
@@ -274,7 +275,7 @@ function ZoomableImage({ src, previewSrc, alt = "", loading = "lazy", className 
   );
 }
 
-function NavigationLinks({ page, route, navigate, closeMenu }) {
+function NavigationLinks({ page, route, navigate }) {
   const navRef = useRef(null);
   const [activeRoute, setActiveRoute] = useState(route);
   const [beam, setBeam] = useState({ left: 0, width: 0 });
@@ -302,11 +303,6 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
     document.fonts.ready.then(update);
     return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, [page, route]);
-  const go = (event, destination, anchor) => {
-    closeMenu?.();
-    navigate(event, destination, anchor);
-  };
-
   return (
     <nav ref={navRef} className="primary-navigation" aria-label="Primary navigation">
       <ol className="numbered-links">
@@ -317,7 +313,7 @@ function NavigationLinks({ page, route, navigate, closeMenu }) {
           { route: "about", label: "about", destination: "/about" },
           { route: "playground", label: "playground", destination: "/playground" },
         ].map((item, index) => <li key={item.route}>
-          <a href={routeHref(item.anchor || item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => go(event, item.destination, item.anchor)}>
+          <a href={routeHref(item.anchor || item.route)} className={activeRoute === item.route ? "active" : ""} onClick={event => navigate(event, item.destination, item.anchor)}>
             <span>{String(index + 1).padStart(2, "0")}.</span><span>{item.label}</span>
           </a>
         </li>)}
@@ -349,8 +345,13 @@ function ContactLinks() {
   );
 }
 
-function BrandMark() {
-  return <img src={assetHref("/branding/alexander-chen-continuous-beacon.gif")} alt="Alexander Chen animated logo" width="720" height="428" style={{display:"block",width:"100%",height:"auto",objectFit:"contain"}} />;
+function BrandMark({ light = false }) {
+  return (
+    <picture className="portfolio-brand-mark">
+      <source media="(prefers-reduced-motion: reduce)" srcSet={assetHref(light ? "/branding/alexander-chen-beacon-light-still.png" : "/branding/alexander-chen-continuous.png")} />
+      <img src={assetHref(light ? "/branding/alexander-chen-continuous-beacon-light.gif" : "/branding/alexander-chen-continuous-beacon.gif")} alt="" width="720" height="428" />
+    </picture>
+  );
 }
 
 function AvailabilityBadge() {
@@ -362,48 +363,103 @@ function AvailabilityBadge() {
   );
 }
 
-function Sidebar({ page, route, navigate, clock, projectProgress }) {
-  const moveTopbarGlow = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty("--topbar-x", `${event.clientX - bounds.left}px`);
-    event.currentTarget.style.setProperty("--topbar-y", `${event.clientY - bounds.top}px`);
+const portfolioNavigation = [
+  { id: "about", label: "About", links: [{ label: "About Alex", route: "about" }, { label: "Education", route: "education" }] },
+  { id: "experience", label: "Experience", links: [{ label: "Work", route: "experience" }, { label: "See Index", route: "work" }] },
+  { id: "projects", label: "Projects", links: [{ label: "AO Studios", route: "ao-studio" }, { label: "Utopia Vinyl", route: "project/utopia-vinyl" }] },
+];
+
+function PortfolioNavigation({ page, route, homeSection, navigate }) {
+  const nav = useRef(null);
+  const [disclosure, setDisclosure] = useState(null);
+  const open = disclosure?.route === route ? disclosure.id : null;
+  const active = page === "home"
+    ? { "home-about": "about", "home-education": "about", experience: "experience", toolkits: "experience", work: "projects" }[homeSection]
+    : portfolioNavigation.find(group => group.links.some(link => link.route === route))?.id || "projects";
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const dismissOutside = event => {
+      if (!nav.current?.contains(event.target)) setDisclosure(null);
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    return () => document.removeEventListener("pointerdown", dismissOutside);
+  }, [open]);
+
+  const close = (restoreFocus = false) => {
+    if (restoreFocus && open) {
+      nav.current?.querySelector(`[aria-controls="portfolio-nav-${open}"]`)?.focus({ preventScroll: true });
+    }
+    setDisclosure(null);
   };
 
   return (
-    <aside
-      className="sidebar global-topbar"
-      onPointerMove={moveTopbarGlow}
-      onPointerLeave={(event) => {
-        event.currentTarget.style.removeProperty("--topbar-x");
-        event.currentTarget.style.removeProperty("--topbar-y");
+    <nav
+      ref={nav}
+      className="portfolio-nav"
+      aria-label="Primary navigation"
+      onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}
+      onKeyDown={event => {
+        if (event.key === "Escape" && open) {
+          event.preventDefault();
+          close(true);
+        }
       }}
     >
+      <ul className="portfolio-nav-groups">
+        {portfolioNavigation.map(group => (
+          <li key={group.id} className={active === group.id ? "is-active" : undefined}>
+            <button
+              type="button"
+              className="portfolio-nav-trigger"
+              aria-expanded={open === group.id}
+              aria-controls={`portfolio-nav-${group.id}`}
+              onClick={() => setDisclosure(open === group.id ? null : { id: group.id, route })}
+            >
+              {group.label}<span className="portfolio-nav-chevron" aria-hidden="true" />
+            </button>
+            <ul className="portfolio-nav-dropdown" id={`portfolio-nav-${group.id}`} hidden={open !== group.id}>
+              {group.links.map(link => (
+                <li key={link.route}>
+                  <a
+                    href={routeHref(link.route)}
+                    aria-current={route === link.route ? "page" : undefined}
+                    onClick={event => {
+                      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                      close(true);
+                      navigate(event, "/", link.route);
+                    }}
+                  >{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function Sidebar({ page, route, homeSection, navigate, projectProgress }) {
+  return (
+    <header className="sidebar global-topbar grouped-topbar">
       <div className="topbar-primary">
-        <a className="brand desktop-brand-lockup reveal reveal-fast" aria-label="Alexander Chen portfolio home" href={routeHref()} onClick={(e) => navigate(e, "/")}><span className="brand-logo"><BrandMark /></span><span className="desktop-brand-copy"><strong>Alexander Chen</strong><small>Portfolio</small></span></a>
-        <NavigationLinks page={page} route={route} navigate={navigate} />
+        <a className="brand desktop-brand-lockup" aria-label="Alexander Chen portfolio home" href={routeHref()} onClick={event => navigate(event, "/")}>
+          <span className="brand-logo"><BrandMark light={page === "home"} /></span>
+          <span className="desktop-brand-copy"><strong>Alexander Chen</strong></span>
+        </a>
+        <PortfolioNavigation page={page} route={route} homeSection={homeSection} navigate={navigate} />
         <div className="topbar-actions">
           <AvailabilityBadge />
           <ContactLinks />
         </div>
       </div>
-      <div className={`topbar-secondary${projectProgress ? " topbar-secondary-progress" : ""}`}>
-        {projectProgress ? (
+      {projectProgress && (
+        <div className="topbar-secondary topbar-secondary-progress">
           <ProjectProgressHUD {...projectProgress} embedded />
-        ) : (
-          <>
-            <div className="profile-copy reveal">
-              <p>{profile.role}</p>
-              <p>{profile.bio}</p>
-            </div>
-            <div className="sidebar-meta reveal">
-              <span>©{new Date().getFullYear()} {profile.name.toLowerCase()}</span>
-              <span>updated {profile.updated}</span>
-              <span>{clock}</span>
-            </div>
-          </>
-        )}
-      </div>
-    </aside>
+        </div>
+      )}
+    </header>
   );
 }
 
@@ -459,46 +515,7 @@ function IcffHubSidebar({ clock, navigate, project }) {
   );
 }
 
-function MobileHeader({ page, route, navigate }) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    document.body.classList.toggle("menu-open", open);
-    return () => document.body.classList.remove("menu-open");
-  }, [open]);
-
-  return (
-    <>
-      <header className="mobile-header">
-        <a className="brand mobile-brand-lockup" aria-label="Alexander Chen portfolio home" href={routeHref()} onClick={(e) => navigate(e, "/")}><span className="brand-logo"><BrandMark /></span><span className="mobile-brand-copy"><strong>Alexander Chen</strong><small>Portfolio</small></span></a>
-        <AvailabilityBadge />
-        <button
-          className={`menu-toggle ${open ? "is-open" : ""}`}
-          type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span /><span /><span />
-        </button>
-      </header>
-      <div className={`mobile-menu ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open}>
-        <div className="profile-copy">
-          <p>{profile.role}</p>
-          <p>{profile.bio}</p>
-        </div>
-        <div>
-          <NavigationLinks page={page} route={route} navigate={navigate} closeMenu={() => setOpen(false)} />
-          <div className="rule" />
-          <ContactLinks />
-        </div>
-        <div className="mobile-menu-meta">©{new Date().getFullYear()} {profile.name.toLowerCase()}</div>
-      </div>
-    </>
-  );
-}
-
-function HoverLogoVideo({ logo, video, label }) {
+function HoverLogoVideo({ logo, video, label, still, stillAlt }) {
   const player = useRef(null);
   const [playing, setPlaying] = useState(false);
   const start = () => {
@@ -510,7 +527,7 @@ function HoverLogoVideo({ logo, video, label }) {
   };
   const stop = () => { setPlaying(false); player.current?.pause(); };
   return <div className={`hover-logo-video${playing ? " is-playing" : ""}`} onPointerEnter={start} onPointerLeave={stop} onFocusCapture={start} onBlurCapture={stop}>
-    <img src={assetHref(logo)} alt={`${label} logo`} />
+    <img src={assetHref(still || logo)} alt={stillAlt || `${label} logo`} loading="lazy" />
     <video ref={player} src={assetHref(video)} muted loop playsInline preload="metadata" aria-label={`${label} video preview`} />
   </div>;
 }
@@ -772,8 +789,8 @@ function ProjectCard({ project, index, logoPreview = false }) {
   const href = project.href || routeHref(`project/${project.slug}`);
   const external = /^https?:\/\//.test(href);
   if (project.slug === "utopia-vinyl") return (
-    <article className="project-card project-card-utopia reveal" style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}>
-      <a href={href} aria-label="Read the Utopia Vinyl case study"><div className="project-media">{logoPreview ? <HoverLogoVideo logo="/brands/utopia-vinyl-logo.png" video={project.cardVideo} label="Utopia Vinyl" /> : <ProjectVisual project={project} surface="card" />}</div></a>
+    <article className={`project-card project-card-utopia${logoPreview ? "" : " reveal"}`} style={{ "--aspect": project.aspect, "--delay": `${Math.min(index * 45, 180)}ms` }}>
+      <a href={href} aria-label="Read the Utopia Vinyl case study"><div className="project-media">{logoPreview ? <HoverLogoVideo still={project.image} stillAlt={project.imageAlt} video={project.cardVideo} label="Utopia Vinyl" /> : <ProjectVisual project={project} surface="card" />}</div></a>
       <div className="project-copy">
         <div className="project-copy-heading">
           <h3><a href={href}>{project.title}</a></h3>
@@ -891,11 +908,11 @@ function ExperienceSkillsCarousel() {
   );
 }
 
-function HomeExperience({ navigate }) {
+function HomeExperience({ navigate, flowMode = false }) {
   const cardStack = useRef(null);
 
   useEffect(() => {
-    if (typeof ResizeObserver === "undefined" || typeof IntersectionObserver === "undefined") return;
+    if (flowMode || typeof ResizeObserver === "undefined" || typeof IntersectionObserver === "undefined") return;
 
     const stack = cardStack.current;
     const cards = Array.from(stack.children);
@@ -964,7 +981,7 @@ function HomeExperience({ navigate }) {
       visibilityObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [flowMode]);
 
   return (
     <section id="experience" className="home-experience" aria-labelledby="home-experience-title">
@@ -1287,7 +1304,7 @@ function CollaboratorCarousel({ navigate }) {
 }
 
 function HomeToolkits() {
-  return <SkillsSelector />;
+  return <SkillsSelector flowMode />;
 }
 
 function HomePlayground({ navigate }) {
@@ -1313,40 +1330,63 @@ function HomeEducation() {
 
 function HomeProjects({ navigate }) {
   const utopia = workProjects.find(project => project.slug === "utopia-vinyl");
+  const clientCases = aoStudioProjectSlugs.map(slug => workProjects.find(project => project.slug === slug)).filter(Boolean);
   return <section id="work" className="portfolio-section home-work-section" aria-labelledby="home-projects-title">
-    <div className="home-work-heading"><h2 id="home-projects-title">Projects<span aria-hidden="true">.</span></h2><a id="home-project-collection" className="project-live-button" href={routeHref("work")} style={{ padding: "14px 24px", borderRadius: "999px", background: "var(--tech-navy)", color: "#fff", display: "inline-flex", alignItems: "center", gap: "12px", minHeight: "48px" }}>Projects catalogue <Arrow /></a></div>
-    <div className="home-project-features">
+    <div className="home-work-heading"><h2 id="home-projects-title">Selected <span>work</span></h2><p>Digital products, creative production, and the thinking behind the work.</p><a id="home-project-collection" className="project-live-button" href={routeHref("work")} style={{ padding: "14px 24px", borderRadius: "999px", background: "var(--tech-navy)", color: "#fff", display: "inline-flex", alignItems: "center", gap: "12px", minHeight: "48px" }}>Projects catalogue <Arrow /></a></div>
+    <div className="home-project-features reveal">
       <ProjectCard project={utopia} index={0} logoPreview />
       <article className="home-ao-feature" id="home-ao-studio">
-        <a className="home-ao-cover" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}><HoverLogoVideo logo="/projects/ao-studio/ao-studio-wordmark-dark.png" video="/projects/work/corcoran/oakville-banner.m4v" label="AO Studio" /></a>
-        <div className="home-ao-copy"><div className="home-ao-heading"><h3>AO Studio</h3><span className="project-status">Ongoing</span></div><p className="home-ao-role">Founder · Creative Director · Designer · Developer</p><p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p><div className="project-card-actions"><a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a><a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a></div><h4>Clients &amp; collaborations</h4><ul>{aoStudioProjectSlugs.map(slug => { const project=workProjects.find(p=>p.slug===slug); return project && <li key={slug}><a href={routeHref(`project/${slug}`)}><span>{project.organization || project.title}</span><Arrow /></a></li>; })}</ul></div>
+        <a className="home-ao-cover" href={routeHref("ao-studio")} aria-label="Explore AO Studio" onClick={event => navigate(event, "/ao-studio")}><HoverLogoVideo logo="/projects/ao-studio/ao-studio-wordmark-dark.png" video="/projects/work/corcoran/oakville-banner.m4v" label="AO Studio" /></a>
+        <div className="home-ao-copy">
+          <div className="home-ao-heading">
+            <h3>AO Studio</h3>
+            <div className="project-copy-meta"><span className="project-status">Ongoing</span></div>
+          </div>
+          <p className="home-ao-role">Founder · Creative Director · Designer · Developer</p>
+          <p>My creative production practice, connecting brand, photography, film, and digital experiences for the companies I collaborate with.</p>
+          <div className="project-card-actions">
+            <a className="project-live-button" href="https://aostudioinfo.com/" target="_blank" rel="noreferrer">Visit AO Studio <Arrow /></a>
+            <a className="project-case-link" href={routeHref("ao-studio")} onClick={event => navigate(event, "/ao-studio")}>Explore the studio <Arrow /></a>
+          </div>
+          <div className="home-ao-clients">
+            <a className="studio-text-link" href={routeHref("home-client-cases")} onClick={event => navigate(event, "/", "home-client-cases")}>Clients &amp; collaborations <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
       </article>
     </div>
-
+    <section className="studio-client-cases" id="home-client-cases" aria-labelledby="studio-client-cases-title">
+      <h3 id="studio-client-cases-title">Clients &amp; collaborations</h3>
+      <div className="studio-case-gallery">
+        {clientCases.map(project => (
+          <a className="studio-case" key={project.slug} href={routeHref(`project/${project.slug}`)}>
+            <span className="studio-case-media"><img src={assetHref(project.image || project.poster)} alt={project.imageAlt || ""} loading="lazy" decoding="async" /></span>
+            <span className="studio-case-meta">{project.coverEyebrow || project.role}</span>
+            <strong>{project.organization || project.title}</strong><span className="studio-case-arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+    </section>
   </section>;
 }
 
 function HomePage({ clock, navigate }) {
+  const collaborators = (
+    <section id="home-collaborators" className="home-collaborators" aria-labelledby="home-collaborators-title">
+      <div className="home-collaborators-heading">
+        <p>Who I’ve worked with</p>
+        <div><h2 id="home-collaborators-title">Trusted across retail, talent, technology, and culture.</h2></div>
+      </div>
+      <CollaboratorCarousel navigate={navigate} />
+    </section>
+  );
   return (
-    <main className="main-content home-main">
-      <HomeHero />
-      <section id="home-collaborators" data-progress-end="work" className="home-collaborators" aria-labelledby="home-collaborators-title">
-        <div className="home-collaborators-heading">
-          <p>Who I’ve worked with</p>
-          <div>
-            <h2 id="home-collaborators-title">Trusted across retail, talent, technology, and culture.</h2>
-          </div>
-        </div>
-        <CollaboratorCarousel navigate={navigate} />
-      </section>
-
+    <FlowDraftHome navigate={navigate} clock={clock} collaborators={collaborators}>
       <HomeProjects navigate={navigate} />
-      <HomeExperience navigate={navigate} />
-      <HomeEducation navigate={navigate} />
       <HomeToolkits />
+      <HomeExperience navigate={navigate} flowMode />
+      <HomeEducation navigate={navigate} />
       <HomePlayground navigate={navigate} />
-      <MobileFooter clock={clock} />
-    </main>
+    </FlowDraftHome>
   );
 }
 
@@ -3784,7 +3824,7 @@ function EducationPage({ embedded = false }) {
           <span className="education-degree-sheen" aria-hidden="true" />
           <div className="education-degree-top">
             <img src={assetHref("/brands/university-of-toronto.webp")} alt="University of Toronto" />
-            <span className="education-seal" aria-label="Class of 2024"><span>U OF T · CLASS OF 2024 ·</span><i aria-hidden="true">✦</i></span>
+            <span className="education-seal" aria-label="Class of 2024"><span>{embedded ? "Class of 2024" : "U OF T · CLASS OF 2024 ·"}</span><i aria-hidden="true">✦</i></span>
           </div>
           <div className="education-degree-main">
             <h2 id="education-degree-title"><span>Honours Bachelor</span> <em>of Arts</em></h2>
@@ -4084,15 +4124,15 @@ function projectProgressFor(project, detail) {
 export default function App() {
   const { page, route, navigate } = usePage();
   const clock = useClock();
-  const [homeSection, setHomeSection] = useState("work");
+  const [homeSection, setHomeSection] = useState("home-about");
   useEffect(() => {
     if (page !== "home") return;
     let frame = 0;
     const update = () => {
       frame = 0;
       const marker = window.innerHeight * .38;
-      let next = "work";
-      for (const id of ["work", "experience", "home-education"]) {
+      let next = "home-about";
+      for (const id of ["work", "toolkits", "experience", "home-education"]) {
         const element = document.getElementById(id);
         if (element && element.getBoundingClientRect().top <= marker) next = id;
       }
@@ -4111,7 +4151,7 @@ export default function App() {
   const isIcffGallery = selectedProject?.slug === "icff-distillery-opening-night-2025";
   const isIcffHub = selectedProject?.slug === "icff-lavazza-inclucity" && selectedProject.caseStudyVariant !== "structured";
   const homeProgress = {
-    work: { label: "Projects section", containerId: "home-collaborators", sections: [{ id: "home-collaborators", label: "Collaborators" }, { id: "work", label: "Projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-project-collection", label: "All projects" }] },
+    work: { label: "Projects section", containerId: "work", sections: [{ id: "work", label: "Projects" }, { id: "home-project-collection", label: "All projects" }, { id: "home-ao-studio", label: "AO Studio" }, { id: "home-client-cases", label: "Client cases" }] },
     experience: { label: "Professional experience", containerId: "experience", sections: about.experience.map((item,index)=>({id:`experience-role-${index}`,label:item.organization})) },
     "home-education": { label: "Education section", containerId: "home-education", sections: [{id:"home-education",label:"Education"}] },
   };
@@ -4144,11 +4184,9 @@ export default function App() {
   }, [page, route]);
 
   return (
-    <div className={`site-shell${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
+    <div className={`site-shell${page === "home" ? " flow-draft-shell studio-flow-shell" : ""}${usesTopbar ? " topbar-shell" : ""}${projectProgress ? " project-progress-shell" : ""}`}>
       {!isPlayground && !selectedProject && <><div className="page-fade page-fade-top" /><div className="page-fade page-fade-bottom" /></>}
-      {!isPlayground && <Sidebar page={page} route={route} navigate={navigate} clock={clock} projectProgress={projectProgress} />}
-      {!isPlayground && <MobileHeader page={page} route={route} navigate={navigate} />}
-      {!isPlayground && projectProgress && <div className="mobile-project-progress"><ProjectProgressHUD {...projectProgress} /></div>}
+      {!isPlayground && <Sidebar page={page} route={route} homeSection={homeSection} navigate={navigate} projectProgress={projectProgress} />}
       {page === "work" ? (
         <ProjectsPage Media={ProjectVisual} />
       ) : page.startsWith("project-log") ? (

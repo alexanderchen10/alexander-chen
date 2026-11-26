@@ -1,0 +1,369 @@
+/* The alternate homepage keeps the existing content and controls in an open narrative. */
+.flow-home .home-collaborators,
+.flow-home .home-experience,
+.flow-home .education-page.education-home-section,
+.flow-home .skills-selector,
+.flow-home .home-playground-section {
+  width: min(1280px, calc(100% - 2 * clamp(24px, 6.5vw, 100px)));
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(80px, 8vw, 140px) 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #c9c0ae;
+  scroll-margin-top: 150px;
+}
+
+.flow-home .home-collaborators-heading,
+.flow-home .home-experience-heading,
+.flow-home .education-intro,
+.flow-home .education-section-heading {
+  align-items: start;
+  gap: 32px;
+}
+
+.flow-home .home-collaborators-heading h2,
+.flow-home .home-experience-heading h2,
+.flow-home .education-intro > h2,
+.flow-home .education-section-heading h2,
+.flow-home .home-playground-section h2 {
+  max-width: 100%;
+  margin: 0;
+  color: #c9c0ae;
+  font-family: "Swanky and Moo Moo", cursive;
+  font-size: clamp(50px, 6vw, 86px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.025em;
+  text-wrap: pretty;
+  transform: none;
+}
+
+.flow-home .home-collaborators-heading > p,
+.flow-home .home-experience-kicker,
+.flow-home .home-playground-section .section-label {
+  margin: 0;
+  color: #d88b73;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: .04em;
+}
+
+/* A quiet rail keeps all thirteen organizations available without a bank of cards. */
+.flow-home .home-collaborators-heading {
+  grid-template-columns: minmax(150px, .4fr) minmax(0, 1.6fr);
+}
+.flow-home .home-collaborators-heading h2 { max-width: 850px; font-size: clamp(44px, 5vw, 74px); }
+.flow-home .home-collaborator-marquee {
+  max-width: 100%;
+  margin: 52px 0 0;
+  padding: 0 0 20px;
+  scroll-padding-inline: 0;
+  scrollbar-color: #726a60 transparent;
+}
+.flow-home .home-collaborator-track { gap: 34px; padding: 0; }
+.flow-home .home-collaborator-track > article { flex: 0 0 180px; width: 180px; }
+.flow-home .home-collaborator,
+.flow-home .home-collaborator:is(:hover, :focus-visible) {
+  display: block;
+  min-height: 0;
+  width: 180px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #c9c0ae;
+  transform: none;
+}
+.flow-home .home-collaborator::after { content: none; }
+.flow-home .home-collaborator-mark { height: 90px; padding: 12px 2px; background: transparent; }
+.flow-home .home-collaborator-mark img,
+.flow-home .home-collaborator:hover .home-collaborator-mark img {
+  width: calc(100% * var(--logo-scale, 1));
+  max-width: 170px;
+  height: 62px;
+  filter: grayscale(1) invert(1);
+  mix-blend-mode: screen;
+  opacity: .75;
+  transform: none;
+  transition: opacity 220ms ease;
+}
+.flow-home .home-collaborator:hover .home-collaborator-mark img { opacity: 1; }
+.flow-home .home-collaborator-meta { min-height: 56px; gap: 12px; padding: 14px 0; border-color: #c9c0ae2b; color: #c9c0ae; }
+.flow-home .home-collaborator-meta span { font-size: 12px; }
+.flow-home .home-collaborator-meta h3 { font-size: 14px; font-weight: 400; line-height: 1.4; text-transform: none; }
+.flow-home .home-collaborator-linked .home-collaborator-meta::after { color: #d88b73; }
+.flow-home .collaborator-scroll-controls { margin-top: 10px; }
+.flow-home .collaborator-scroll-controls > span { color: #a49d90; font-size: 14px; }
+.flow-home .collaborator-scroll-controls button,
+.flow-home .collaborator-scroll-controls button:is(:hover, :focus-visible) {
+  border-color: #c9c0ae45;
+  background: transparent;
+  box-shadow: none;
+  color: #c9c0ae;
+}
+
+/* Experience reads as a sequence of complete entries rather than a sticky deck. */
+.flow-home .home-experience { overflow: visible; }
+.flow-home .home-experience-heading,
+.flow-home .home-experience-list { width: 100%; margin-inline: 0; }
+.flow-home .home-experience-heading { grid-template-columns: 1fr; }
+.flow-home .home-experience-kicker { grid-column: 1; }
+.flow-home .home-experience-kicker::before { background: #d88b73; }
+.flow-home .home-experience-heading h2 span { display: inline; }
+.flow-home .home-experience-heading h2 span + span { padding-left: 0; color: #d88b73; }
+.flow-home .home-experience-stack { gap: 0; isolation: auto; }
+.flow-home .home-experience-stack .home-experience-card,
+.flow-home .home-experience-stack.is-deck .home-experience-card {
+  position: relative !important;
+  top: auto !important;
+  pointer-events: auto !important;
+}
+.flow-home .home-experience-stack .home-experience-card > .home-experience-item,
+.flow-home .home-experience-stack.is-deck .home-experience-card > .home-experience-item {
+  --experience-accent: #d88b73;
+  --experience-muted: #b2aa9c;
+  --experience-line: #c9c0ae33;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 2fr);
+  gap: clamp(36px, 5vw, 76px);
+  padding: 64px 0 78px;
+  border: 0;
+  border-top: 1px solid #c9c0ae33;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+  color: #c9c0ae;
+  opacity: 1 !important;
+  transform: none !important;
+  will-change: auto;
+}
+.flow-home .home-experience-item::before { content: none; }
+.flow-home .home-experience-stack .home-experience-sequence { position: static; margin-bottom: 22px; color: #d88b73; font-size: 13px; }
+.flow-home .home-experience-stack .home-experience-side h3 { margin-bottom: 18px; color: #c9c0ae; font-size: clamp(26px, 2.4vw, 36px); font-weight: 400; line-height: 1.2; letter-spacing: -.035em; }
+.flow-home .home-experience-stack .home-experience-side p { color: #aaa294; font-size: 16px; line-height: 1.7; }
+.flow-home .home-experience-stack .home-experience-content h4 { color: #c9c0ae; font-size: clamp(25px, 2.3vw, 34px); font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+.flow-home .home-experience-stack .home-experience-summary { max-width: 67ch; margin: 22px 0 32px; color: #b2aa9c; font-size: 18px; line-height: 1.75; }
+.flow-home .home-experience-stack .home-experience-highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 36px; }
+.flow-home .home-experience-stack .home-experience-highlights li { padding-top: 18px; border-color: #c9c0ae25; }
+.flow-home .home-experience-stack .home-experience-highlights strong { color: #d88b73; font-size: 21px; font-weight: 500; line-height: 1.4; letter-spacing: -.02em; }
+.flow-home .home-experience-stack .home-experience-highlights p { margin-top: 12px; color: #b2aa9c; font-size: 16px; line-height: 1.75; }
+.flow-home .home-experience-stack .home-experience-projects { gap: 10px; margin-top: 32px; }
+.flow-home .home-experience-projects > p { color: #a49d90; font-size: 13px; }
+.flow-home .home-experience-stack .home-experience-project,
+.flow-home .home-experience-stack .home-experience-project:is(:hover, :focus-visible) {
+  min-height: 44px;
+  gap: 12px;
+  padding: 9px 0;
+  border: 0;
+  border-bottom: 1px solid #c9c0ae35;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #c9c0ae;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.flow-home .home-experience-stack .home-experience-project:is(:hover, :focus-visible) { color: #d88b73; }
+.flow-home .home-experience-project-preview { border-color: #c9c0ae3b; border-radius: 5px; background: #101b2a; box-shadow: none; }
+.flow-home .home-experience-project-preview::after { border-top-color: #101b2a; }
+.flow-home .home-experience-project-preview-caption { color: #c9c0ae; }
+.flow-home .home-experience-project-preview-caption small { color: #d88b73; font-size: 12px; }
+.flow-home .home-experience-project-preview-caption strong { font-size: 16px; }
+.flow-home .home-experience-stack .experience-card-open { right: 0; bottom: 26px; color: #d88b73; font-size: 15px; font-weight: 400; }
+.flow-home .experience-skills { margin: 40px 0 54px; }
+.flow-home .experience-skills-heading { padding-inline: 0; }
+.flow-home .experience-skills-heading p { color: #a49d90; font-size: 13px; }
+.flow-home .experience-skills-heading button,
+.flow-home .experience-skills-heading button:is(:hover, :focus-visible) { padding: 9px 12px; border-color: #c9c0ae3b; background: transparent; box-shadow: none; color: #c9c0ae; font-size: 14px; }
+.flow-home .experience-skills-window { padding-block: 20px; border-color: #c9c0ae2e; background: transparent; }
+.flow-home .experience-skills-group li { color: #b2aa9c; font-size: clamp(24px, 2.8vw, 38px); font-weight: 400; }
+.flow-home .experience-skills-group li > span { color: #d88b73; }
+
+/* Education keeps its full degree and selectable credentials, with quieter surfaces. */
+.flow-home .education-page.education-home-section { overflow: visible; padding-bottom: clamp(80px, 8vw, 140px); }
+.flow-home .education-intro { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; margin-bottom: 64px; }
+.flow-home .education-intro > h2 { grid-column: 1; }
+.flow-home .education-resume-link { max-width: 100%; color: #d88b73; font-size: 16px; line-height: 1.5; }
+.flow-home .education-degree-stage { perspective: none; }
+.flow-home .education-degree,
+.flow-home .education-degree:focus-visible {
+  gap: 36px;
+  padding: 40px 0;
+  border: 0;
+  border-block: 1px solid #c9c0ae33;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #c9c0ae;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
+.flow-home .education-degree::before,
+.flow-home .education-degree::after,
+.flow-home .education-degree-sheen { display: none; }
+.flow-home .education-degree-top img { width: 210px; max-width: 60%; height: 70px; padding: 0; border-radius: 0; background: transparent; filter: grayscale(1) invert(1); mix-blend-mode: screen; opacity: .8; }
+.flow-home .education-seal { width: auto; aspect-ratio: auto; border: 0; border-radius: 0; color: #aaa294; animation: none; }
+.flow-home .education-seal span { max-width: 15ch; font-size: 13px; font-weight: 400; letter-spacing: .04em; line-height: 1.7; }
+.flow-home .education-seal::after,
+.flow-home .education-seal i { display: none; }
+.flow-home .education-degree h2 { max-width: 15ch; color: #c9c0ae; font-family: var(--font-body); font-size: clamp(38px, 4.3vw, 62px); font-weight: 400; line-height: 1.12; letter-spacing: -.04em; }
+.flow-home .education-degree h2 span,
+.flow-home .education-degree h2 em { animation: none; }
+.flow-home .education-degree h2 em { color: #d88b73; }
+.flow-home .education-year { color: #c9c0ae25; font-size: clamp(82px, 9vw, 130px); font-weight: 400; -webkit-text-stroke: 0; }
+.flow-home .education-year-digit > span { animation: none; transform: translateY(calc(var(--year-digit) * -1em)); }
+.flow-home .education-degree-bottom { grid-template-columns: minmax(0, 1fr) auto; gap: 20px 36px; }
+.flow-home .education-degree-bottom a { color: #c9c0ae; font-size: 18px; font-weight: 400; line-height: 1.6; }
+.flow-home .education-degree-bottom p { color: #aaa294; font-size: 16px; }
+.flow-home .education-degree .education-tags { grid-column: 1 / -1; justify-content: flex-start; }
+.flow-home .education-degree .education-tags li,
+.flow-home .education-degree .education-tags li:hover { padding: 0; border-radius: 0; background: transparent; color: #b2aa9c; font-size: 18px; line-height: 1.6; transform: none; }
+.flow-home .education-card-hint { display: none; }
+.flow-home .education-beyond { margin-top: 76px; }
+.flow-home .education-section-heading { grid-template-columns: minmax(0, 1fr) minmax(0, .6fr); gap: 30px 54px; margin-bottom: 34px; }
+.flow-home .education-section-heading h2 { font-size: clamp(42px, 4.8vw, 64px); }
+.flow-home .education-section-heading p { max-width: 32ch; color: #aaa294; font-size: 16px; line-height: 1.7; }
+.flow-home .education-credentials { gap: 0; }
+.flow-home .education-certificate,
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) { overflow: visible; border: 0; border-top: 1px solid #c9c0ae33; border-radius: 0; background: transparent; box-shadow: none; }
+.flow-home .education-certificate::before { display: none; }
+.flow-home .education-certificate button { grid-template-columns: 36px minmax(0, 1.5fr) minmax(0, .45fr) minmax(0, .6fr) 20px; gap: 24px; padding: 28px 0; color: #c9c0ae; }
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) button { color: #d88b73; }
+.flow-home .education-certificate-copy strong { font-size: clamp(23px, 2.4vw, 32px); font-weight: 400; line-height: 1.3; letter-spacing: -.025em; }
+.flow-home .education-certificate-copy small,
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) .education-certificate-copy small { color: #aaa294; font-size: 16px; line-height: 1.5; }
+.flow-home .education-certificate-number,
+.flow-home .education-certificate-type,
+.flow-home .education-certificate-status { color: #aaa294; font-size: 14px; line-height: 1.6; letter-spacing: .025em; }
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) :is(.education-certificate-number, .education-certificate-type, .education-certificate-arrow) { color: #d88b73; }
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) .education-certificate-copy { transform: none; }
+.flow-home .education-certificate-status i { width: 5px; height: 5px; background: #d88b73; box-shadow: none; animation: none; }
+.flow-home .education-certificate-arrow { color: #d88b73; }
+.flow-home .education-credential-detail { grid-template-columns: minmax(0, .25fr) minmax(0, 1fr); min-height: 110px; gap: 24px; margin-top: 0; padding: 28px 0; border: 0; border-top: 1px solid #c9c0ae33; border-radius: 0; background: transparent; box-shadow: none; color: #b2aa9c; animation: none; }
+.flow-home .education-credential-detail span { color: #d88b73; font-size: 14px; line-height: 1.7; letter-spacing: .04em; }
+.flow-home .education-credential-detail p { font-size: 18px; line-height: 1.7; }
+
+/* The same complete toolkit switches in place rather than trapping the page scroll. */
+.flow-home .skills-selector { --skills-row: 108px; min-height: 0; }
+.flow-home .skills-selector-stage { position: relative; top: auto; height: auto; min-height: 0; overflow: visible; padding: 0; }
+.flow-home .skills-selector-stage::before { display: none; }
+.flow-home .skills-selector-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7%; min-height: 0; }
+.flow-home .skills-selector-marker { width: 8px; height: 8px; background: #d88b73; translate: 0 calc(var(--skills-active) * var(--skills-row) + var(--skills-row) / 2 - 4px); transition-duration: 260ms; }
+.flow-home .skills-selector-tab { padding-left: 28px; color: #8b867e; font-size: clamp(28px, 2.8vw, 42px); font-weight: 400; line-height: 1.2; letter-spacing: -.025em; white-space: normal; transition: color 240ms ease; }
+.flow-home .skills-selector-tab.is-active,
+.flow-home .skills-selector-tab:not(.is-active):hover { color: #c9c0ae; }
+.flow-home .skills-selector-label,
+.flow-home .skills-selector-tab.is-active .skills-selector-label { translate: 0; }
+.flow-home .skills-selector-panels { padding-top: 20px; }
+.flow-home .skills-selector-panel { gap: 30px; }
+.flow-home .skills-selector-intro { color: #d88b73; font-size: clamp(25px, 2.2vw, 32px); font-weight: 400; line-height: 1.5; }
+.flow-home .skills-selector-grid { gap: 14px 30px; }
+.flow-home .skills-selector-grid > li { color: #c9c0ae; font-size: 18px; line-height: 1.65; overflow-wrap: normal; }
+.flow-home .skills-selector-count { color: #aaa294; font-size: 15px; line-height: 1.6; }
+.flow-home .skills-selector-panel:not(.is-inactive) :is(.skills-selector-intro, .skills-selector-grid > li, .skills-selector-count) { animation-duration: 260ms; animation-delay: 0ms; }
+
+/* The playground remains a real destination, introduced by the original Pixel Alex. */
+.flow-home .home-playground-intro { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); gap: 9%; }
+.flow-home .home-playground-section .section-label { margin-bottom: 24px; }
+.flow-home .home-playground-section h2 { margin-bottom: 28px; }
+.flow-home .home-playground-section header > p:not(.section-label) { color: #b2aa9c; font-size: 20px; line-height: 1.75; }
+.flow-home .home-playground-section header > a { min-height: 44px; margin-top: 32px; border-color: #d88b7366; color: #d88b73; font-size: 16px; line-height: 1.5; }
+.flow-home .home-playground-pixel,
+.flow-home .home-playground-pixel:is(:hover, :focus-visible) { grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); gap: 22px; min-height: 300px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; transform: none; }
+.flow-home .home-playground-pixel::after { display: none; }
+.flow-home .home-playground-pixel-art { height: 250px; }
+.flow-home .home-playground-pixel-art img { max-width: 170px; filter: none; }
+.flow-home .home-playground-pixel-copy small { color: #d88b73; font-size: 13px; font-weight: 400; line-height: 1.6; }
+.flow-home .home-playground-pixel-copy strong { color: #c9c0ae; font-size: 28px; font-weight: 400; line-height: 1.25; }
+.flow-home .home-playground-pixel-copy strong > span { color: #d88b73; }
+.flow-home .pixel-spark { color: #d88b73; }
+
+.flow-home :is(.home-collaborator, .home-collaborator-marquee, .collaborator-scroll-controls button, .experience-card-open, .home-experience-project, .experience-skills-heading button, .education-degree, .education-resume-link, .education-certificate button, .skills-selector-tab, .skills-selector-panel, .home-playground-pixel):focus-visible {
+  outline: 2px solid #d88b73;
+  outline-offset: 6px;
+}
+
+@media (max-width: 1000px) {
+  .flow-home .home-experience-stack .home-experience-card > .home-experience-item,
+  .flow-home .home-experience-stack.is-deck .home-experience-card > .home-experience-item { grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); gap: 36px; }
+  .flow-home .home-experience-stack .home-experience-highlights { grid-template-columns: 1fr; }
+  .flow-home .education-certificate button { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 16px; }
+  .flow-home .education-certificate-type { grid-column: 2; }
+  .flow-home .education-certificate-status { grid-column: 3; grid-row: 1 / span 2; }
+  .flow-home .education-certificate-arrow { display: none; }
+  .flow-home .skills-selector { --skills-row: 90px; }
+  .flow-home .skills-selector-layout { grid-template-columns: 1fr; gap: 48px; }
+  .flow-home .skills-selector-tab { font-size: clamp(30px, 4.3vw, 42px); }
+  .flow-home .skills-selector-panels { padding-top: 0; }
+}
+
+@media (max-width: 650px) {
+  .flow-home .home-collaborators,
+  .flow-home .home-experience,
+  .flow-home .education-page.education-home-section,
+  .flow-home .skills-selector,
+  .flow-home .home-playground-section { width: calc(100% - 48px); padding-block: 72px; scroll-margin-top: 100px; }
+  .flow-home .home-collaborators-heading { grid-template-columns: 1fr; gap: 22px; }
+  .flow-home .home-collaborator-track { gap: 26px; }
+  .flow-home .home-collaborator-track > article,
+  .flow-home .home-collaborator { flex-basis: 160px; width: 160px; }
+  .flow-home .home-collaborators-heading h2 { font-size: 47px; }
+  .flow-home .home-experience-heading h2 { font-size: 54px; }
+  .flow-home .home-experience-stack .home-experience-card > .home-experience-item,
+  .flow-home .home-experience-stack.is-deck .home-experience-card > .home-experience-item { grid-template-columns: 1fr; gap: 30px; padding: 38px 0 76px; }
+  .flow-home .home-experience-stack .home-experience-side { padding-bottom: 0; }
+  .flow-home .home-experience-stack .home-experience-side h3 { font-size: 29px; }
+  .flow-home .home-experience-stack .home-experience-content h4 { font-size: 26px; }
+  .flow-home .home-experience-stack .home-experience-summary { font-size: 17px; }
+  .flow-home .home-experience-stack .home-experience-projects { margin-top: 24px; }
+  .flow-home .experience-skills-heading p { max-width: 18ch; }
+  .flow-home .experience-skills-heading button { font-size: 13px; }
+  .flow-home .experience-skills-group li { font-size: 26px; }
+  .flow-home .education-intro { grid-template-columns: 1fr; gap: 28px; margin-bottom: 42px; }
+  .flow-home .education-degree-top { gap: 16px; }
+  .flow-home .education-degree-top img { max-width: 58%; height: 60px; }
+  .flow-home .education-seal span { font-size: 11px; }
+  .flow-home .education-degree-main { grid-template-columns: 1fr; gap: 26px; }
+  .flow-home .education-degree h2 { font-size: 40px; }
+  .flow-home .education-year { font-size: 90px; }
+  .flow-home .education-degree-bottom { grid-template-columns: 1fr; justify-items: start; gap: 16px; }
+  .flow-home .education-degree-bottom a { font-size: 17px; }
+  .flow-home .education-degree .education-tags li { font-size: 17px; }
+  .flow-home .education-section-heading { grid-template-columns: 1fr; gap: 24px; }
+  .flow-home .education-section-heading h2 { font-size: 48px; }
+  .flow-home .education-section-heading p { max-width: 100%; }
+  .flow-home .education-certificate button { grid-template-columns: 25px minmax(0, 1fr); gap: 12px 14px; padding-block: 26px; }
+  .flow-home .education-certificate-number { align-self: start; padding-top: 3px; }
+  .flow-home .education-certificate-copy strong { font-size: 25px; }
+  .flow-home .education-certificate-copy small { font-size: 15px; }
+  .flow-home .education-certificate-type { grid-column: 2; }
+  .flow-home .education-certificate-status { grid-column: 2; grid-row: auto; justify-self: start; }
+  .flow-home .education-credential-detail { grid-template-columns: 1fr; gap: 12px; min-height: 170px; }
+  .flow-home .education-credential-detail p { font-size: 17px; }
+  .flow-home .skills-selector { --skills-row: 82px; }
+  .flow-home .skills-selector-layout { gap: 38px; }
+  .flow-home .skills-selector-tab { padding-left: 24px; font-size: 27px; line-height: 1.25; }
+  .flow-home .skills-selector-intro { font-size: 25px; }
+  .flow-home .skills-selector-grid { grid-template-columns: 1fr; gap: 14px; }
+  .flow-home .skills-selector-grid > li { font-size: 17px; }
+  .flow-home .home-playground-intro { grid-template-columns: 1fr; gap: 36px; }
+  .flow-home .home-playground-section h2 { font-size: 54px; }
+  .flow-home .home-playground-section header > p:not(.section-label) { font-size: 18px; }
+  .flow-home .home-playground-pixel,
+  .flow-home .home-playground-pixel:is(:hover, :focus-visible) { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: 18px; min-height: 250px; }
+  .flow-home .home-playground-pixel-art { height: 230px; }
+  .flow-home .home-playground-pixel-art img { max-width: 145px; }
+  .flow-home .home-playground-pixel-copy strong { font-size: 27px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-home .skills-selector-marker,
+  .flow-home .skills-selector-tab,
+  .flow-home .home-collaborator-mark img,
+  .flow-home .education-certificate button { transition: none; }
+  .flow-home .skills-selector-panel:not(.is-inactive) :is(.skills-selector-intro, .skills-selector-grid > li, .skills-selector-count) { animation: none; }
+}

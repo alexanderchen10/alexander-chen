@@ -1,0 +1,360 @@
+.flow-home :is(.flow-story, .home-collaborators, .home-experience, .education-page.education-home-section, .skills-selector, .home-playground-section, .flow-contact) {
+  width: min(1280px, calc(100% - 2 * var(--paper-gutter, clamp(24px, 6.5vw, 100px))));
+  padding: clamp(55px, 6vw, 96px) 0;
+  border-top: 1px solid var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.flow-home :is(.flow-story, .flow-contact) .flow-written,
+.flow-home :is(.home-collaborators-heading, .home-experience-heading, .education-intro, .education-section-heading, .home-playground-section) h2 {
+  color: var(--flow-ink);
+  font-family: var(--paper-serif, Georgia, serif);
+  font-size: clamp(43px, 5.3vw, 76px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -.05em;
+  text-wrap: balance;
+}
+
+.flow-home :is(.home-collaborators-heading > p, .home-experience-kicker, .home-playground-section .section-label) {
+  color: var(--flow-accent);
+  font-size: 12px;
+  letter-spacing: .055em;
+}
+
+.flow-home .flow-story {
+  gap: clamp(32px, 6vw, 88px) clamp(32px, 5.4vw, 80px);
+}
+
+.flow-home .flow-story .flow-written small {
+  margin: 10px 0 0 1.2em;
+  white-space: normal;
+}
+
+.flow-home .flow-story-copy {
+  padding-top: 2px;
+  line-height: 1.65;
+}
+
+.flow-home :is(.flow-story-copy p, .flow-contact > p:not(.flow-contact-address)) {
+  color: var(--flow-muted);
+}
+
+.flow-home .flow-story-copy .flow-large-copy {
+  color: var(--flow-ink);
+}
+
+.flow-home .flow-current a,
+.flow-home .flow-contact .flow-links a {
+  border-color: var(--flow-line);
+}
+
+.flow-home :is(.flow-current a, .flow-contact .flow-links a):hover {
+  border-color: var(--flow-accent);
+  color: var(--flow-accent);
+}
+
+.flow-home .flow-footer {
+  width: min(1280px, calc(100% - 2 * var(--paper-gutter, clamp(24px, 6.5vw, 100px))));
+}
+
+.flow-home .flow-footer > p:first-child {
+  color: var(--flow-ink);
+  font-family: var(--paper-serif, Georgia, serif);
+}
+
+/* Collaborators */
+.flow-home .home-collaborators-heading {
+  align-items: baseline;
+}
+
+.flow-home .home-collaborator-marquee {
+  margin-top: clamp(28px, 4vw, 48px);
+  scrollbar-color: var(--flow-muted) transparent;
+}
+
+.flow-home .home-collaborator-mark {
+  padding-inline: 12px;
+  background: color-mix(in srgb, var(--logo-bg) 22%, #f9f7f0);
+}
+
+.flow-home .home-collaborator-mark img,
+.flow-home .home-collaborator:hover .home-collaborator-mark img {
+  max-width: 100%;
+  filter: saturate(.85);
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+
+.flow-home .home-collaborator:hover .home-collaborator-mark img {
+  filter: saturate(1);
+}
+
+.flow-home .home-collaborator-meta {
+  border-color: var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.flow-home .home-collaborator-meta span,
+.flow-home .collaborator-scroll-controls > span {
+  color: var(--flow-muted);
+}
+
+.flow-home .home-collaborator-linked .home-collaborator-meta::after {
+  color: var(--flow-accent);
+}
+
+.flow-home .collaborator-scroll-controls button,
+.flow-home .collaborator-scroll-controls button:is(:hover, :focus-visible) {
+  border-color: var(--flow-line);
+  color: var(--flow-accent);
+}
+
+/* Professional experience */
+.flow-home .home-experience-kicker::before {
+  background: var(--flow-accent);
+}
+
+.flow-home .home-experience-heading h2 span + span {
+  color: var(--flow-accent);
+}
+
+.flow-home :is(.home-experience-stack, .home-experience-stack.is-deck) .home-experience-card > .home-experience-item {
+  --experience-accent: var(--flow-accent);
+  --experience-muted: var(--flow-muted);
+  --experience-line: var(--flow-line);
+  padding-block: clamp(34px, 4vw, 60px) clamp(55px, 5vw, 72px);
+  border-top-color: var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.flow-home .home-experience-stack :is(.home-experience-side h3, .home-experience-content h4) {
+  color: var(--flow-ink);
+  font-weight: 500;
+}
+
+.flow-home .home-experience-stack :is(.home-experience-side p, .home-experience-summary, .home-experience-highlights p),
+.flow-home :is(.home-experience-projects > p, .experience-skills-heading p) {
+  color: var(--flow-muted);
+}
+
+.flow-home .home-experience-stack :is(.home-experience-sequence, .home-experience-highlights strong, .experience-card-open),
+.flow-home .experience-skills-group li > span {
+  color: var(--flow-accent);
+}
+
+.flow-home .home-experience-stack .home-experience-highlights li,
+.flow-home .experience-skills-window {
+  border-color: var(--flow-line);
+}
+
+.flow-home .home-experience-stack .home-experience-project,
+.flow-home .experience-skills-heading button {
+  border-color: var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.flow-home .home-experience-stack .home-experience-project:is(:hover, :focus-visible),
+.flow-home .experience-skills-heading button:is(:hover, :focus-visible) {
+  border-color: var(--flow-accent);
+  color: var(--flow-accent);
+}
+
+.flow-home .home-experience-project-preview {
+  border-color: var(--flow-line);
+  background: #f8f6f1;
+  box-shadow: 0 10px 25px #20242c15;
+}
+
+.flow-home .home-experience-project-preview::after {
+  border-top-color: #f8f6f1;
+}
+
+.flow-home :is(.home-experience-project-preview-caption, .experience-skills-group li) {
+  color: var(--flow-ink);
+}
+
+.flow-home .home-experience-project-preview-caption small {
+  color: var(--flow-accent);
+}
+
+/* Education */
+.flow-home .education-intro {
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+
+.flow-home .education-resume-link {
+  color: var(--flow-accent);
+}
+
+.flow-home .education-degree,
+.flow-home .education-degree:focus-visible {
+  border-color: var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.flow-home .education-degree {
+  isolation: auto;
+}
+
+.flow-home .education-degree-top {
+  /* Let the wordmark blend with the page texture through the clear row. */
+  z-index: auto;
+}
+
+.flow-home .education-degree-top img {
+  width: clamp(140px, 23vw, 210px);
+  max-width: 58%;
+  height: auto;
+  filter: none;
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+
+.flow-home .education-seal span {
+  max-width: none;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.flow-home :is(.education-degree h2, .education-degree-bottom a) {
+  color: var(--flow-ink);
+}
+
+.flow-home .education-degree h2 em {
+  color: var(--flow-accent);
+}
+
+.flow-home .education-year {
+  color: color-mix(in srgb, var(--flow-ink) 26%, transparent);
+}
+
+.flow-home :is(.education-seal, .education-degree-bottom p, .education-section-heading p),
+.flow-home .education-degree .education-tags li,
+.flow-home .education-degree .education-tags li:hover {
+  color: var(--flow-muted);
+}
+
+.flow-home .education-beyond {
+  margin-top: clamp(36px, 6vw, 76px);
+}
+
+.flow-home .education-certificate,
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active),
+.flow-home .education-credential-detail {
+  border-color: var(--flow-line);
+}
+
+.flow-home .education-certificate button {
+  color: var(--flow-ink);
+}
+
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) :is(button, .education-certificate-number, .education-certificate-type, .education-certificate-arrow),
+.flow-home :is(.education-certificate-arrow, .education-credential-detail span) {
+  color: var(--flow-accent);
+}
+
+.flow-home .education-certificate-copy small,
+.flow-home .education-certificate:is(:hover, :focus-within, .is-active) .education-certificate-copy small,
+.flow-home :is(.education-certificate-number, .education-certificate-type, .education-certificate-status, .education-credential-detail) {
+  color: var(--flow-muted);
+}
+
+.flow-home .education-certificate-status i {
+  background: var(--flow-accent);
+}
+
+/* Skills and playground */
+.flow-home .skills-selector-marker {
+  background: var(--flow-accent);
+}
+
+.flow-home .skills-selector-tab,
+.flow-home .skills-selector-count {
+  color: var(--flow-muted);
+}
+
+.flow-home .skills-selector-tab.is-active,
+.flow-home .skills-selector-tab:not(.is-active):hover,
+.flow-home .skills-selector-grid > li {
+  color: var(--flow-ink);
+}
+
+.flow-home .skills-selector-intro {
+  color: var(--flow-accent);
+}
+
+.flow-home .home-playground-section h2 {
+  margin-bottom: 0.4em;
+}
+
+.flow-home .home-playground-section .section-label {
+  margin-bottom: 16px;
+}
+
+.flow-home .home-playground-section header > p:not(.section-label) {
+  color: var(--flow-muted);
+}
+
+.flow-home .home-playground-section header > a {
+  border-color: var(--flow-line);
+  color: var(--flow-accent);
+}
+
+.flow-home .home-playground-section header > a:hover {
+  border-color: var(--flow-accent);
+}
+
+.flow-home .home-playground-pixel-art {
+  background: color-mix(in srgb, var(--flow-accent) 8%, transparent);
+  border-radius: 42% 42% 4px 4px;
+}
+
+.flow-home .home-playground-pixel-art img {
+  max-width: 100%;
+}
+
+.flow-home .home-playground-pixel-copy strong {
+  color: var(--flow-ink);
+}
+
+.flow-home :is(.home-playground-pixel-copy small, .home-playground-pixel-copy strong > span) {
+  color: var(--flow-accent);
+}
+
+.flow-home .pixel-spark {
+  background: var(--flow-accent);
+  box-shadow: 7px 0 var(--flow-accent), 0 7px var(--flow-accent);
+  opacity: .5;
+}
+
+.flow-home :is(.home-collaborator, .home-collaborator-marquee, .collaborator-scroll-controls button, .experience-card-open, .home-experience-project, .experience-skills-heading button, .education-degree, .education-resume-link, .education-certificate button, .skills-selector-tab, .skills-selector-panel, .home-playground-pixel):focus-visible {
+  outline-color: var(--flow-accent);
+}
+
+@media (max-width: 809px) {
+  .flow-home .flow-story-practice {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 650px) {
+  .flow-home :is(.flow-story, .flow-contact) .flow-written,
+  .flow-home :is(.home-collaborators-heading, .home-experience-heading, .education-intro, .education-section-heading, .home-playground-section) h2 {
+    font-size: clamp(39px, 9vw, 54px);
+  }
+
+  .flow-home .education-intro {
+    gap: 16px;
+  }
+
+  .flow-home .home-playground-pixel,
+  .flow-home .home-playground-pixel:is(:hover, :focus-visible) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .flow-home .home-playground-pixel-art {
+    height: clamp(130px, 41vw, 210px);
+  }
+}

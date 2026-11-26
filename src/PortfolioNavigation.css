@@ -1,0 +1,292 @@
+.topbar-shell {
+  --portfolio-header-height: 72px;
+}
+
+.global-topbar.grouped-topbar {
+  --header-ink: #272432;
+  --header-muted: #595466;
+  --header-accent: #5b3fb6;
+  --header-line: #1f1d1c1a;
+  --header-background: #faf9f8f5;
+  --dropdown-background: #faf9f8;
+  --dropdown-hover: #ede8f7;
+  --dropdown-shadow: #26203530;
+  inset: 0 0 auto;
+  display: grid;
+  align-items: center;
+  width: 100%;
+  height: var(--portfolio-header-height);
+  margin: 0;
+  padding: 0 clamp(18px, 3.2vw, 58px);
+  overflow: visible;
+  border: 0;
+  border-bottom: 1px solid var(--header-line);
+  border-radius: 0;
+  background: var(--header-background);
+  color: var(--header-ink);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  transform: none;
+}
+
+.flow-draft-shell .global-topbar.grouped-topbar {
+  --header-ink: #eee7d9;
+  --header-muted: #d1c8ba;
+  --header-accent: #f5bb9c;
+  --header-line: #e6d8c837;
+  --header-background: #0b111b99;
+  --dropdown-background: #151e2c;
+  --dropdown-hover: #ffffff12;
+  --dropdown-shadow: #02060ca8;
+}
+
+.global-topbar.grouped-topbar::before {
+  display: none;
+}
+
+.grouped-topbar > .topbar-primary {
+  z-index: 2;
+}
+
+.grouped-topbar .desktop-brand-lockup:hover,
+.grouped-topbar .desktop-brand-lockup:focus-visible {
+  transform: none;
+  letter-spacing: 0;
+}
+
+.grouped-topbar .desktop-brand-lockup .brand-logo {
+  width: 55px;
+  flex-basis: 55px;
+}
+
+.portfolio-brand-mark,
+.portfolio-brand-mark img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+.grouped-topbar .desktop-brand-copy strong {
+  color: var(--header-ink);
+  font-size: 13px;
+}
+
+.grouped-topbar .topbar-actions {
+  gap: 4px clamp(12px, 1.4vw, 24px);
+}
+
+.grouped-topbar .availability-badge,
+.grouped-topbar .contact-links {
+  color: var(--header-muted);
+}
+
+.grouped-topbar .availability-badge:hover,
+.grouped-topbar .contact-links a:hover,
+.grouped-topbar .contact-links a:focus-visible {
+  color: var(--header-ink);
+}
+
+.grouped-topbar .contact-links a::before {
+  display: none;
+}
+
+.grouped-topbar .topbar-secondary-progress {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 -1px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  transform: none;
+}
+
+.grouped-topbar:hover .topbar-secondary,
+.grouped-topbar:focus-within .topbar-secondary {
+  transform: none;
+}
+
+.grouped-topbar .project-progress-hud.scroll-progress-indicator {
+  height: 2px;
+  background: transparent;
+}
+
+.flow-draft-shell .grouped-topbar .scroll-progress-indicator > span {
+  background: #b794e8;
+}
+
+.portfolio-nav-groups,
+.portfolio-nav-dropdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.portfolio-nav-groups {
+  display: flex;
+  align-items: center;
+  gap: clamp(9px, 2vw, 34px);
+}
+
+.portfolio-nav-groups > li {
+  position: relative;
+}
+
+.portfolio-nav-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--header-ink);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.portfolio-nav-trigger::after {
+  position: absolute;
+  inset: auto 5px 4px;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+}
+
+.portfolio-nav-trigger:hover,
+.portfolio-nav-trigger[aria-expanded="true"],
+.portfolio-nav-groups > .is-active > .portfolio-nav-trigger {
+  color: var(--header-accent);
+}
+
+.portfolio-nav-groups > .is-active > .portfolio-nav-trigger::after {
+  opacity: .75;
+}
+
+.portfolio-nav-chevron {
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.portfolio-nav-trigger[aria-expanded="true"] .portfolio-nav-chevron {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+.portfolio-nav-dropdown {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  left: 50%;
+  min-width: 176px;
+  padding: 5px;
+  border: 1px solid var(--header-line);
+  border-radius: 10px;
+  background: var(--dropdown-background);
+  color: var(--header-ink);
+  box-shadow: 0 10px 26px var(--dropdown-shadow);
+  transform: translateX(-50%);
+}
+
+.portfolio-nav-dropdown[hidden] {
+  display: none;
+}
+
+.portfolio-nav-dropdown a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.portfolio-nav-dropdown a:hover,
+.portfolio-nav-dropdown a:focus-visible,
+.portfolio-nav-dropdown a[aria-current] {
+  background: var(--dropdown-hover);
+  color: var(--header-accent);
+}
+
+.portfolio-nav :focus-visible,
+.grouped-topbar .brand:focus-visible {
+  outline: 2px solid var(--header-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (min-width: 810px) and (max-width: 1100px) {
+  .grouped-topbar .availability-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 809px) {
+  .topbar-shell {
+    --portfolio-header-height: 64px;
+  }
+
+  .global-topbar.grouped-topbar {
+    padding-inline: 14px;
+  }
+
+  .global-topbar.grouped-topbar .topbar-primary {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .grouped-topbar .topbar-primary > .portfolio-nav {
+    justify-self: end;
+  }
+
+  .grouped-topbar .topbar-actions {
+    display: none;
+  }
+
+  .grouped-topbar .desktop-brand-lockup .brand-logo {
+    width: 44px;
+    flex-basis: 44px;
+  }
+
+  .global-topbar.grouped-topbar .desktop-brand-lockup {
+    min-height: 44px;
+  }
+
+  .portfolio-nav-groups {
+    gap: clamp(3px, 1.7vw, 16px);
+  }
+
+  .portfolio-nav-trigger {
+    padding-inline: 4px;
+    gap: 7px;
+    font-size: 13px;
+  }
+
+  .portfolio-nav-groups > li:first-child .portfolio-nav-dropdown {
+    left: 0;
+    transform: none;
+  }
+
+  .portfolio-nav-groups > li:last-child .portfolio-nav-dropdown {
+    right: 0;
+    left: auto;
+    transform: none;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .grouped-topbar .desktop-brand-copy {
+    display: none;
+  }
+}

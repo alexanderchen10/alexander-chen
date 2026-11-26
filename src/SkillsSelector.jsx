@@ -71,7 +71,7 @@ const categories = [
   }
 ];
 
-export default function SkillsSelector() {
+export default function SkillsSelector({ flowMode = false }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const sectionRef = useRef(null);
   const tabRefs = useRef([]);
@@ -118,7 +118,7 @@ export default function SkillsSelector() {
 
     function updateMode() {
       reducedMotionRef.current = reducedMotion.matches;
-      pinnedRef.current = desktop.matches && !reducedMotion.matches;
+      pinnedRef.current = !flowMode && desktop.matches && !reducedMotion.matches;
       scrollTargetRef.current = null;
       requestUpdate();
     }
@@ -180,7 +180,7 @@ export default function SkillsSelector() {
       desktop.removeEventListener("change", updateMode);
       reducedMotion.removeEventListener("change", updateMode);
     };
-  }, []);
+  }, [flowMode]);
 
   function selectCategory(index, keyboard = false) {
     setSelectedIndex(index);

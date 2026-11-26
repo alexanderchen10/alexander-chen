@@ -1,0 +1,260 @@
+.studio-flow :is(.home-collaborators, .home-experience, .education-page.education-home-section, .skills-selector, .home-playground-section) {
+  width: min(1440px, calc(100% - 2 * var(--studio-gutter, clamp(20px, 5vw, 88px))));
+  max-width: none;
+  padding: clamp(60px, 8vw, 120px) 0;
+  border-top: 1px solid var(--flow-line);
+  color: var(--flow-ink);
+  scroll-margin-top: calc(var(--portfolio-header-height, 76px) + 24px);
+}
+
+.studio-flow :is(.home-collaborators-heading, .home-experience-heading, .education-intro, .education-section-heading, .home-playground-section) h2,
+.studio-flow .skills-selector > .sr-only {
+  color: var(--flow-ink);
+  font-family: var(--font-display);
+  font-size: clamp(37px, 5.2vw, 78px);
+  font-weight: 550;
+  line-height: .99;
+  letter-spacing: -.058em;
+  text-wrap: balance;
+}
+
+/* Partner marks read like a credit roll, with space to scroll the whole rail. */
+.studio-flow .home-collaborators-heading h2 {
+  max-width: 20ch;
+  font-size: clamp(32px, 4.5vw, 68px);
+}
+
+.studio-flow .home-collaborator-track {
+  --studio-credit-width: clamp(150px, 16vw, 215px);
+  gap: 12px;
+}
+
+.studio-flow .home-collaborator-track > article {
+  flex: 0 0 var(--studio-credit-width);
+  width: var(--studio-credit-width);
+}
+
+.studio-flow .home-collaborator-track .home-collaborator,
+.studio-flow .home-collaborator-track .home-collaborator:is(:hover, :focus-visible) {
+  width: 100%;
+  padding: 4px 12px;
+  border: 1px solid var(--flow-line);
+  border-radius: 6px;
+  background: var(--studio-surface, #171f2b);
+  color: var(--flow-ink);
+}
+
+.studio-flow .home-collaborator-track .home-collaborator:is(:hover, :focus-visible) {
+  border-color: var(--flow-accent);
+}
+
+.studio-flow .home-collaborator-mark {
+  background: transparent;
+}
+
+.studio-flow .home-collaborator-mark img,
+.studio-flow .home-collaborator:hover .home-collaborator-mark img {
+  filter: grayscale(1) invert(1) brightness(1.2);
+  mix-blend-mode: screen;
+}
+
+.studio-flow .home-collaborator-meta :is(h3, span) {
+  overflow-wrap: anywhere;
+}
+
+/* Keep the experience entries open and make the outcomes easy to scan. */
+.studio-flow .home-experience-heading {
+  gap: 16px;
+}
+
+.studio-flow .home-experience-heading h2 span + span {
+  color: var(--flow-ink);
+}
+
+.studio-flow .home-experience-stack :is(.home-experience-side h3, .home-experience-content h4) {
+  font-weight: 550;
+}
+
+.studio-flow .home-experience-stack .home-experience-summary {
+  margin-block: 14px 24px;
+  font-size: clamp(16px, 1.35vw, 19px);
+  line-height: 1.65;
+}
+
+.studio-flow .home-experience-stack .home-experience-highlights p {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.6;
+}
+
+.studio-flow .home-experience-project-preview {
+  background: var(--studio-surface, #171f2b);
+  box-shadow: 0 10px 30px #05080d80;
+}
+
+.studio-flow .home-experience-project-preview::after {
+  border-top-color: var(--studio-surface, #171f2b);
+}
+
+/* A matte degree panel sets off the existing wordmark and credentials. */
+.studio-flow .education-degree,
+.studio-flow .education-degree:focus-visible {
+  gap: clamp(24px, 3vw, 42px);
+  padding: clamp(19px, 4vw, 56px);
+  border: 1px solid var(--flow-line);
+  border-radius: 8px;
+  background: var(--studio-surface, #171f2b);
+}
+
+.studio-flow .education-degree-top img {
+  filter: grayscale(1) invert(1);
+  mix-blend-mode: screen;
+}
+
+.studio-flow .education-resume-link,
+.studio-flow .education-degree-bottom a {
+  border-color: var(--flow-line);
+  color: var(--flow-ink);
+}
+
+.studio-flow :is(.education-resume-link, .education-degree-bottom a):is(:hover, :focus-visible) {
+  border-color: var(--flow-accent);
+  color: var(--flow-accent);
+}
+
+.studio-flow .education-degree h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.studio-flow .education-degree h2 em {
+  font-style: normal;
+}
+
+.studio-flow .education-year {
+  color: color-mix(in srgb, var(--flow-muted) 50%, transparent);
+}
+
+.studio-flow .education-section-heading h2 {
+  font-size: clamp(31px, 3.9vw, 56px);
+}
+
+.studio-flow .education-credential-detail {
+  padding: clamp(16px, 3vw, 34px);
+  border: 1px solid var(--flow-line);
+  border-radius: 6px;
+  background: var(--studio-surface, #171f2b);
+}
+
+/* The skill tabs keep their keyboard behavior and switch in place. */
+.studio-flow .skills-selector > .sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 0 clamp(26px, 4vw, 56px);
+  padding: 0;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+}
+
+.studio-flow .skills-selector {
+  --skills-row: clamp(70px, 7vw, 96px);
+}
+
+.studio-flow .skills-selector-layout {
+  gap: clamp(24px, 5vw, 70px);
+}
+
+.studio-flow .skills-selector-marker {
+  left: 12px;
+  z-index: 1;
+}
+
+.studio-flow .skills-selector-tab {
+  padding-inline: 34px 15px;
+  border-top: 1px solid var(--flow-line);
+  font-size: clamp(24px, 3vw, 43px);
+  font-weight: 500;
+}
+
+.studio-flow .skills-selector-tab:last-child {
+  border-bottom: 1px solid var(--flow-line);
+}
+
+.studio-flow .skills-selector-tab.is-active {
+  background: var(--studio-surface, #171f2b);
+}
+
+.studio-flow .skills-selector-tab:focus-visible {
+  outline-offset: -2px;
+}
+
+.studio-flow .skills-selector-panels {
+  padding: clamp(18px, 3vw, 38px);
+  border: 1px solid var(--flow-line);
+  border-radius: 8px;
+  background: var(--studio-surface, #171f2b);
+}
+
+.studio-flow .skills-selector-intro {
+  font-size: clamp(21px, 2.3vw, 32px);
+  line-height: 1.35;
+}
+
+.studio-flow .skills-selector-grid > li {
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.55;
+}
+
+/* Keep the original pixel-art invitation inside the same frame treatment. */
+.studio-flow .home-playground-section h2 {
+  margin-bottom: .35em;
+}
+
+.studio-flow .home-playground-pixel,
+.studio-flow .home-playground-pixel:is(:hover, :focus-visible) {
+  gap: 14px;
+  min-height: 0;
+  padding: clamp(14px, 2.7vw, 32px);
+  border: 1px solid var(--flow-line);
+  border-radius: 8px;
+  background: radial-gradient(ellipse at 12% 100%, #27374f, var(--studio-surface, #171f2b) 70%);
+}
+
+.studio-flow .home-playground-pixel:is(:hover, :focus-visible) {
+  border-color: var(--flow-accent);
+}
+
+.studio-flow .home-playground-pixel-art {
+  height: clamp(136px, 19vw, 240px);
+  background: none;
+}
+
+.studio-flow .home-playground-pixel-art img {
+  max-width: 100%;
+}
+
+.studio-flow .home-playground-pixel-copy strong {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.6vw, 36px);
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 809px) {
+  .studio-flow .education-seal span {
+    letter-spacing: 0;
+  }
+
+  .studio-flow .skills-selector-tab {
+    font-size: clamp(21px, 5.5vw, 32px);
+  }
+}
+
+@media (max-width: 650px) {
+  .studio-flow .home-playground-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
